@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}10th NCJ - Home{% endblock %}
+
+{% block content %}
+<div class="hero">
+    <h1>10th NCJ oraganized by NDCC</h1>
+    <p>Join us for an exciting celebration of talent and creativity</p>
+    <a href="{{ url_for('register') }}" class="btn btn-primary">Register Now</a>
+</div>
+
+<div class="segments">
+    <h2>Available Segments</h2>
+    <div class="segment-grid">
+        {% for segment in segments %}
+        <div class="segment-card">
+            <h3>{{ segment.name }}</h3>
+            <p class="segment-type">{{ segment.type }}</p>
+            <p class="segment-price">Price: ${{ segment.price }}</p>
+            <a href="{{ url_for('register') }}" class="btn btn-secondary">Register for this segment</a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

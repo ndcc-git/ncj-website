@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Registrations{% endblock %}
+
+{% block content %}
+<div class="admin-registrations">
+    <h2>Manage Registrations</h2>
+    
+    <div class="filters">
+        <form method="GET" action="{{ url_for('admin_registrations') }}">
+            <div class="filter-group">
+                <label for="segment">Segment:</label>
+                <select name="segment_id" id="segment">
+                    <option value="">All Segments</option>
+                    {% for segment in segments %}
+                    <option value="{{ segment._id }}" {% if segment_id == segment._id|string %}selected{% endif %}>
+                        {{ segment.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label for="verified">Verified Status:</label>
+                <select name="verified" id="verified">
+                    <option value="">All</option>
+                    <option value="true" {% if verified_filter == 'true' %}selected{% endif %}>Verified</option>
+                    <option value="false" {% if verified_filter == 'false' %}selected{% endif %}>Not Verified</option>
+                </select>
+            </div>
+            
+            <button type="submit" class="btn btn-primary">Filter</button>
+            <button type="button" id="bulk-verify-btn" class="btn btn-success">Bulk Verify Selected</button>
+        </form>
+    </div>
+    
+    <table id="registrations-table">
+        <thead>
+            <tr>
+                <th><input type="checkbox" id="select-all"></th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Segment</th>
+                <th>Category</th>
+                <th>Institution</th>
+                <th>CA Ref</th>
+                <th>Bkash</th>
+                <th>Transaction ID</th>
+                <th>Date</th>
+                <th>Verified</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for reg in registrations %}
+            <tr data-id="{{ reg._id }}">
+                <td><input type="checkbox" class="registration-checkbox"></td>
+                <td>{{ reg.full_name }}</td>
+                <td>{{ reg.email }}</td>
+                <td>{{ reg.segment_name }}</td>
+                <td>{{ reg.category }}</td>
+                <td>{{ reg.institution }}</td>
+                <td>{{ reg.ca_ref }}</td>
+                <td>{{ reg.bkash_number }}</td>
+                <td>{{ reg.transaction_id }}</td>
+                <td>{{ reg.registration_date.strftime('%Y-%m-%d') }}</td>
+                <td>
+                    {% if reg.verified %}
+                        <span class="badge verified">Yes</span>
+                    {% else %}
+                        <span class="badge not-verified">No</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if not reg.verified %}
+                    <button class="btn btn-sm btn-success verify-btn" data-id="{{ reg._id }}">Verify</button>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.getElementById('select-all').addEventListener('change', function() {
+        const checkboxes = document.querySelectorAll('.registration-checkbox');
+        checkboxes.forEach(cb => cb.checked = this.checked);
+    });
+    
+    document.querySelectorAll('.verify-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const regId = this.dataset.id;
+            verifyRegistration(regId);
+        });
+    });
+    
+    document.getElementById('bulk-verify-btn').addEventListener('click', function() {
+        const selectedIds = [];
+        document.querySelectorAll('.registration-checkbox:checked').forEach(cb => {
+            selectedIds.push(cb.closest('tr').dataset.id);
+        });
+        
+        if (selectedIds.length === 0) {
+            alert('Please select at least one registration to verify.');
+            return;
+        }
+        
+        if (confirm(`Are you sure you want to verify ${selectedIds.length} registration(s)?`)) {
+            bulkVerify(selectedIds);
+        }
+    });
+    
+    function verifyRegistration(regId) {
+        const meta = document.querySelector('meta[name="csrf-token"]');
+        const csrfToken = meta.getAttribute("content");
+        fetch(`/admin/verify-registration/${regId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Failed to verify registration');
+            }
+        });
+    }
+    
+    function bulkVerify(registrationIds) {
+        const meta = document.querySelector('meta[name="csrf-token"]');
+        const csrfToken = meta.getAttribute("content");
+        fetch('/admin/bulk-verify', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
+            body: JSON.stringify({ registration_ids: registrationIds })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(`${data.verified_count} registration(s) verified successfully.`);
+                location.reload();
+            } else {
+                alert('Failed to bulk verify: ' + data.message);
+            }
+        });
+    }
+</script>
+{% endblock %}

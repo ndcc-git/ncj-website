@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block title %}Email Management{% endblock %}
+
+{% block content %}
+<div class="admin-email">
+    <h2>Email Management</h2>
+    
+    <form method="POST" action="{{ url_for('admin_email') }}">
+        {{ form.hidden_tag() }}
+        
+        <div class="form-group">
+            {{ form.subject.label }}
+            {{ form.subject(class="form-control") }}
+            {% if form.subject.errors %}
+                <div class="errors">
+                    {% for error in form.subject.errors %}
+                        <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+        
+        <div class="form-group">
+            {{ form.message.label }}
+            {{ form.message(class="form-control") }}
+            {% if form.message.errors %}
+                <div class="errors">
+                    {% for error in form.message.errors %}
+                        <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+        
+        <div class="form-group">
+            {{ form.segment.label }}
+            {{ form.segment(class="form-control") }}
+            {% if form.segment.errors %}
+                <div class="errors">
+                    {% for error in form.segment.errors %}
+                        <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+        
+        <div class="form-group">
+            {{ form.category.label }}
+            {{ form.category(class="form-control") }}
+            {% if form.category.errors %}
+                <div class="errors">
+                    {% for error in form.category.errors %}
+                        <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+        
+        <div class="form-group">
+            {{ form.verified_only() }} {{ form.verified_only.label }}
+        </div>
+        
+        <div class="form-group">
+            {{ form.submit(class="btn btn-primary") }}
+        </div>
+    </form>
+</div>
+{% endblock %}

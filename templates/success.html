@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}Registration Successful{% endblock %}
+
+{% block content %}
+<div class="success-message">
+    <h2>Registration Successful!</h2>
+    <div class="success-details">
+        <p>Thank you for registering, <strong>{{ registration.full_name }}</strong>!</p>
+        <p>Your registration ID is: <code>{{ registration._id }}</code></p>
+        
+        <div class="registration-summary">
+            <h3>Registration Details:</h3>
+            <ul>
+                <li><strong>Email:</strong> {{ registration.email }}</li>
+                <li><strong>Segment:</strong> {{ registration.segment_name }}</li>
+                <li><strong>Category:</strong> {{ registration.category }}</li>
+                <li><strong>Institution:</strong> {{ registration.institution }}</li>
+                {% if registration.ca_ref != "" %}
+                <li><strong>CA Reference:</strong> {{ registration.ca_ref }}</li>
+                {% endif %}
+                <li><strong>Transaction ID:</strong> {{ registration.transaction_id }}</li>
+            </ul>
+        </div>
+        
+        <p>Your registration is pending verification. You will receive an email once it's verified.</p>
+        
+        <a href="{{ url_for('index') }}" class="btn btn-primary">Return to Home</a>
+        <a href="{{ url_for('register') }}" class="btn btn-secondary">Register for Another Segment</a>
+    </div>
+</div>
+{% endblock %}

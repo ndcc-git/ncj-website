@@ -205,6 +205,18 @@ def get_segment_categories(segment_id):
         return jsonify({'categories': []})
     except:
         return jsonify({'categories': []})
+    
+@app.route('/api/segments/<segment_id>/type')
+def get_segment_type(segment_id):
+    """API endpoint to get categories for a segment"""
+    try:
+        segment = segments_collection.find_one({'_id': ObjectId(segment_id)})
+        if segment:
+            return jsonify({'type': segment.get('type', '')})
+        return jsonify({'type': ''})
+    except:
+        return jsonify({'type': ''})
+
 
 # ========== ADMIN ROUTES ==========
 

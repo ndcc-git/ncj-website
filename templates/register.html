@@ -125,6 +125,11 @@
 
 {% block scripts %}
 <script>
+
+
+
+
+
     document.getElementById('segment-select').addEventListener('change', function() {
         const segmentId = this.value;
         if (segmentId) {
@@ -151,6 +156,18 @@
                         `;
                         categoryDiv.appendChild(div);
                     });
+                });
+            fetch(`/api/segments/${segmentId}/type`)
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data.type);
+                    if (data.type == "Team") {
+                        const nameLabel = document.querySelector("body > div > div > form > div:nth-child(4) > label");
+                        nameLabel.innerHTML = "Team Name"
+                    } else {
+                        const nameLabel = document.querySelector("body > div > div > form > div:nth-child(4) > label");
+                        nameLabel.innerHTML = "Full Name"
+                    }
                 });
         }
     });

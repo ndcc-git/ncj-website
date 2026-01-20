@@ -1,6 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SelectField, RadioField, BooleanField, TextAreaField, HiddenField, SubmitField
 from wtforms.validators import DataRequired, Email, Length, Regexp, Optional
+from flask_wtf.file import FileField, FileAllowed
 from wtforms.widgets import TextArea
 
 class RegistrationForm(FlaskForm):
@@ -48,6 +49,46 @@ class RegistrationForm(FlaskForm):
     # Hidden fields for bot prevention
     honeypot = StringField('Honeypot', validators=[Optional()])
     timestamp = HiddenField()
+
+class CARegistrationForm(FlaskForm):
+    """CA Registration Form"""
+    full_name = StringField('Full Name', validators=[
+        DataRequired(),
+        Length(min=2, max=100)
+    ])
+    
+    institution = StringField('Institution/University', validators=[
+        DataRequired(),
+        Length(min=2, max=200)
+    ])
+    
+    class_info = StringField('Class/Year', validators=[
+        DataRequired(),
+        Length(min=1, max=50)
+    ])
+    
+    phone = StringField('Phone Number', validators=[
+        DataRequired(),
+        Regexp(r'^01[3-9]\d{8}$', message='Enter a valid Bangladesh mobile number')
+    ])
+    
+    email = StringField('Email', validators=[
+        DataRequired(),
+        Email(),
+        Length(max=100)
+    ])
+    
+    why_ca = TextAreaField('Why do you want to be a CA?', validators=[
+        DataRequired(),
+        Length(min=20, max=1000)
+    ], widget=TextArea(), render_kw={"rows": 6})
+    
+    profile_picture = FileField('Profile Picture (Optional)', validators=[
+        FileAllowed(['jpg', 'jpeg', 'png'], 'Images only! (jpg, jpeg, png)')
+    ])
+    
+    submit = SubmitField('Apply as CA')
+
 
 class AdminLoginForm(FlaskForm):
     """Admin login form"""

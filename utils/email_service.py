@@ -89,3 +89,49 @@ def send_email_async(app, to_email, subject, body):
     """Send email asynchronously"""
     with app.app_context():
         send_email(to_email, subject, body)
+
+
+def send_ca_approval_email(ca_registration):
+    """Send approval email to CA"""
+    subject = f"Congratulations! Your CA Application is Approved - Code: {ca_registration['ca_code']}"
+    body = f"""
+    Dear {ca_registration['full_name']},
+    
+    We are pleased to inform you that your Campus Ambassador (CA) application has been approved!
+    
+    Your CA Code: {ca_registration['ca_code']}
+    
+    As a Campus Ambassador, you will receive:
+    1. Special recognition at the festival
+    2. Certificate of appreciation
+    3. Opportunity to win exciting prizes
+    4. Networking opportunities
+    
+    Please keep your CA code confidential and use it when referring participants.
+    
+    Best regards,
+    Festival Organizing Committee
+    """
+    
+    return send_email(ca_registration['email'], subject, body)
+
+def send_ca_registration_email(ca_registration):
+    """Send confirmation email after CA registration"""
+    subject = f"CA Application Received - {ca_registration['ca_code']}"
+    body = f"""
+    Dear {ca_registration['full_name']},
+    
+    Thank you for applying to be a Campus Ambassador for Festival 2024!
+    
+    Your application has been received and is under review.
+    
+    Your CA Code: {ca_registration['ca_code']}
+    Application ID: {ca_registration['_id']}
+    
+    We will notify you once your application is reviewed. This usually takes 3-5 business days.
+    
+    Best regards,
+    Festival Organizing Committee
+    """
+    
+    return send_email(ca_registration['email'], subject, body)

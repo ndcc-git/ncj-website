@@ -14,6 +14,9 @@
             <div class="nav-links">
                 <a href="{{ url_for('index') }}">Home</a>
                 <a href="{{ url_for('register') }}">Register</a>
+                <!-- Add to navigation links -->
+                <a href="{{ url_for('ca_register') }}">Become a CA</a>
+                <a href="{{ url_for('admin_ca_registrations') }}">CA Management</a>
                 {% if session.get('admin_token') %}
                     <a href="{{ url_for('admin_dashboard') }}">Dashboard</a>
                     <a href="{{ url_for('admin_logout') }}">Logout</a>

@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block title %}CA Application Successful{% endblock %}
+
+{% block content %}
+<div class="ca-success">
+    <div class="success-header">
+        <h2>Campus Ambassador Application Successful!</h2>
+        <div class="confetti">🎉</div>
+    </div>
+    
+    <div class="ca-details-card">
+        <div class="ca-code-display">
+            <h3>Your Unique CA Code</h3>
+            <div class="ca-code">{{ ca_registration.ca_code }}</div>
+            <p class="code-note">Keep this code confidential. Use it when referring participants.</p>
+        </div>
+        
+        <div class="application-summary">
+            <h3>Application Details</h3>
+            <div class="details-grid">
+                <div class="detail-item">
+                    <span class="detail-label">Name:</span>
+                    <span class="detail-value">{{ ca_registration.full_name }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">CA Code:</span>
+                    <span class="detail-value">{{ ca_registration.ca_code }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Email:</span>
+                    <span class="detail-value">{{ ca_registration.email }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Phone:</span>
+                    <span class="detail-value">{{ ca_registration.phone }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Institution:</span>
+                    <span class="detail-value">{{ ca_registration.institution }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Class/Year:</span>
+                    <span class="detail-value">{{ ca_registration.class }}</span>
+                </div>
+                <div class="detail-item full-width">
+                    <span class="detail-label">Application Status:</span>
+                    <span class="detail-value status-{{ ca_registration.status }}">
+                        {{ ca_registration.status|title }}
+                    </span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="next-steps">
+            <h3>What's Next?</h3>
+            <ol>
+                <li>Your application is now <strong>{{ ca_registration.status }}</strong></li>
+                <li>You will receive an email confirmation shortly</li>
+                <li>The organizing committee will review your application within 3-5 business days</li>
+                <li>If approved, you'll receive:
+                    <ul>
+                        <li>CA Welcome Kit</li>
+                        <li>Detailed guidelines</li>
+                        <li>Access to CA portal</li>
+                    </ul>
+                </li>
+            </ol>
+        </div>
+        
+        <div class="ca-actions">
+            <a href="{{ url_for('index') }}" class="btn btn-primary">Back to Home</a>
+            <a href="{{ url_for('ca_register') }}" class="btn btn-secondary">Apply Again (for friend)</a>
+            <button onclick="copyCACode()" class="btn btn-success">Copy CA Code</button>
+        </div>
+    </div>
+    
+    <div class="ca-instructions">
+        <h3>How to Use Your CA Code?</h3>
+        <div class="instructions-grid">
+            <div class="instruction">
+                <div class="instruction-icon">1️⃣</div>
+                <h4>Share Your Code</h4>
+                <p>Give your CA code to participants when they register</p>
+            </div>
+            <div class="instruction">
+                <div class="instruction-icon">2️⃣</div>
+                <h4>Track Registrations</h4>
+                <p>Each registration with your code will be tracked to your account</p>
+            </div>
+            <div class="instruction">
+                <div class="instruction-icon">3️⃣</div>
+                <h4>Earn Rewards</h4>
+                <p>Get rewards based on the number of successful registrations</p>
+            </div>
+            <div class="instruction">
+                <div class="instruction-icon">4️⃣</div>
+                <h4>Receive Certificate</h4>
+                <p>Get a certificate of appreciation for your efforts</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function copyCACode() {
+        const caCode = '{{ ca_registration.ca_code }}';
+        navigator.clipboard.writeText(caCode)
+            .then(() => {
+                alert(`CA Code "${caCode}" copied to clipboard!`);
+            })
+            .catch(err => {
+                console.error('Failed to copy: ', err);
+            });
+    }
+    
+    // Save CA code to localStorage for future reference
+    localStorage.setItem('last_ca_code', '{{ ca_registration.ca_code }}');
+</script>
+{% endblock %}

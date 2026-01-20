@@ -1,0 +1,191 @@
+{% extends "base.html" %}
+
+{% block title %}CA Registrations Management{% endblock %}
+
+{% block content %}
+<div class="admin-ca-registrations">
+    <h2>Campus Ambassador Registrations</h2>
+    
+    <div class="filters">
+        <form method="GET" action="{{ url_for('admin_ca_registrations') }}">
+            <div class="filter-group">
+                <label for="status">Status:</label>
+                <select name="status" id="status">
+                    <option value="all" {% if status_filter == 'all' %}selected{% endif %}>All</option>
+                    <option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>Pending</option>
+                    <option value="approved" {% if status_filter == 'approved' %}selected{% endif %}>Approved</option>
+                    <option value="rejected" {% if status_filter == 'rejected' %}selected{% endif %}>Rejected</option>
+                </select>
+            </div>
+            
+            <button type="submit" class="btn btn-primary">Filter</button>
+        </form>
+    </div>
+    
+    <table id="ca-registrations-table">
+        <thead>
+            <tr>
+                <th>CA Code</th>
+                <th>Name</th>
+                <th>Institution</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Class</th>
+                <th>Registration Date</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ca in ca_registrations %}
+            <tr data-id="{{ ca._id }}">
+                <td><strong>{{ ca.ca_code }}</strong></td>
+                <td>{{ ca.full_name }}</td>
+                <td>{{ ca.institution }}</td>
+                <td>{{ ca.email }}</td>
+                <td>{{ ca.phone }}</td>
+                <td>{{ ca.class }}</td>
+                <td>{{ ca.registration_date.strftime('%Y-%m-%d') }}</td>
+                <td>
+                    <span class="status-badge status-{{ ca.status }}">
+                        {{ ca.status|title }}
+                    </span>
+                </td>
+                <td>
+                    <div class="action-buttons">
+                        <button class="btn btn-sm btn-info view-btn" data-id="{{ ca._id }}">View</button>
+                        {% if ca.status == 'pending' %}
+                        <button class="btn btn-sm btn-success approve-btn" data-id="{{ ca._id }}">Approve</button>
+                        <button class="btn btn-sm btn-danger reject-btn" data-id="{{ ca._id }}">Reject</button>
+                        {% endif %}
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Modal for viewing CA details -->
+<div id="caDetailsModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <div id="caDetailsContent">
+            <!-- Details will be loaded here -->
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Status update functions
+    document.querySelectorAll('.approve-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            updateCAStatus(this.dataset.id, 'approved');
+        });
+    });
+    
+    document.querySelectorAll('.reject-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            updateCAStatus(this.dataset.id, 'rejected');
+        });
+    });
+    
+    function updateCAStatus(caId, status) {
+        const meta = document.querySelector('meta[name="csrf-token"]');
+        const csrfToken = meta.getAttribute("content");
+        if (confirm(`Are you sure you want to ${status} this CA application?`)) {
+            fetch(`/admin/update-ca-status/${caId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                },
+                body: JSON.stringify({ status: status })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Failed to update status: ' + data.message);
+                }
+            });
+        }
+    }
+    
+    // View CA details
+    document.querySelectorAll('.view-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const caId = this.dataset.id;
+            fetch(`/api/ca-details/${caId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showCADetails(data.ca);
+                    }
+                });
+        });
+    });
+    
+    function showCADetails(ca) {
+        const modal = document.getElementById('caDetailsModal');
+        const content = document.getElementById('caDetailsContent');
+        
+        content.innerHTML = `
+            <h3>CA Application Details</h3>
+            <div class="ca-details">
+                <div class="detail-row">
+                    <strong>CA Code:</strong> ${ca.ca_code}
+                </div>
+                <div class="detail-row">
+                    <strong>Full Name:</strong> ${ca.full_name}
+                </div>
+                <div class="detail-row">
+                    <strong>Institution:</strong> ${ca.institution}
+                </div>
+                <div class="detail-row">
+                    <strong>Class/Year:</strong> ${ca.class}
+                </div>
+                <div class="detail-row">
+                    <strong>Email:</strong> ${ca.email}
+                </div>
+                <div class="detail-row">
+                    <strong>Phone:</strong> ${ca.phone}
+                </div>
+                <div class="detail-row">
+                    <strong>Status:</strong> <span class="status-badge status-${ca.status}">${ca.status}</span>
+                </div>
+                <div class="detail-row">
+                    <strong>Why CA:</strong>
+                    <p>${ca.why_ca}</p>
+                </div>
+                ${ca.profile_picture ? `
+                <div class="detail-row">
+                    <strong>Profile Picture:</strong><br>
+                    <img src="/static/uploads/ca_profiles/${ca.profile_picture}" style="max-width: 200px; margin-top: 10px;">
+                </div>
+                ` : ''}
+                <div class="detail-row">
+                    <strong>Registration Date:</strong> ${new Date(ca.registration_date).toLocaleString()}
+                </div>
+            </div>
+        `;
+        
+        modal.style.display = 'block';
+    }
+    
+    // Modal close functionality
+    document.querySelector('.close').addEventListener('click', function() {
+        document.getElementById('caDetailsModal').style.display = 'none';
+    });
+    
+    window.addEventListener('click', function(event) {
+        const modal = document.getElementById('caDetailsModal');
+        if (event.target == modal) {
+            modal.style.display = 'none';
+        }
+    });
+</script>
+{% endblock %}

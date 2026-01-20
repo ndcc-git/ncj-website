@@ -1,3 +1,6 @@
+import os
+import random
+import string
 from flask import Flask, render_template, request, jsonify, redirect, url_for, flash, session
 from flask_wtf.csrf import CSRFProtect
 from pymongo import MongoClient
@@ -7,11 +10,11 @@ from functools import wraps
 from bson.objectid import ObjectId
 import pandas as pd
 from io import BytesIO
-
+from werkzeug.utils import secure_filename
 from config import Config
-from forms import RegistrationForm, AdminLoginForm, EmailForm
+from forms import RegistrationForm, AdminLoginForm, EmailForm, CARegistrationForm
 from utils.security import hash_password, verify_password, generate_csrf_token, verify_csrf_token
-from utils.email_service import send_verification_email, send_bulk_emails
+from utils.email_service import send_verification_email, send_bulk_emails, send_ca_approval_email
 from utils.export_service import export_to_excel, export_to_csv
 
 app = Flask(__name__)
@@ -28,6 +31,37 @@ db = client.festival_db
 users_collection = db.users
 registrations_collection = db.registrations
 segments_collection = db.segments
+ca_collection = db.ca
+
+def generate_ca_code(full_name):
+    """Generate unique 4-letter CA code from name"""
+    # Get initials from name
+    initials = ''.join([word[0].upper() for word in full_name.split() if word])
+    
+    # If initials are less than 4 letters, add random letters
+    if len(initials) >= 4:
+        code = initials[:4]
+    else:
+        # Add random letters to make 4 characters
+        random_chars = ''.join(random.choices(string.ascii_uppercase, k=4-len(initials)))
+        code = initials + random_chars
+    
+    # Check if code already exists, if yes, add number
+    existing_ca = db.ca_registrations.find_one({'ca_code': code})
+    counter = 1
+    original_code = code
+    
+    while existing_ca:
+        if counter < 10:
+            code = f"{original_code[:3]}{counter}"
+        else:
+            code = f"{original_code[:2]}{counter:02d}"
+        existing_ca = db.ca_registrations.find_one({'ca_code': code})
+        counter += 1
+    
+    return code
+
+
 
 def init_db():
     """Initialize database with sample data if empty"""
@@ -79,6 +113,9 @@ def init_db():
         }
         users_collection.insert_one(admin_user)
 
+    db.ca_registrations.create_index([('email', 1)], unique=False)
+    db.ca_registrations.create_index([('ca_code', 1)], unique=True)
+
 def admin_required(f):
     """Decorator to require admin authentication"""
     @wraps(f)
@@ -108,6 +145,84 @@ def index():
     """Home page"""
     segments = list(segments_collection.find({}, {'_id': 1, 'name': 1, 'price': 1, 'type': 1}))
     return render_template('index.html', segments=segments)
+
+@app.route('/ca-register', methods=['GET', 'POST'])
+def ca_register():
+    """CA Registration page"""
+    form = CARegistrationForm()
+    
+    if form.validate_on_submit():
+        # Check if email already registered as CA
+        existing_ca = db.ca_registrations.find_one({'email': form.email.data})
+        if existing_ca:
+            flash('This email is already registered as a CA', 'error')
+            return redirect(url_for('ca_register'))
+        
+        # Generate CA code
+        ca_code = generate_ca_code(form.full_name.data)
+        
+        # Handle profile picture upload
+        profile_pic_filename = None
+        if form.profile_picture.data:
+            file = form.profile_picture.data
+            filename = secure_filename(file.filename)
+            # Create unique filename with CA code
+            file_ext = os.path.splitext(filename)[1]
+            profile_pic_filename = f"ca_{ca_code}_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}{file_ext}"
+            
+            # Save file (in production, use cloud storage)
+            upload_folder = os.path.join(app.root_path, 'static', 'uploads', 'ca_profiles')
+            os.makedirs(upload_folder, exist_ok=True)
+            file_path = os.path.join(upload_folder, profile_pic_filename)
+            file.save(file_path)
+        
+        # Create CA registration
+        ca_data = {
+            'full_name': form.full_name.data,
+            'institution': form.institution.data,
+            'class': form.class_info.data,
+            'phone': form.phone.data,
+            'email': form.email.data,
+            'why_ca': form.why_ca.data,
+            'profile_picture': profile_pic_filename,
+            'ca_code': ca_code,
+            'status': 'pending',  # pending, approved, rejected
+            'registration_date': datetime.utcnow(),
+            'ip_address': request.remote_addr,
+            'user_agent': request.user_agent.string
+        }
+        
+        # Insert into database
+        result = db.ca_registrations.insert_one(ca_data)
+        
+        # Store in session for auto-fill
+        session['last_ca_registration'] = {
+            'full_name': form.full_name.data,
+            'email': form.email.data,
+            'phone': form.phone.data,
+            'institution': form.institution.data
+        }
+        
+        return redirect(url_for('ca_registration_success', ca_id=str(result.inserted_id)))
+    
+    # Pre-fill form with session data if available
+    if 'last_ca_registration' in session:
+        form.full_name.data = session['last_ca_registration']['full_name']
+        form.email.data = session['last_ca_registration']['email']
+        form.phone.data = session['last_ca_registration']['phone']
+        form.institution.data = session['last_ca_registration']['institution']
+    
+    return render_template('ca_register.html', form=form)
+
+@app.route('/ca-registration-success/<ca_id>')
+def ca_registration_success(ca_id):
+    """CA Registration success page"""
+    ca_registration = db.ca_registrations.find_one({'_id': ObjectId(ca_id)})
+    if not ca_registration:
+        flash('CA registration not found', 'error')
+        return redirect(url_for('index'))
+    
+    return render_template('ca_success.html', ca_registration=ca_registration)
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -219,6 +334,67 @@ def get_segment_type(segment_id):
 
 
 # ========== ADMIN ROUTES ==========
+
+# Add CA management to admin dashboard
+@app.route('/admin/ca-registrations')
+@admin_required
+def admin_ca_registrations():
+    """View and manage CA registrations"""
+    status_filter = request.args.get('status', 'all')
+    
+    query = {}
+    if status_filter != 'all':
+        query['status'] = status_filter
+    
+    ca_registrations = list(db.ca_registrations.find(query).sort('registration_date', -1))
+    
+    return render_template('admin/ca_registrations.html',
+                         ca_registrations=ca_registrations,
+                         status_filter=status_filter)
+
+@app.route('/admin/update-ca-status/<ca_id>', methods=['POST'])
+@admin_required
+def update_ca_status(ca_id):
+    """Update CA status (approve/reject)"""
+    status = request.json.get('status')
+    
+    if status not in ['approved', 'rejected', 'pending']:
+        return jsonify({'success': False, 'message': 'Invalid status'}), 400
+    
+    try:
+        result = db.ca_registrations.update_one(
+            {'_id': ObjectId(ca_id)},
+            {'$set': {'status': status, 'status_updated_at': datetime.utcnow()}}
+        )
+        
+        if status == 'approved':
+            # Send approval email
+            ca = db.ca_registrations.find_one({'_id': ObjectId(ca_id)})
+            if ca:
+                send_ca_approval_email(ca)
+        
+        return jsonify({'success': True})
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+
+@app.route('/api/ca-details/<ca_id>')
+@admin_required
+def api_ca_details(ca_id):
+    """API endpoint to get CA details"""
+    try:
+        ca = db.ca_registrations.find_one({'_id': ObjectId(ca_id)})
+        if ca:
+            # Convert ObjectId to string for JSON serialization
+            ca['_id'] = str(ca['_id'])
+            return jsonify({'success': True, 'ca': ca})
+        return jsonify({'success': False, 'message': 'CA not found'}), 404
+    except:
+        return jsonify({'success': False, 'message': 'Invalid CA ID'}), 400
+
+
+
+
 
 @app.route('/admin/login', methods=['GET', 'POST'])
 def admin_login():

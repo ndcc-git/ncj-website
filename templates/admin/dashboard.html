@@ -26,6 +26,12 @@
             <h3>Pending Verification</h3>
             <p class="stat-number">{{ total_registrations - verified_registrations }}</p>
         </div>
+
+        <div class="stat-card">
+            <h3>Contact Messages</h3>
+            <p class="stat-number">{{ contact_messages_count }}</p>
+            <small>{{ unread_contact_messages }} unread</small>
+        </div>
     </div>
     
     <div class="admin-links">
@@ -37,6 +43,11 @@
         <a href="{{ url_for('admin_analytics') }}" class="admin-link">
             <h3>Analytics</h3>
             <p>View registration statistics</p>
+        </a>
+
+        <a href="{{ url_for('admin_contact_messages') }}" class="admin-link">
+            <h3>Contact Messages</h3>
+            <p>View and manage contact inquiries</p>
         </a>
         
         <!-- <a href="{{ url_for('admin_email') }}" class="admin-link">

@@ -4,7 +4,7 @@ import string
 from flask import Flask, render_template, request, jsonify, redirect, url_for, flash, session
 from flask_wtf.csrf import CSRFProtect
 from pymongo import MongoClient
-from datetime import datetime
+from datetime import datetime, timedelta
 import jwt
 from functools import wraps
 from bson.objectid import ObjectId
@@ -12,7 +12,7 @@ import pandas as pd
 from io import BytesIO
 from werkzeug.utils import secure_filename
 from config import Config
-from forms import RegistrationForm, AdminLoginForm, EmailForm, CARegistrationForm
+from forms import RegistrationForm, AdminLoginForm, EmailForm, CARegistrationForm, ContactForm
 from utils.security import hash_password, verify_password, generate_csrf_token, verify_csrf_token
 from utils.email_service import send_verification_email, send_bulk_emails, send_ca_approval_email
 from utils.export_service import export_to_excel, export_to_csv
@@ -310,6 +310,65 @@ def registration_success(registration_id):
     
     return render_template('success.html', registration=registration)
 
+
+@app.route('/contact', methods=['GET', 'POST'])
+def contact():
+    """Contact form page"""
+    form = ContactForm()
+    
+    if form.validate_on_submit():
+        # Check for spam/duplicate submissions
+        recent_submission = db.contact_messages.find_one({
+            'email': form.email.data,
+            'submitted_at': {'$gte': datetime.utcnow() - timedelta(hours=1)}
+        })
+        
+        if recent_submission:
+            flash('You have already submitted a message recently. Please wait before submitting again.', 'warning')
+            return redirect(url_for('contact'))
+        
+        # Create contact message
+        contact_data = {
+            'name': form.name.data,
+            'institution': form.institution.data,
+            'email': form.email.data,
+            'message': form.message.data,
+            'submitted_at': datetime.utcnow(),
+            'ip_address': request.remote_addr,
+            'user_agent': request.user_agent.string,
+            'status': 'unread',  # unread, read, replied
+            'archived': False
+        }
+        
+        # Insert into database
+        db.contact_messages.insert_one(contact_data)
+        
+        flash('Your message has been sent successfully! We will get back to you soon.', 'success')
+        
+        # Store in session for auto-fill
+        session['last_contact'] = {
+            'name': form.name.data,
+            'email': form.email.data,
+            'institution': form.institution.data
+        }
+        
+        return redirect(url_for('contact_success'))
+    
+    # Pre-fill form with session data if available
+    if 'last_contact' in session:
+        form.name.data = session['last_contact']['name']
+        form.email.data = session['last_contact']['email']
+        form.institution.data = session['last_contact']['institution']
+    
+    return render_template('contact.html', form=form)
+
+@app.route('/contact-success')
+def contact_success():
+    """Contact form success page"""
+    return render_template('contact_success.html')
+
+
+
 @app.route('/api/segments/<segment_id>/categories')
 def get_segment_categories(segment_id):
     """API endpoint to get categories for a segment"""
@@ -393,6 +452,45 @@ def api_ca_details(ca_id):
         return jsonify({'success': False, 'message': 'Invalid CA ID'}), 400
 
 
+@app.route('/api/message-details/<message_id>')
+@admin_required
+def api_message_details(message_id):
+    """API endpoint to get message details"""
+    try:
+        message = db.contact_messages.find_one({'_id': ObjectId(message_id)})
+        if message:
+            # Convert ObjectId to string for JSON serialization
+            message['_id'] = str(message['_id'])
+            # Convert datetime to string
+            if 'submitted_at' in message and isinstance(message['submitted_at'], datetime):
+                message['submitted_at'] = message['submitted_at'].isoformat()
+            return jsonify({'success': True, 'message': message})
+        return jsonify({'success': False, 'message': 'Message not found'}), 404
+    except:
+        return jsonify({'success': False, 'message': 'Invalid message ID'}), 400
+
+# Add bulk update endpoint
+@app.route('/admin/update-message-status/bulk', methods=['POST'])
+@admin_required
+def bulk_update_message_status():
+    """Bulk update message status"""
+    status = request.json.get('status')
+    message_ids = request.json.get('message_ids', [])
+    
+    if not message_ids or status not in ['unread', 'read', 'replied']:
+        return jsonify({'success': False, 'message': 'Invalid request'}), 400
+    
+    try:
+        object_ids = [ObjectId(msg_id) for msg_id in message_ids]
+        
+        result = db.contact_messages.update_many(
+            {'_id': {'$in': object_ids}},
+            {'$set': {'status': status}}
+        )
+        
+        return jsonify({'success': True, 'modified': result.modified_count})
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
 
 
 
@@ -440,8 +538,19 @@ def admin_dashboard():
     verified_registrations = registrations_collection.count_documents({'verified': True})
     total_segments = segments_collection.count_documents({})
     
+    # Get contact message statistics
+    contact_messages_count = db.contact_messages.count_documents({'archived': False})
+    unread_contact_messages = db.contact_messages.count_documents({
+        'status': 'unread',
+        'archived': False
+    })
+    
     # Get recent registrations
     recent_registrations = list(registrations_collection.find().sort('registration_date', -1).limit(10))
+    
+    # Get recent contact messages
+    recent_messages = list(db.contact_messages.find({'archived': False})
+                          .sort('submitted_at', -1).limit(5))
     
     # Get segment statistics
     segments = list(segments_collection.find({}))
@@ -450,7 +559,10 @@ def admin_dashboard():
                          total_registrations=total_registrations,
                          verified_registrations=verified_registrations,
                          total_segments=total_segments,
+                         contact_messages_count=contact_messages_count,
+                         unread_contact_messages=unread_contact_messages,
                          recent_registrations=recent_registrations,
+                         recent_messages=recent_messages,
                          segments=segments)
 
 @app.route('/admin/registrations')
@@ -523,6 +635,86 @@ def bulk_verify():
         return jsonify({'success': True, 'verified_count': result.modified_count})
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)}), 500
+
+
+@app.route('/admin/contact-messages')
+@admin_required
+def admin_contact_messages():
+    """View and manage contact messages"""
+    status_filter = request.args.get('status', 'all')
+    archived_filter = request.args.get('archived', 'false') == 'true'
+    
+    query = {'archived': archived_filter}
+    
+    if status_filter != 'all':
+        query['status'] = status_filter
+    
+    # Get messages sorted by newest first
+    contact_messages = list(db.contact_messages.find(query).sort('submitted_at', -1))
+    
+    # Get statistics
+    unread_count = db.contact_messages.count_documents({'status': 'unread', 'archived': False})
+    total_messages = db.contact_messages.count_documents({'archived': False})
+    
+    return render_template('admin/contact_messages.html',
+                         contact_messages=contact_messages,
+                         status_filter=status_filter,
+                         archived_filter=archived_filter,
+                         unread_count=unread_count,
+                         total_messages=total_messages)
+
+@app.route('/admin/update-message-status/<message_id>', methods=['POST'])
+@admin_required
+def update_message_status(message_id):
+    """Update contact message status"""
+    status = request.json.get('status')
+    archived = request.json.get('archived')
+    
+    if status not in ['unread', 'read', 'replied', None]:
+        return jsonify({'success': False, 'message': 'Invalid status'}), 400
+    
+    update_data = {}
+    if status is not None:
+        update_data['status'] = status
+    
+    if archived is not None:
+        update_data['archived'] = archived
+    
+    try:
+        result = db.contact_messages.update_one(
+            {'_id': ObjectId(message_id)},
+            {'$set': update_data}
+        )
+        
+        return jsonify({'success': True, 'modified': result.modified_count})
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+@app.route('/admin/delete-message/<message_id>', methods=['DELETE'])
+@admin_required
+def delete_message(message_id):
+    """Delete a contact message"""
+    try:
+        result = db.contact_messages.delete_one({'_id': ObjectId(message_id)})
+        
+        if result.deleted_count > 0:
+            return jsonify({'success': True})
+        else:
+            return jsonify({'success': False, 'message': 'Message not found'}), 404
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+# Add to init_db function
+def init_db():
+    """Initialize database with sample data if empty"""
+    # ... existing init_db code ...
+    
+    # Ensure contact messages collection has indexes
+    db.contact_messages.create_index([('email', 1)])
+    db.contact_messages.create_index([('submitted_at', -1)])
+    db.contact_messages.create_index([('status', 1)])
+    db.contact_messages.create_index([('archived', 1)])
+
 
 @app.route('/admin/analytics')
 @admin_required

@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}Message Sent Successfully{% endblock %}
+
+{% block content %}
+<div class="contact-success">
+    <div class="success-icon">
+        <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+            <circle cx="40" cy="40" r="38" stroke="#27ae60" stroke-width="4"/>
+            <path d="M25 40L35 50L55 30" stroke="#27ae60" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+    </div>
+    
+    <h2>Message Sent Successfully!</h2>
+    
+    <div class="success-message">
+        <p>Thank you for contacting us. Your message has been received and will be reviewed by our team.</p>
+        
+        <div class="whats-next">
+            <h3>What happens next?</h3>
+            <ul>
+                <li>We'll review your message within 24 hours</li>
+                <li>You'll receive a response at the email you provided</li>
+                <li>For urgent matters, please allow 1-2 business days</li>
+                <li>Check your spam folder if you don't see our response</li>
+            </ul>
+        </div>
+        
+        <div class="contact-actions">
+            <a href="{{ url_for('index') }}" class="btn btn-primary">Back to Home</a>
+            <a href="{{ url_for('contact') }}" class="btn btn-secondary">Send Another Message</a>
+        </div>
+        
+        <div class="quick-help">
+            <h4>Need Immediate Assistance?</h4>
+            <p>For urgent matters, you can also:</p>
+            <ul>
+                <li>Call our helpline: +880 XXXX-XXXXXX</li>
+                <li>Visit our office during business hours</li>
+                <li>Check our <a href="#">Frequently Asked Questions</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

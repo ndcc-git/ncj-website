@@ -126,3 +126,29 @@ class EmailForm(FlaskForm):
     verified_only = BooleanField('Send to verified registrations only')
     
     submit = SubmitField('Send Email')
+
+
+class ContactForm(FlaskForm):
+    """Contact form for inquiries"""
+    name = StringField('Your Name', validators=[
+        DataRequired(),
+        Length(min=2, max=100)
+    ])
+    
+    institution = StringField('Institution/Organization', validators=[
+        DataRequired(),
+        Length(min=2, max=200)
+    ])
+    
+    email = StringField('Email', validators=[
+        DataRequired(),
+        Email(),
+        Length(max=100)
+    ])
+    
+    message = TextAreaField('Message', validators=[
+        DataRequired(),
+        Length(min=10, max=2000)
+    ], widget=TextArea(), render_kw={"rows": 6})
+    
+    submit = SubmitField('Send Message')

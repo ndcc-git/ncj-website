@@ -685,3 +685,248 @@ footer {
         letter-spacing: 3px;
     }
 }
+
+
+
+
+
+
+
+/* Contact Page Styles */
+.contact-page {
+    max-width: 1200px;
+    margin: 2rem auto;
+}
+
+.contact-header {
+    text-align: center;
+    margin-bottom: 2rem;
+    padding: 2rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 10px;
+}
+
+.contact-container {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.contact-form-container {
+    background: white;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.contact-info {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.info-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.info-card h3 {
+    color: #2c3e50;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.info-icon {
+    font-size: 1.2rem;
+}
+
+.quick-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.quick-links li {
+    margin-bottom: 0.5rem;
+}
+
+.quick-links a {
+    color: #3498db;
+    text-decoration: none;
+}
+
+.quick-links a:hover {
+    text-decoration: underline;
+}
+
+/* Contact Success Page */
+.contact-success {
+    max-width: 600px;
+    margin: 3rem auto;
+    text-align: center;
+}
+
+.success-icon {
+    margin-bottom: 2rem;
+}
+
+.success-icon svg {
+    animation: checkmark 0.5s ease-in-out;
+}
+
+@keyframes checkmark {
+    0% { transform: scale(0); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+.whats-next {
+    text-align: left;
+    margin: 2rem 0;
+    padding: 1.5rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.whats-next ul {
+    margin-left: 1.5rem;
+    margin-top: 0.5rem;
+}
+
+.contact-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin: 2rem 0;
+}
+
+.quick-help {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background: #e8f4fc;
+    border-radius: 8px;
+    text-align: left;
+}
+
+.quick-help ul {
+    margin-left: 1.5rem;
+    margin-top: 0.5rem;
+}
+
+/* Admin Contact Messages */
+.message-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.message-row.unread {
+    background-color: #f0f8ff;
+    font-weight: bold;
+}
+
+.message-preview {
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.message-actions {
+    display: flex;
+    gap: 0.25rem;
+    flex-wrap: wrap;
+}
+
+.badge-archived {
+    background-color: #6c757d;
+    color: white;
+    padding: 0.2rem 0.5rem;
+    border-radius: 3px;
+    font-size: 0.7rem;
+    margin-top: 0.25rem;
+    display: inline-block;
+}
+
+.no-messages {
+    text-align: center;
+    padding: 3rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+    margin: 2rem 0;
+}
+
+/* Message Details Modal */
+.message-details {
+    margin: 1rem 0;
+}
+
+.message-details .detail-row {
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #eee;
+}
+
+.message-details .detail-row:last-child {
+    border-bottom: none;
+}
+
+.message-content {
+    background: #f8f9fa;
+    padding: 1rem;
+    border-radius: 5px;
+    margin-top: 0.5rem;
+    max-height: 300px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+}
+
+.message-actions-modal {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+    flex-wrap: wrap;
+}
+
+/* Status badges for contact messages */
+.status-unread {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.status-read {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.status-replied {
+    background-color: #d1ecf1;
+    color: #0c5460;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .contact-container {
+        grid-template-columns: 1fr;
+    }
+    
+    .contact-actions {
+        flex-direction: column;
+    }
+    
+    .message-actions {
+        flex-direction: column;
+    }
+    
+    .message-actions button {
+        width: 100%;
+        margin-bottom: 0.25rem;
+    }
+}

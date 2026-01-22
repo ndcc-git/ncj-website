@@ -15,7 +15,7 @@ from config import Config
 from forms import RegistrationForm, AdminLoginForm, EmailForm, CARegistrationForm, ContactForm
 from utils.security import hash_password, verify_password, generate_csrf_token, verify_csrf_token
 from utils.email_service import send_verification_email, send_bulk_emails, send_ca_approval_email
-from utils.export_service import export_to_excel, export_to_csv
+from utils.export_service import export_ca_to_csv, export_to_excel, export_to_csv
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -31,7 +31,7 @@ db = client.festival_db
 users_collection = db.users
 registrations_collection = db.registrations
 segments_collection = db.segments
-ca_collection = db.ca
+ca_collection = db.ca_registrations
 
 def generate_ca_code(full_name):
     """Generate unique 4-letter CA code from name"""
@@ -797,7 +797,7 @@ def admin_email():
 @admin_required
 def admin_export():
     """Export data page"""
-    format_type = request.args.get('format', 'excel')
+    format_type = request.args.get('format', 'csv')
     segment_id = request.args.get('segment_id')
     
     query = {}
@@ -811,6 +811,26 @@ def admin_export():
         return csv_data
     else:
         excel_data = export_to_excel(registrations)
+        return excel_data
+
+@app.route('/admin/ca-export')
+@admin_required
+def admin_ca_export():
+    """Export data page"""
+    format_type = request.args.get('format', 'csv')
+    status = request.args.get('status')
+    
+    query = {}
+    if status:
+        query['status'] = status
+    
+    ca_data = list(ca_collection.find(query))
+
+    if format_type == 'csv':
+        csv_data = export_ca_to_csv(ca_data)
+        return csv_data
+    else:
+        excel_data = export_to_excel(ca_data)
         return excel_data
 
 @app.errorhandler(404)

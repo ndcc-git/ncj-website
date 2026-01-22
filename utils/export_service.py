@@ -70,3 +70,35 @@ def export_to_csv(registrations):
         mimetype='text/csv',
         headers={'Content-Disposition': 'attachment;filename=registrations.csv'}
     )
+
+def export_ca_to_csv(ca_data):
+    """Export registrations to CSV format"""
+    # Convert to DataFrame
+    data = []
+    for ca in ca_data:
+        data.append({
+            'ID': str(ca.get('_id', '')),
+            'CA Code': ca.get('ca_code', ''),
+            'Profile': ca.get('profile_picture', ''),
+            'Full Name': ca.get('full_name', ''),
+            'Email': ca.get('email', ''),
+            'Institution': ca.get('institution', ''),
+            'Class': ca.get('class', ''),
+            'Phone Number': ca.get('phone', ''),
+            'Status': ca.get('status'),
+            'Why CA': ca.get('why_ca', ''),
+            'Registration Date': ca.get('registration_date', '')
+        })
+    
+    df = pd.DataFrame(data)
+    
+    # Create CSV file in memory
+    output = StringIO()
+    df.to_csv(output, index=False)
+    output.seek(0)
+    
+    return Response(
+        output.getvalue(),
+        mimetype='text/csv',
+        headers={'Content-Disposition': 'attachment;filename=ca.csv'}
+    )

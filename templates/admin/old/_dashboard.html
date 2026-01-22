@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="admin-dashboard">
+    <h2>Dashboard Overview</h2>
+    
+    <div class="stats-grid">
+        <div class="stat-card">
+            <h3>Total Registrations</h3>
+            <p class="stat-number">{{ total_registrations }}</p>
+        </div>
+        
+        <div class="stat-card">
+            <h3>Verified Registrations</h3>
+            <p class="stat-number">{{ verified_registrations }}</p>
+        </div>
+        
+        <div class="stat-card">
+            <h3>Total Segments</h3>
+            <p class="stat-number">{{ total_segments }}</p>
+        </div>
+        
+        <div class="stat-card">
+            <h3>Pending Verification</h3>
+            <p class="stat-number">{{ total_registrations - verified_registrations }}</p>
+        </div>
+
+        <div class="stat-card">
+            <h3>Contact Messages</h3>
+            <p class="stat-number">{{ contact_messages_count }}</p>
+            <small>{{ unread_contact_messages }} unread</small>
+        </div>
+    </div>
+    
+    <div class="admin-links">
+        <a href="{{ url_for('admin_registrations') }}" class="admin-link">
+            <h3>Manage Registrations</h3>
+            <p>View and verify registrations</p>
+        </a>
+        
+        <a href="{{ url_for('admin_analytics') }}" class="admin-link">
+            <h3>Analytics</h3>
+            <p>View registration statistics</p>
+        </a>
+
+        <a href="{{ url_for('admin_contact_messages') }}" class="admin-link">
+            <h3>Contact Messages</h3>
+            <p>View and manage contact inquiries</p>
+        </a>
+        
+        <!-- <a href="{{ url_for('admin_email') }}" class="admin-link">
+            <h3>Email Management</h3>
+            <p>Send emails to participants</p>
+        </a> -->
+        
+        <a href="{{ url_for('admin_export') }}?format=excel" class="admin-link">
+            <h3>Export Data</h3>
+            <p>Download registration data</p>
+        </a>
+    </div>
+    
+    <div class="recent-registrations">
+        <h3>Recent Registrations</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Segment</th>
+                    <th>Date</th>
+                    <th>Verified</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for reg in recent_registrations %}
+                <tr>
+                    <td>{{ reg.full_name }}</td>
+                    <td>{{ reg.email }}</td>
+                    <td>{{ reg.segment_name }}</td>
+                    <td>{{ reg.registration_date.strftime('%Y-%m-%d %H:%M') }}</td>
+                    <td>{{ 'Yes' if reg.verified else 'No' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

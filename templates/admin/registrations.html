@@ -1,102 +1,212 @@
-{% extends "base.html" %}
+{% extends "adm_base.html" %}
 
-{% block title %}Manage Registrations{% endblock %}
+{% block title %}Admin Segment Registrations{% endblock %}
 
 {% block content %}
-<div class="admin-registrations">
-    <h2>Manage Registrations</h2>
-    
-    <div class="filters">
-        <form method="GET" action="{{ url_for('admin_registrations') }}">
-            <div class="filter-group">
-                <label for="segment">Segment:</label>
-                <select name="segment_id" id="segment">
-                    <option value="">All Segments</option>
-                    {% for segment in segments %}
-                    <option value="{{ segment._id }}" {% if segment_id == segment._id|string %}selected{% endif %}>
-                        {{ segment.name }}
-                    </option>
-                    {% endfor %}
-                </select>
+
+<section class="section is-title-bar">
+    <div class="level">
+        <div class="level-left">
+            <div class="level-item">
+                <ul>
+                    <li>Admin</li>
+                    <li>Segment Registrations</li>
+                </ul>
             </div>
-            
-            <div class="filter-group">
-                <label for="verified">Verified Status:</label>
-                <select name="verified" id="verified">
-                    <option value="">All</option>
-                    <option value="true" {% if verified_filter == 'true' %}selected{% endif %}>Verified</option>
-                    <option value="false" {% if verified_filter == 'false' %}selected{% endif %}>Not Verified</option>
-                </select>
-            </div>
-            
-            <button type="submit" class="btn btn-primary">Filter</button>
-            <button type="button" id="bulk-verify-btn" class="btn btn-success">Bulk Verify Selected</button>
-        </form>
+        </div>
     </div>
-    
-    <table id="registrations-table">
-        <thead>
-            <tr>
-                <th><input type="checkbox" id="select-all"></th>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Segment</th>
-                <th>Category</th>
-                <th>Institution</th>
-                <th>CA Ref</th>
-                <th>Bkash</th>
-                <th>Transaction ID</th>
-                <th>Date</th>
-                <th>Verified</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for reg in registrations %}
-            <tr data-id="{{ reg._id }}">
-                <td><input type="checkbox" class="registration-checkbox"></td>
-                <td>{{ reg.full_name }}</td>
-                <td>{{ reg.email }}</td>
-                <td>{{ reg.segment_name }}</td>
-                <td>{{ reg.category }}</td>
-                <td>{{ reg.institution }}</td>
-                <td>{{ reg.ca_ref }}</td>
-                <td>{{ reg.bkash_number }}</td>
-                <td>{{ reg.transaction_id }}</td>
-                <td>{{ reg.registration_date.strftime('%Y-%m-%d') }}</td>
-                <td>
-                    {% if reg.verified %}
-                        <span class="badge verified">Yes</span>
-                    {% else %}
-                        <span class="badge not-verified">No</span>
-                    {% endif %}
-                </td>
-                <td>
-                    {% if not reg.verified %}
-                    <button class="btn btn-sm btn-success verify-btn" data-id="{{ reg._id }}">Verify</button>
-                    {% endif %}
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+</section>
+
+<form method="GET" action="{{ url_for('admin_registrations') }}">
+    <div class="field is-grouped is-align-items-center">
+
+        <!-- Segment -->
+        <div class="field is-horizontal mx-3">
+            <div class="field-label is-normal">
+                <label class="label">Segment:</label>
+            </div>
+            <div class="field-body">
+                <div class="field">
+                    <div class="control">
+                        <div class="select">
+                            <select name="segment_id">
+                                <option value="">All Segments</option>
+                                {% for segment in segments %}
+                                <option value="{{ segment._id }}" {% if segment_id==segment._id|string %}selected{%
+                                    endif %}>
+                                    {{ segment.name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Verified -->
+        <div class="field is-horizontal mr-3">
+            <div class="field-label is-normal">
+                <label class="label">Verified:</label>
+            </div>
+            <div class="field-body">
+                <div class="field">
+                    <div class="control">
+                        <div class="select">
+                            <select name="verified" id="verified">
+                                <option value="">All</option>
+                                <option value="true" {% if verified_filter=='true' %}selected{% endif %}>Verified
+                                </option>
+                                <option value="false" {% if verified_filter=='false' %}selected{% endif %}>Not Verified
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Buttons -->
+        <div class="field is-grouped">
+            <div class="control mr-3">
+                <button type="submit" class="button is-link">Filter</button>
+            </div>
+            <div class="control">
+                <button type="button" id="bulk-verify-btn" class="button is-link is-light bulk-verify-btn">
+                    Bulk Verify Selected
+                </button>
+            </div>
+        </div>
+
+    </div>
+</form>
+
+
+
+<div class="card has-table">
+    <header class="card-header">
+        <p class="card-header-title">
+            <span class="icon"><i class="mdi mdi-account-multiple"></i></span>
+            Registrations
+        </p>
+        <a href="{{ request.url }}" class="card-header-icon">
+            <span class="icon"><i class="mdi mdi-reload"></i></span>
+        </a>
+    </header>
+    <div class="card-content">
+        <div class="b-table has-pagination">
+            <div class="table-wrapper has-mobile-cards">
+                <table class="table is-fullwidth is-striped is-hoverable is-fullwidth">
+                    <thead>
+                        <tr>
+                            <th class="is-checkbox-cell">
+                                <label class="b-checkbox checkbox">
+                                    <input type="checkbox" value="false" id="select-all">
+                                    <span class="check"></span>
+                                </label>
+                            </th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Segment</th>
+                            <th>Category</th>
+                            <th>Institution</th>
+                            <th>CA Ref</th>
+                            <th>Bkash</th>
+                            <th>Transaction ID</th>
+                            <th>Date</th>
+                            <th>Verified</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for reg in registrations %}
+                        <tr data-id="{{ reg._id }}">
+                            <td class="is-checkbox-cell">
+                                <label class="b-checkbox checkbox">
+                                    <input type="checkbox" value="false" class="registration-checkbox">
+                                    <span class="check"></span>
+                                </label>
+                            </td>
+                            <td data-label="Name">{{ reg.full_name }}</td>
+                            <td data-label="Email">{{ reg.email }}</td>
+                            <td data-label="Segment">{{ reg.segment_name }}</td>
+                            <td data-label="Category">{{ reg.category }}</td>
+                            <td data-label="Institution">{{ reg.institution }}</td>
+                            <td data-label="CA Ref">{{ reg.ca_ref }}</td>
+                            <td data-label="Bkash">{{ reg.bkash_number }}</td>
+                            <td data-label="Transaction ID">{{ reg.transaction_id }}</td>
+
+
+                            <td data-label="Date">
+                                <small class="has-text-grey is-abbr-like" title="Oct 25, 2020">
+                                    {{ reg.registration_date.strftime('%#d %b %Y') }}
+                                </small>
+                            </td>
+
+                            <td data-label="Verified">
+                                {% if reg.verified %}
+                                <span class="is-primary">Yes</span>
+                                {% else %}
+                                <span class="is-danger">No</span>
+                                {% endif %}
+                            </td>
+
+                            <td class="is-actions-cell">
+                                {% if not reg.verified %}
+                                <div class="buttons is-right verify-btn">
+                                    <button class="button is-small is-primary" type="button">
+                                        Verify
+                                    </button>
+                                </div>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="notification">
+                <div class="level">
+                    <div class="level-left">
+                        <div class="level-item">
+                            <div class="buttons has-addons">
+                                <button type="button" class="button is-active">1</button>
+                                <button type="button" class="button">2</button>
+                                <button type="button" class="button">3</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="level-right">
+                        <div class="level-item">
+                            <small>Page 1 of 3</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+
+
 {% endblock %}
 
 {% block scripts %}
+
 <script>
-    document.getElementById('select-all').addEventListener('change', function() {
+    document.getElementById('select-all').addEventListener('change', function () {
         const checkboxes = document.querySelectorAll('.registration-checkbox');
         checkboxes.forEach(cb => cb.checked = this.checked);
     });
-    
+
     document.querySelectorAll('.verify-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const regId = this.dataset.id;
             verifyRegistration(regId);
         });
     });
-    
+
+
     document.getElementById('bulk-verify-btn').addEventListener('click', function() {
         const selectedIds = [];
         document.querySelectorAll('.registration-checkbox:checked').forEach(cb => {
@@ -112,7 +222,7 @@
             bulkVerify(selectedIds);
         }
     });
-    
+
     function verifyRegistration(regId) {
         const meta = document.querySelector('meta[name="csrf-token"]');
         const csrfToken = meta.getAttribute("content");
@@ -132,7 +242,7 @@
             }
         });
     }
-    
+
     function bulkVerify(registrationIds) {
         const meta = document.querySelector('meta[name="csrf-token"]');
         const csrfToken = meta.getAttribute("content");
@@ -154,5 +264,8 @@
             }
         });
     }
+
 </script>
+
+
 {% endblock %}

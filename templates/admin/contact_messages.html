@@ -1,155 +1,197 @@
-{% extends "base.html" %}
+{% extends "adm_base.html" %}
 
-{% block title %}Contact Messages{% endblock %}
+{% block title %}Admin Segment Registrations{% endblock %}
 
 {% block content %}
-<div class="admin-contact-messages">
-    <h2>Contact Messages</h2>
-    
-    <div class="message-stats">
-        <div class="stat-card">
-            <h3>Total Messages</h3>
-            <p class="stat-number">{{ total_messages }}</p>
-        </div>
-        <div class="stat-card">
-            <h3>Unread Messages</h3>
-            <p class="stat-number">{{ unread_count }}</p>
+
+<section class="section is-title-bar">
+    <div class="level">
+        <div class="level-left">
+            <div class="level-item">
+                <ul>
+                    <li>Admin</li>
+                    <li>Contact Messages</li>
+                </ul>
+            </div>
         </div>
     </div>
-    
-    <div class="filters">
-        <form method="GET" action="{{ url_for('admin_contact_messages') }}">
-            <div class="filter-group">
-                <label for="status">Status:</label>
-                <select name="status" id="status">
-                    <option value="all" {% if status_filter == 'all' %}selected{% endif %}>All Status</option>
-                    <option value="unread" {% if status_filter == 'unread' %}selected{% endif %}>Unread</option>
-                    <option value="read" {% if status_filter == 'read' %}selected{% endif %}>Read</option>
-                    <option value="replied" {% if status_filter == 'replied' %}selected{% endif %}>Replied</option>
-                </select>
+</section>
+
+<form method="GET" action="{{ url_for('admin_contact_messages') }}">
+    <div class="field is-grouped is-align-items-center">
+
+        <!-- Segment -->
+        <div class="field is-horizontal mx-3">
+            <div class="field-label is-normal">
+                <label class="label">Status:</label>
             </div>
-            
-            <div class="filter-group">
-                <label for="archived">Show Archived:</label>
-                <select name="archived" id="archived">
-                    <option value="false" {% if not archived_filter %}selected{% endif %}>No</option>
-                    <option value="true" {% if archived_filter %}selected{% endif %}>Yes</option>
-                </select>
-            </div>
-            
-            <button type="submit" class="btn btn-primary">Filter</button>
-            <button type="button" id="mark-all-read" class="btn btn-secondary">Mark All as Read</button>
-        </form>
-    </div>
-    
-    {% if contact_messages %}
-    <table id="messages-table">
-        <thead>
-            <tr>
-                <th>Status</th>
-                <th>Name</th>
-                <th>Institution</th>
-                <th>Email</th>
-                <th>Message Preview</th>
-                <th>Submitted</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for message in contact_messages %}
-            <tr class="message-row {% if message.status == 'unread' %}unread{% endif %}" data-id="{{ message._id }}">
-                <td>
-                    <span class="status-badge status-{{ message.status }}">
-                        {{ message.status|title }}
-                    </span>
-                    {% if message.archived %}
-                    <span class="badge badge-archived">Archived</span>
-                    {% endif %}
-                </td>
-                <td>{{ message.name }}</td>
-                <td>{{ message.institution }}</td>
-                <td><a href="mailto:{{ message.email }}">{{ message.email }}</a></td>
-                <td class="message-preview">
-                    {{ message.message[:100] }}{% if message.message|length > 100 %}...{% endif %}
-                </td>
-                <td>{{ message.submitted_at.strftime('%Y-%m-%d %H:%M') }}</td>
-                <td>
-                    <div class="message-actions">
-                        <button class="btn btn-sm btn-info view-message" data-id="{{ message._id }}">View</button>
-                        {% if message.status == 'unread' %}
-                        <button class="btn btn-sm btn-success mark-read" data-id="{{ message._id }}">Mark Read</button>
-                        {% endif %}
-                        {% if not message.archived %}
-                        <button class="btn btn-sm btn-warning archive-message" data-id="{{ message._id }}">Archive</button>
-                        {% else %}
-                        <button class="btn btn-sm btn-secondary unarchive-message" data-id="{{ message._id }}">Unarchive</button>
-                        {% endif %}
-                        <button class="btn btn-sm btn-danger delete-message" data-id="{{ message._id }}">Delete</button>
+            <div class="field-body">
+                <div class="field">
+                    <div class="control">
+                        <div class="select">
+                            <select name="status">
+                                <option value="all" {% if status_filter=='all' %}selected{% endif %}>All Status</option>
+                                <option value="unread" {% if status_filter=='unread' %}selected{% endif %}>Unread
+                                </option>
+                                <option value="read" {% if status_filter=='read' %}selected{% endif %}>Read</option>
+                                <option value="replied" {% if status_filter=='replied' %}selected{% endif %}>Replied
+                                </option>
+                            </select>
+                        </div>
                     </div>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    {% else %}
-    <div class="no-messages">
-        <p>No contact messages found.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Buttons -->
+        <div class="field is-grouped">
+            <div class="control mr-3">
+                <button type="submit" class="button is-link">Filter</button>
+            </div>
+        </div>
+
     </div>
-    {% endif %}
+</form>
+
+
+
+<div class="card has-table">
+    <header class="card-header">
+        <p class="card-header-title">
+            <span class="icon"><i class="mdi mdi-account-multiple"></i></span>
+            Messages
+        </p>
+        <a href="{{ request.url }}" class="card-header-icon">
+            <span class="icon"><i class="mdi mdi-reload"></i></span>
+        </a>
+    </header>
+    <div class="card-content">
+        <div class="b-table has-pagination">
+            <div class="table-wrapper has-mobile-cards">
+                <table class="table is-fullwidth is-striped is-hoverable is-fullwidth">
+                    <thead>
+                        <tr>
+                            <th>Status</th>
+                            <th>Name</th>
+                            <th>Institution</th>
+                            <th>Email</th>
+                            <th>Message Preview</th>
+                            <th>Date</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for message in contact_messages %}
+                        <tr data-id="{{ message._id }}">
+                            <td data-label="Staus">
+                                <strong>
+                                    <span class="tag is-light
+                                        {% if message.status == 'unread' %}is-danger
+                                        {% elif message.status == 'read' %}is-primary
+                                        {% elif message.status == 'replied' %}is-success
+                                        {% else %}is-dark
+                                        {% endif %}">
+                                        {{ message.status|title }}
+                                    </span>
+                                </strong>
+                            </td>
+                            <td data-label="Name">{{ message.name }}</td>
+                            <td data-label="Institution">{{ message.institution }}</td>
+                            <td data-label="Email">{{ message.email }}</td>
+                            <td data-label="Message Preview">
+                                {{ message.message[:100] }}{% if message.message|length > 100 %}...{% endif %}
+                            </td>
+                            <td data-label="Date">
+                                <small class="has-text-grey is-abbr-like" title="Oct 25, 2020">
+                                    {{ message.submitted_at.strftime('%#d %b %Y') }}
+                                </small>
+                            </td>
+                            <td class="is-actions-cell">
+                                <div class="buttons">
+                                    <button class="button is-small is-info view-message" data-id="{{ message._id }}"
+                                        id="open-modal" type="button">
+                                        View
+                                    </button>
+                                    <button class="button is-small is-primary mark-read" data-id="{{ message._id }}"
+                                        id="open-modal" type="button">
+                                        Mark Read
+                                    </button>
+                                    <button class="button is-small is-danger delete-message" data-id="{{ message._id }}"
+                                        id="open-modal" type="button">
+                                        Delete
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="notification">
+                <div class="level">
+                    <div class="level-left">
+                        <div class="level-item">
+                            <div class="buttons has-addons">
+                                <button type="button" class="button is-active">1</button>
+                                <button type="button" class="button">2</button>
+                                <button type="button" class="button">3</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="level-right">
+                        <div class="level-item">
+                            <small>Page 1 of 3</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
-<!-- Modal for viewing message details -->
-<div id="messageDetailsModal" class="modal">
-    <div class="modal-content">
-        <span class="close">&times;</span>
-        <div id="messageDetailsContent">
-            <!-- Message details will be loaded here -->
-        </div>
+
+<div class="modal" id="messageDetailsModal">
+    <div class="modal-background"></div>
+
+    <div class="modal-card">
+        <header class="modal-card-head">
+            <p class="modal-card-title">CA Application Details</p>
+            <button class="delete" aria-label="close"></button>
+        </header>
+
+        <section class="modal-card-body" id="messageDetailsContent">
+            <!-- JS injects content here -->
+        </section>
+
+        <footer class="modal-card-foot">
+            <button class="button is-dark is-light" id="messageCloseBtn">Close</button>
+        </footer>
     </div>
 </div>
+
+
+
 {% endblock %}
 
 {% block scripts %}
+
 <script>
-    // Mark message as read
-    document.querySelectorAll('.mark-read').forEach(btn => {
+
+document.querySelectorAll('.mark-read').forEach(btn => {
         btn.addEventListener('click', function() {
             updateMessageStatus(this.dataset.id, 'read');
         });
     });
-    
-    // Archive message
-    document.querySelectorAll('.archive-message').forEach(btn => {
-        btn.addEventListener('click', function() {
-            archiveMessage(this.dataset.id, true);
-        });
-    });
-    
-    // Unarchive message
-    document.querySelectorAll('.unarchive-message').forEach(btn => {
-        btn.addEventListener('click', function() {
-            archiveMessage(this.dataset.id, false);
-        });
-    });
-    
-    // Delete message
-    document.querySelectorAll('.delete-message').forEach(btn => {
+
+document.querySelectorAll('.delete-message').forEach(btn => {
         btn.addEventListener('click', function() {
             if (confirm('Are you sure you want to delete this message? This action cannot be undone.')) {
                 deleteMessage(this.dataset.id);
             }
         });
     });
-    
-    // Mark all as read
-    document.getElementById('mark-all-read').addEventListener('click', function() {
-        if (confirm('Mark all messages as read?')) {
-            const messageIds = Array.from(document.querySelectorAll('.message-row')).map(row => row.dataset.id);
-            updateMessageStatus(messageIds, 'read');
-        }
-    });
-    
-    function updateMessageStatus(messageId, status) {
+
+function updateMessageStatus(messageId, status) {
         const ids = Array.isArray(messageId) ? messageId : [messageId];
         const meta = document.querySelector('meta[name="csrf-token"]');
         const csrfToken = meta.getAttribute("content");
@@ -173,34 +215,16 @@
             }
         });
     }
-    
-    function archiveMessage(messageId, archive) {
-        const meta = document.querySelector('meta[name="csrf-token"]');
-        const csrfToken = meta.getAttribute("content");
-        fetch(`/admin/update-message-status/${messageId}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': csrfToken
-            },
-            body: JSON.stringify({ archived: archive })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                location.reload();
-            } else {
-                alert('Failed to archive message: ' + data.message);
-            }
-        });
-    }
-    
+
     function deleteMessage(messageId) {
         const meta = document.querySelector('meta[name="csrf-token"]');
         const csrfToken = meta.getAttribute("content");
         fetch(`/admin/delete-message/${messageId}`, {
             method: 'DELETE',
-            'X-CSRFToken': csrfToken
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
         })
         .then(response => response.json())
         .then(data => {
@@ -211,16 +235,16 @@
             }
         });
     }
-    
-    // View message details
+
+
     document.querySelectorAll('.view-message').forEach(btn => {
         btn.addEventListener('click', function() {
             const messageId = this.dataset.id;
             
             // Mark as read when viewing
-            if (this.closest('.message-row').classList.contains('unread')) {
-                updateMessageStatus(messageId, 'read');
-            }
+            // if (this.closest('.message-row').classList.contains('unread')) {
+            //     updateMessageStatus(messageId, 'read');
+            // }
             
             fetch(`/api/message-details/${messageId}`)
                 .then(response => response.json())
@@ -231,63 +255,85 @@
                 });
         });
     });
-    
-    function showMessageDetails(message) {
-        const modal = document.getElementById('messageDetailsModal');
-        const content = document.getElementById('messageDetailsContent');
-        
-        content.innerHTML = `
-            <h3>Message Details</h3>
-            <div class="message-details">
-                <div class="detail-row">
-                    <strong>From:</strong> ${message.name}
-                </div>
-                <div class="detail-row">
-                    <strong>Institution:</strong> ${message.institution}
-                </div>
-                <div class="detail-row">
-                    <strong>Email:</strong> <a href="mailto:${message.email}">${message.email}</a>
-                </div>
-                <div class="detail-row">
-                    <strong>Submitted:</strong> ${new Date(message.submitted_at).toLocaleString()}
-                </div>
-                <div class="detail-row">
-                    <strong>Status:</strong> <span class="status-badge status-${message.status}">${message.status}</span>
-                </div>
-                <div class="detail-row">
-                    <strong>IP Address:</strong> ${message.ip_address}
-                </div>
-                <div class="detail-row">
-                    <strong>Message:</strong>
-                    <div class="message-content">
-                        ${message.message.replace(/\n/g, '<br>')}
-                    </div>
+
+function showMessageDetails(message) {
+  const modal = document.getElementById('messageDetailsModal');
+  const content = document.getElementById('messageDetailsContent');
+
+  const statusClass =
+    message.status === "read" ? "is-success" :
+    message.status === "replied" ? "is-info" :
+    "is-warning";
+
+  content.innerHTML = `
+    <div class="card">
+      <div class="card-content">
+
+        <!-- Header -->
+        <div class="media">
+            <div class="media-content" style="overflow-wrap:anywhere;">
+                <p class="title is-5 mb-5">${message.name}</p>
+                <p class="subtitle is-6 mb-2">${message.email}</p>
+
+                <div class="tags">
+                <span class="tag is-light">${message.institution}</span>
+                <span class="tag ${statusClass}">
+                    ${message.status.toUpperCase()}
+                </span>
                 </div>
             </div>
-            <div class="message-actions-modal">
-                <button onclick="updateMessageStatus('${message._id}', 'read')" class="btn btn-sm btn-success">Mark as Read</button>
-                <button onclick="updateMessageStatus('${message._id}', 'replied')" class="btn btn-sm btn-info">Mark as Replied</button>
-                ${message.archived ? 
-                    `<button onclick="archiveMessage('${message._id}', false)" class="btn btn-sm btn-secondary">Unarchive</button>` :
-                    `<button onclick="archiveMessage('${message._id}', true)" class="btn btn-sm btn-warning">Archive</button>`
-                }
-                <button onclick="deleteMessage('${message._id}')" class="btn btn-sm btn-danger">Delete</button>
-            </div>
-        `;
-        
-        modal.style.display = 'block';
-    }
-    
-    // Modal close functionality
-    document.querySelector('.close').addEventListener('click', function() {
-        document.getElementById('messageDetailsModal').style.display = 'none';
-    });
-    
-    window.addEventListener('click', function(event) {
-        const modal = document.getElementById('messageDetailsModal');
-        if (event.target == modal) {
-            modal.style.display = 'none';
-        }
-    });
+        </div>
+
+
+        <hr>
+
+        <!-- Info -->
+        <div class="content">
+          <p><strong>Submitted:</strong> ${new Date(message.submitted_at).toLocaleString()}</p>
+          <p><strong>IP Address:</strong> ${message.ip_address}</p>
+
+          <div class="box mt-4">
+            <p class="has-text-weight-semibold mb-2">Message</p>
+            <p>${message.message.replace(/\n/g, '<br>')}</p>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="buttons is-right mt-4">
+          <button onclick="updateMessageStatus('${message._id}', 'read')" 
+                  class="button is-success is-light is-small">
+            Mark as Read
+          </button>
+
+          <button onclick="updateMessageStatus('${message._id}', 'replied')" 
+                  class="button is-info is-light is-small">
+            Mark as Replied
+          </button>
+
+
+          <button onclick="deleteMessage('${message._id}')" 
+                  class="button is-danger is-light is-small">
+            Delete
+          </button>
+        </div>
+
+      </div>
+    </div>
+  `;
+
+  modal.classList.add("is-active");
+}
+
+document.querySelectorAll(
+  "#messageDetailsModal .delete, #messageDetailsModal .modal-background, #messageCloseBtn"
+).forEach(el => {
+  el.addEventListener("click", () => {
+    document.getElementById("messageDetailsModal").classList.remove("is-active");
+  });
+});
+
+
 </script>
+
+
 {% endblock %}

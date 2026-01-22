@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block title %}Analytics Dashboard{% endblock %}
+
+{% block content %}
+<div class="admin-analytics">
+    <h2>Analytics Dashboard</h2>
+    
+    <div class="analytics-grid">
+        <div class="analytics-card">
+            <h3>Daily Registrations</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Registrations</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for stat in daily_stats %}
+                    <tr>
+                        <td>{{ stat._id }}</td>
+                        <td>{{ stat.count }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="analytics-card">
+            <h3>Category Distribution</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Category</th>
+                        <th>Count</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for stat in category_stats %}
+                    <tr>
+                        <td>{{ stat._id }}</td>
+                        <td>{{ stat.count }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="analytics-card">
+            <h3>Segment Popularity</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Segment</th>
+                        <th>Registrations</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for stat in segment_stats %}
+                    <tr>
+                        <td>{{ stat._id }}</td>
+                        <td>{{ stat.count }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="analytics-card">
+            <h3>CA Popularity</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>CA Ref</th>
+                        <th>Registrations</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for stat in ca_stats %}
+                    <tr>
+                        <td>{{ stat._id }}</td>
+                        <td>{{ stat.count }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

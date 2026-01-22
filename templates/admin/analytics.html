@@ -1,91 +1,206 @@
-{% extends "base.html" %}
+{% extends "adm_base.html" %}
 
-{% block title %}Analytics Dashboard{% endblock %}
+{% block title %}Admin Segment Registrations{% endblock %}
 
 {% block content %}
-<div class="admin-analytics">
-    <h2>Analytics Dashboard</h2>
-    
-    <div class="analytics-grid">
-        <div class="analytics-card">
-            <h3>Daily Registrations</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th>Registrations</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for stat in daily_stats %}
-                    <tr>
-                        <td>{{ stat._id }}</td>
-                        <td>{{ stat.count }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        
-        <div class="analytics-card">
-            <h3>Category Distribution</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Category</th>
-                        <th>Count</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for stat in category_stats %}
-                    <tr>
-                        <td>{{ stat._id }}</td>
-                        <td>{{ stat.count }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        
-        <div class="analytics-card">
-            <h3>Segment Popularity</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Segment</th>
-                        <th>Registrations</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for stat in segment_stats %}
-                    <tr>
-                        <td>{{ stat._id }}</td>
-                        <td>{{ stat.count }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
 
-        <div class="analytics-card">
-            <h3>CA Popularity</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>CA Ref</th>
-                        <th>Registrations</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for stat in ca_stats %}
-                    <tr>
-                        <td>{{ stat._id }}</td>
-                        <td>{{ stat.count }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+<section class="section is-title-bar">
+    <div class="level">
+        <div class="level-left">
+            <div class="level-item">
+                <ul>
+                    <li>Admin</li>
+                    <li>Analytics</li>
+                </ul>
+            </div>
         </div>
     </div>
+</section>
+
+<div class="columns is-multiline mt-2 ml-2">
+
+<div class="column is-3-desktop is-6-tablet is-12-mobile">
+  <div class="card is-shadowless has-background-white-ter" style="border-radius: 12px;">
+    
+    <!-- Card header -->
+    <header class="card-content pb-2">
+      <div class="is-flex is-justify-content-space-between is-align-items-center">
+        <p class="title is-6 mb-0">Daily Registrations</p>
+
+        <a href="{{ request.url }}" class="icon has-text-grey">
+          <i class="mdi mdi-refresh"></i>
+        </a>
+      </div>
+    </header>
+
+    <!-- Card body -->
+    <div class="card-content pt-2">
+      <div class="table-container">
+        <table class="table is-fullwidth is-hoverable is-striped is-borderless">
+          <thead>
+            <tr class="has-text-grey">
+              <th>Date</th>
+              <th class="has-text-right">Registrations</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {% for stat in daily_stats %}
+            <tr>
+              <td>{{ stat._id }}</td>
+              <td class="has-text-right has-text-weight-semibold">
+                {{ stat.count }}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
 </div>
+
+
+<div class="column is-3-desktop is-6-tablet is-12-mobile">
+  <div class="card is-shadowless has-background-white-ter" style="border-radius: 12px;">
+    
+    <!-- Card header -->
+    <header class="card-content pb-2">
+      <div class="is-flex is-justify-content-space-between is-align-items-center">
+        <p class="title is-6 mb-0">Category Stats</p>
+
+        <a href="{{ request.url }}" class="icon has-text-grey">
+          <i class="mdi mdi-refresh"></i>
+        </a>
+      </div>
+    </header>
+
+    <!-- Card body -->
+    <div class="card-content pt-2">
+      <div class="table-container">
+        <table class="table is-fullwidth is-hoverable is-striped is-borderless">
+          <thead>
+            <tr class="has-text-grey">
+              <th>Category</th>
+              <th class="has-text-right">Registrations</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {% for stat in category_stats %}
+            <tr>
+              <td>{{ stat._id }}</td>
+              <td class="has-text-right has-text-weight-semibold">
+                {{ stat.count }}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+
+<div class="column is-3-desktop is-6-tablet is-12-mobile">
+  <div class="card is-shadowless has-background-white-ter" style="border-radius: 12px;">
+    
+    <!-- Card header -->
+    <header class="card-content pb-2">
+      <div class="is-flex is-justify-content-space-between is-align-items-center">
+        <p class="title is-6 mb-0">Segment Stats</p>
+
+        <a href="{{ request.url }}" class="icon has-text-grey">
+          <i class="mdi mdi-refresh"></i>
+        </a>
+      </div>
+    </header>
+
+    <!-- Card body -->
+    <div class="card-content pt-2">
+      <div class="table-container">
+        <table class="table is-fullwidth is-hoverable is-striped is-borderless">
+          <thead>
+            <tr class="has-text-grey">
+              <th>Segment</th>
+              <th class="has-text-right">Registrations</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {% for stat in segment_stats %}
+            <tr>
+              <td>{{ stat._id }}</td>
+              <td class="has-text-right has-text-weight-semibold">
+                {{ stat.count }}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+
+<div class="column is-3-desktop is-6-tablet is-12-mobile">
+  <div class="card is-shadowless has-background-white-ter" style="border-radius: 12px;">
+    
+    <!-- Card header -->
+    <header class="card-content pb-2">
+      <div class="is-flex is-justify-content-space-between is-align-items-center">
+        <p class="title is-6 mb-0">CA stats</p>
+
+        <a href="{{ request.url }}" class="icon has-text-grey">
+          <i class="mdi mdi-refresh"></i>
+        </a>
+      </div>
+    </header>
+
+    <!-- Card body -->
+    <div class="card-content pt-2">
+      <div class="table-container">
+        <table class="table is-fullwidth is-hoverable is-striped is-borderless">
+          <thead>
+            <tr class="has-text-grey">
+              <th>CA Code</th>
+              <th class="has-text-right">Registrations</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {% for stat in ca_stats %}
+            <tr>
+              <td>{{ stat._id }}</td>
+              <td class="has-text-right has-text-weight-semibold">
+                {{ stat.count }}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+
+<script>
+
+</script>
+
+
 {% endblock %}

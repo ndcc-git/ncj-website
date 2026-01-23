@@ -100,12 +100,12 @@
                         <span>About</span>
                     </a>
                     {% if session.get('admin_token') %}
-                    <a title="Log out" href="{{ url_for('admin_logout') }}" class="navbar-item is-desktop-icon-only">
+                    <a title="Log out" href="{{ url_for('admin.admin_logout') }}" class="navbar-item is-desktop-icon-only">
                         <span class="icon"><i class="mdi mdi-logout"></i></span>
                         <span>Log out</span>
                     </a>
                     {% else %}
-                    <a href="{{ url_for('admin_login') }}">Admin Login</a>
+                    <a href="{{ url_for('admin.admin_login') }}">Admin Login</a>
                     {% endif %}
                 </div>
             </div>
@@ -120,7 +120,7 @@
                 <p class="menu-label">General</p>
                 <ul class="menu-list">
                     <li>
-                        <a href="{{ url_for('admin_dashboard') }}" class="is-active router-link-active has-icon">
+                        <a href="{{ url_for('admin.admin_dashboard') }}" class="is-active router-link-active has-icon">
                             <span class="icon"><i class="mdi mdi-desktop-mac"></i></span>
                             <span class="menu-item-label">Dashboard</span>
                         </a>
@@ -129,13 +129,13 @@
                 <p class="menu-label">Panels</p>
                 <ul class="menu-list">
                     <li>
-                        <a href="{{ url_for('admin_analytics') }}" class="has-icon">
+                        <a href="{{ url_for('admin.admin_analytics') }}" class="has-icon">
                             <span class="icon has-update-mark"><i class="mdi mdi-table"></i></span>
                             <span class="menu-item-label">Analytics</span>
                         </a>
                     </li>
                     <li>
-                        <a href="{{ url_for('admin_contact_messages') }}" class="has-icon">
+                        <a href="{{ url_for('admin.admin_contact_messages') }}" class="has-icon">
                             <span class="icon"><i class="mdi mdi-contacts"></i></span>
                             <span class="menu-item-label">Contact Messages</span>
                         </a>
@@ -151,12 +151,12 @@
                         </a>
                         <ul>
                             <li>
-                                <a href="{{ url_for('admin_ca_registrations') }}">
+                                <a href="{{ url_for('admin.admin_ca_registrations') }}">
                                     <span>CA</span>
                                 </a>
                             </li>
                             <li>
-                                <a href="{{ url_for('admin_registrations') }}">
+                                <a href="{{ url_for('admin.admin_registrations') }}">
                                     <span>Segments
                                     </span>
                                 </a>
@@ -165,7 +165,7 @@
                     </li>
 
                     <li>
-                        <a class="has-icon has-dropdown-icon" href="{{ url_for('admin_export') }}" >
+                        <a class="has-icon has-dropdown-icon" href="{{ url_for('admin.admin_export') }}" >
                             <span class="icon"><i class="mdi mdi-export"></i></span>
                             <span class="menu-item-label">Export</span>
                             
@@ -173,7 +173,7 @@
                     </li>
 
                     <li>
-                        <a class="has-icon has-dropdown-icon" href="{{ url_for('admin_users') }}" >
+                        <a class="has-icon has-dropdown-icon" href="{{ url_for('admin.admin_users') }}" >
                             <span class="icon"><i class="mdi mdi-account-multiple"></i></span>
                             <span class="menu-item-label">Accounts</span>
                             
@@ -206,9 +206,7 @@
 
     <!-- Scripts below are for demo only -->
     <script type="text/javascript" src="{{ url_for('static', filename='js/main.js') }}"></script>
-    <!-- <script type="text/javascript" src="{{ url_for('static', filename='js/chart.sample.js') }}"></script> -->
 
-    <!-- Icons below are for demo only. Feel free to use any icon pack. Docs: https://bulma.io/documentation/elements/icon/ -->
     <link rel="stylesheet" href="https://cdn.materialdesignicons.com/4.9.95/css/materialdesignicons.min.css">
     {% block scripts %}{% endblock %}
 </body>

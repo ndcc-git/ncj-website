@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SelectField, RadioField, BooleanField, TextAreaField, HiddenField, SubmitField
+from wtforms import StringField, PasswordField, SelectField, RadioField, TextAreaField, HiddenField, SubmitField
 from wtforms.validators import DataRequired, Email, Length, Regexp, Optional, EqualTo
 from flask_wtf.file import FileField, FileAllowed
 from wtforms.widgets import TextArea
@@ -101,31 +101,6 @@ class AdminLoginForm(FlaskForm):
         DataRequired()
     ])
     submit = SubmitField('Login')
-
-class EmailForm(FlaskForm):
-    """Email form for admin"""
-    subject = StringField('Subject', validators=[
-        DataRequired(),
-        Length(min=2, max=200)
-    ])
-    
-    message = TextAreaField('Message', validators=[
-        DataRequired(),
-        Length(min=10, max=5000)
-    ], widget=TextArea(), render_kw={"rows": 10})
-    
-    segment = SelectField('Segment (Optional)', choices=[], validators=[Optional()])
-    category = SelectField('Category (Optional)', choices=[
-        ('', 'All Categories'),
-        ('P', 'Primary'),
-        ('S', 'School'),
-        ('HS', 'High School'),
-        ('A', 'Adult')
-    ], validators=[Optional()])
-    
-    verified_only = BooleanField('Send to verified registrations only')
-    
-    submit = SubmitField('Send Email')
 
 
 class ContactForm(FlaskForm):

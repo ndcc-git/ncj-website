@@ -165,26 +165,11 @@
                     </li>
 
                     <li>
-                        <a class="has-icon has-dropdown-icon">
+                        <a class="has-icon has-dropdown-icon" href="{{ url_for('admin_export') }}" >
                             <span class="icon"><i class="mdi mdi-export"></i></span>
                             <span class="menu-item-label">Export</span>
-                            <div class="dropdown-icon">
-                                <span class="icon"><i class="mdi mdi-plus"></i></span>
-                            </div>
+                            
                         </a>
-                        <ul>
-                            <li>
-                                <a href="{{ url_for('admin_export') }}?format=csv">
-                                    <span>CSV</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="{{ url_for('admin_export') }}?format=excel">
-                                    <span>XLSX
-                                    </span>
-                                </a>
-                            </li>
-                        </ul>
                     </li>
                 </ul>
                 <p class="menu-label">About</p>

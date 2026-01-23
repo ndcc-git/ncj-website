@@ -796,22 +796,34 @@ def admin_email():
 @app.route('/admin/export')
 @admin_required
 def admin_export():
-    """Export data page"""
+    segments = list(segments_collection.find({}))
+    return render_template(
+        'admin/export.html',
+        segments=segments
+    )
+
+@app.route('/admin/reg-export')
+@admin_required
+def admin_reg_export():
     format_type = request.args.get('format', 'csv')
+    verified = request.args.get('verified')  # "true", "false", or None
     segment_id = request.args.get('segment_id')
-    
+
     query = {}
+
     if segment_id:
         query['segment_id'] = ObjectId(segment_id)
-    
+
+    if verified in ('true', 'false'):
+        query['verified'] = True if verified == 'true' else False
+
     registrations = list(registrations_collection.find(query))
-    
+
     if format_type == 'csv':
-        csv_data = export_to_csv(registrations)
-        return csv_data
+        return export_to_csv(registrations)
     else:
-        excel_data = export_to_excel(registrations)
-        return excel_data
+        return export_to_excel(registrations)
+
 
 @app.route('/admin/ca-export')
 @admin_required

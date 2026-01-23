@@ -1,0 +1,169 @@
+{% extends "adm_base.html" %}
+
+{% block title %}Admin Segment Registrations{% endblock %}
+
+{% block content %}
+
+<section class="section is-title-bar">
+    <div class="level">
+        <div class="level-left">
+            <div class="level-item">
+                <ul>
+                    <li>Admin</li>
+                    <li>Export</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<h4 class="title is-4 ml-3">Registrations</h4>
+
+<form method="GET" action="{{ url_for('admin_reg_export') }}" class="my-3">
+    <div class="field is-grouped is-align-items-center">
+
+        <!-- Segment -->
+        <div class="field is-horizontal mx-3 mb-0">
+            <div class="field-label is-normal">
+                <label class="label">Segment</label>
+            </div>
+            <div class="field-body">
+                <div class="field mb-0">
+                    <div class="control">
+                        <div class="select">
+                            <select name="segment_id">
+                                <option value="">All Segments</option>
+                                {% for segment in segments %}
+                                <option value="{{ segment._id }}" {% if segment_id==segment._id|string %}selected{% endif %}>
+                                    {{ segment.name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Verified -->
+        <div class="field is-horizontal mr-3 mb-0">
+            <div class="field-label is-normal">
+                <label class="label">Verified</label>
+            </div>
+            <div class="field-body">
+                <div class="field mb-0">
+                    <div class="control">
+                        <div class="select">
+                            <select name="verified">
+                                <option value="">All</option>
+                                <option value="true" {% if verified_filter=='true' %}selected{% endif %}>Verified</option>
+                                <option value="false" {% if verified_filter=='false' %}selected{% endif %}>Not Verified</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Format -->
+        <div class="field is-horizontal mr-3 mb-0">
+            <div class="field-label is-normal">
+                <label class="label">Format</label>
+            </div>
+            <div class="field-body">
+                <div class="field mb-0">
+                    <div class="control">
+                        <div class="select">
+                            <select name="format">
+                                <option value="csv">CSV</option>
+                                <option value="xlsx">XLSX</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Export Button -->
+        <div class="field mb-0">
+            <div class="control">
+                <button type="submit" class="button is-link">
+                    Export
+                </button>
+            </div>
+        </div>
+
+    </div>
+</form>
+
+<h4 class="title is-4 ml-3">CA Registrations</h4>
+
+<form method="GET" action="{{ url_for('admin_ca_export') }}" class="my-3 ml-3">
+    <div class="field is-grouped is-align-items-center">
+
+        <!-- Status -->
+        <div class="field is-horizontal mr-3 mb-0">
+            <div class="field-label is-normal">
+                <label class="label">Status</label>
+            </div>
+            <div class="field-body">
+                <div class="field mb-0">
+                    <div class="control">
+                        <div class="select">
+                            <select name="status">
+                                <option value="">All</option>
+                                <option value="approved" {% if verified_filter=='true' %}selected{% endif %}>Approved</option>
+                                <option value="rejected" {% if verified_filter=='false' %}selected{% endif %}>Rejected</option>
+                                <option value="pending" {% if verified_filter=='false' %}selected{% endif %}>Pending</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Format -->
+        <div class="field is-horizontal mr-3 mb-0">
+            <div class="field-label is-normal">
+                <label class="label">Format</label>
+            </div>
+            <div class="field-body">
+                <div class="field mb-0">
+                    <div class="control">
+                        <div class="select">
+                            <select name="format">
+                                <option value="csv">CSV</option>
+                                <option value="xlsx">XLSX</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Export Button -->
+        <div class="field mb-0">
+            <div class="control">
+                <button type="submit" class="button is-link">
+                    Export
+                </button>
+            </div>
+        </div>
+
+    </div>
+</form>
+
+
+
+
+
+{% endblock %}
+
+{% block scripts %}
+
+<script>
+
+</script>
+
+
+{% endblock %}

@@ -123,27 +123,16 @@
         <header class="card-header">
             <p class="card-header-title">
                 <span class="icon"><i class="mdi mdi-finance"></i></span>
-                Performance
+                Registration Volume
             </p>
             <a href="#" class="card-header-icon">
                 <span class="icon"><i class="mdi mdi-reload"></i></span>
             </a>
         </header>
         <div class="card-content">
-            <div class="chart-area">
-                <div style="height: 100%;">
-                    <div class="chartjs-size-monitor">
-                        <div class="chartjs-size-monitor-expand">
-                            <div></div>
-                        </div>
-                        <div class="chartjs-size-monitor-shrink">
-                            <div></div>
-                        </div>
-                    </div>
-                    <canvas id="big-line-chart" width="2992" height="1000" class="chartjs-render-monitor"
-                        style="display: block; height: 400px; width: 1197px;"></canvas>
-                </div>
-            </div>
+            <canvas id="myChart">
+
+            </canvas>
         </div>
     </div>
 
@@ -212,6 +201,42 @@
         </div>
     </div>
 </section>
+
+{% endblock %}
+
+{% block scripts %}
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+const ctx = document.getElementById('myChart');
+
+const segments = {{ segments | tojson }};
+
+const labels = segments.map(s => s.name);
+const dataValues = segments.map(s => s.current_participants || 0);
+
+new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: labels,
+        datasets: [{
+            label: 'Participants per Segment',
+            data: dataValues,
+            borderWidth: 1
+        }]
+    },
+    options: {
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+    }
+});
+</script>
 
 
 {% endblock %}

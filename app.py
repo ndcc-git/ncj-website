@@ -1,3 +1,4 @@
+import json
 import os
 import random
 import string
@@ -8,6 +9,7 @@ from datetime import datetime, timedelta
 import jwt
 from functools import wraps
 from bson.objectid import ObjectId
+from bson import json_util
 import pandas as pd
 from io import BytesIO
 from werkzeug.utils import secure_filename
@@ -554,11 +556,11 @@ def admin_dashboard():
     
     # Get segment statistics
     segments = list(segments_collection.find({}))
-    
+    segments = json.loads(json_util.dumps(list(segments)))
+
     return render_template('admin/dashboard.html',
                          total_registrations=total_registrations,
                          verified_registrations=verified_registrations,
-                         total_segments=total_segments,
                          contact_messages_count=contact_messages_count,
                          unread_contact_messages=unread_contact_messages,
                          recent_registrations=recent_registrations,

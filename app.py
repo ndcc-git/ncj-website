@@ -14,7 +14,7 @@ import pandas as pd
 from io import BytesIO
 from werkzeug.utils import secure_filename
 from config import Config
-from forms import RegistrationForm, AdminLoginForm, EmailForm, CARegistrationForm, ContactForm
+from forms import RegistrationForm, AdminLoginForm, EmailForm, CARegistrationForm, ContactForm, AdminUserForm
 from utils.security import hash_password, verify_password, generate_csrf_token, verify_csrf_token
 from utils.email_service import send_verification_email, send_bulk_emails, send_ca_approval_email
 from utils.export_service import export_ca_to_csv, export_to_excel, export_to_csv
@@ -494,8 +494,6 @@ def bulk_update_message_status():
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)}), 500
 
-
-
 @app.route('/admin/login', methods=['GET', 'POST'])
 def admin_login():
     """Admin login page"""
@@ -508,7 +506,18 @@ def admin_login():
         admin_user = users_collection.find_one({'email': form.email.data, 'role': 'admin'})
         
         if admin_user and verify_password(admin_user['password'], form.password.data):
-            # Generate JWT token
+            # Check if account is active
+            if not admin_user.get('active', True):
+                flash('Your account has been deactivated. Please contact another admin.', 'error')
+                return redirect(url_for('admin_login'))
+            
+            # Update last login
+            users_collection.update_one(
+                {'_id': admin_user['_id']},
+                {'$set': {'last_login': datetime.utcnow()}}
+            )
+            
+            # Generate JWT token with email
             token_payload = {
                 'email': admin_user['email'],
                 'role': 'admin',
@@ -517,12 +526,42 @@ def admin_login():
             token = jwt.encode(token_payload, app.config['JWT_SECRET_KEY'], algorithm='HS256')
             
             session['admin_token'] = token
+            session['admin_email'] = admin_user['email']
             flash('Logged in successfully', 'success')
             return redirect(url_for('admin_dashboard'))
         else:
             flash('Invalid email or password', 'error')
     
     return render_template('admin/login.html', form=form)
+
+
+# @app.route('/admin/login', methods=['GET', 'POST'])
+# def admin_login():
+#     """Admin login page"""
+#     if 'admin_token' in session:
+#         return redirect(url_for('admin_dashboard'))
+    
+#     form = AdminLoginForm()
+    
+#     if form.validate_on_submit():
+#         admin_user = users_collection.find_one({'email': form.email.data, 'role': 'admin'})
+        
+#         if admin_user and verify_password(admin_user['password'], form.password.data):
+#             # Generate JWT token
+#             token_payload = {
+#                 'email': admin_user['email'],
+#                 'role': 'admin',
+#                 'exp': datetime.utcnow() + app.config['JWT_ACCESS_TOKEN_EXPIRES']
+#             }
+#             token = jwt.encode(token_payload, app.config['JWT_SECRET_KEY'], algorithm='HS256')
+            
+#             session['admin_token'] = token
+#             flash('Logged in successfully', 'success')
+#             return redirect(url_for('admin_dashboard'))
+#         else:
+#             flash('Invalid email or password', 'error')
+    
+#     return render_template('admin/login.html', form=form)
 
 @app.route('/admin/logout')
 def admin_logout():
@@ -794,6 +833,134 @@ def admin_email():
     segments = list(segments_collection.find({}))
     
     return render_template('admin/email.html', form=form, segments=segments)
+
+# Replace both admin_users and add_admin_user routes with this combined route:
+@app.route('/admin/users', methods=['GET', 'POST'])
+@admin_required
+def admin_users():
+    """View all admin users and add new ones"""
+    form = AdminUserForm()
+    
+    # Handle form submission for adding new admin
+    if form.validate_on_submit():
+        # Check if email already exists
+        existing_user = users_collection.find_one({'email': form.email.data})
+        if existing_user:
+            flash('Email already registered as an admin', 'error')
+            return redirect(url_for('admin_users'))
+        
+        # Create new admin user
+        admin_user = {
+            'name': form.name.data,
+            'email': form.email.data,
+            'password': hash_password(form.password.data),
+            'role': 'admin',
+            'created_at': datetime.utcnow(),
+            'created_by': session.get('admin_email', 'system'),
+            'active': True,
+            'last_login': None
+        }
+        
+        # Insert into database
+        users_collection.insert_one(admin_user)
+        
+        flash(f'Admin user {form.email.data} added successfully', 'success')
+        return redirect(url_for('admin_users'))
+    
+    # Get all admin users for display
+    admin_users_list = list(users_collection.find({'role': 'admin'}).sort('created_at', -1))
+    
+    return render_template('admin/users.html', 
+                         form=form, 
+                         admin_users=admin_users_list)
+
+# Remove the add_admin_user route entirely
+
+# Keep the other admin user management routes (delete, reset password)
+@app.route('/admin/users/<user_id>/reset-password', methods=['POST'])
+@admin_required
+def reset_admin_password(user_id):
+    """Reset admin user password"""
+    try:
+        new_password = request.json.get('new_password')
+        
+        if not new_password or len(new_password) < 6:
+            return jsonify({'success': False, 'message': 'Password must be at least 6 characters'}), 400
+        
+        user = users_collection.find_one({'_id': ObjectId(user_id), 'role': 'admin'})
+        
+        if not user:
+            return jsonify({'success': False, 'message': 'User not found'}), 404
+        
+        # Update password
+        users_collection.update_one(
+            {'_id': ObjectId(user_id)},
+            {'$set': {
+                'password': hash_password(new_password),
+                'updated_at': datetime.utcnow(),
+                'password_changed_at': datetime.utcnow()
+            }}
+        )
+        
+        return jsonify({'success': True, 'message': 'Password reset successfully'})
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+@app.route('/admin/users/<user_id>/delete', methods=['DELETE'])
+@admin_required
+def delete_admin_user(user_id):
+    """Delete admin user"""
+    try:
+        user = users_collection.find_one({'_id': ObjectId(user_id), 'role': 'admin'})
+        
+        if not user:
+            return jsonify({'success': False, 'message': 'User not found'}), 404
+        
+        # Prevent deleting own account
+        current_admin_email = session.get('admin_email')
+        if user['email'] == current_admin_email:
+            return jsonify({'success': False, 'message': 'Cannot delete your own account'}), 400
+        
+        # Delete user
+        result = users_collection.delete_one({'_id': ObjectId(user_id)})
+        
+        if result.deleted_count > 0:
+            return jsonify({'success': True, 'message': 'User deleted successfully'})
+        else:
+            return jsonify({'success': False, 'message': 'Failed to delete user'}), 500
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+    
+
+# Update admin_required decorator to store admin email in session
+def admin_required(f):
+    """Decorator to require admin authentication"""
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        token = session.get('admin_token')
+        
+        if not token:
+            return redirect(url_for('admin_login'))
+        
+        try:
+            payload = jwt.decode(token, app.config['JWT_SECRET_KEY'], algorithms=['HS256'])
+            if payload['role'] != 'admin':
+                flash('Admin access required', 'error')
+                return redirect(url_for('admin_login'))
+            
+            # Store admin email in session for reference
+            session['admin_email'] = payload['email']
+            
+        except jwt.ExpiredSignatureError:
+            flash('Session expired. Please login again.', 'error')
+            return redirect(url_for('admin_login'))
+        except jwt.InvalidTokenError:
+            flash('Invalid token. Please login again.', 'error')
+            return redirect(url_for('admin_login'))
+        
+        return f(*args, **kwargs)
+    return decorated_function
+
 
 @app.route('/admin/export')
 @admin_required

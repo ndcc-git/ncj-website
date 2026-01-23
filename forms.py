@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SelectField, RadioField, BooleanField, TextAreaField, HiddenField, SubmitField
-from wtforms.validators import DataRequired, Email, Length, Regexp, Optional
+from wtforms.validators import DataRequired, Email, Length, Regexp, Optional, EqualTo
 from flask_wtf.file import FileField, FileAllowed
 from wtforms.widgets import TextArea
 
@@ -152,3 +152,28 @@ class ContactForm(FlaskForm):
     ], widget=TextArea(), render_kw={"rows": 6})
     
     submit = SubmitField('Send Message')
+
+class AdminUserForm(FlaskForm):
+    """Form for adding admin users"""
+    name = StringField('Full Name', validators=[
+        DataRequired(),
+        Length(min=2, max=100)
+    ])
+    
+    email = StringField('Email', validators=[
+        DataRequired(),
+        Email(),
+        Length(max=100)
+    ])
+    
+    password = PasswordField('Password', validators=[
+        DataRequired(),
+        Length(min=6, message='Password must be at least 6 characters')
+    ])
+    
+    confirm_password = PasswordField('Confirm Password', validators=[
+        DataRequired(),
+        EqualTo('password', message='Passwords must match')
+    ])
+    
+    submit = SubmitField('Add Admin User')

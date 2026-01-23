@@ -1,0 +1,314 @@
+{% extends "base.html" %}
+
+{% block title %}Admin User Management{% endblock %}
+
+{% block content %}
+<div class="admin-users">
+    <div class="admin-container">
+        <!-- Left column: Add User Form -->
+        <div class="admin-form-column">
+            <div class="form-card">
+                <h3><i class="form-icon">➕</i> Add New Admin User</h3>
+                
+                <div class="form-guide">
+                    <p><strong>Note:</strong> All admin users have equal privileges.</p>
+                </div>
+                
+                <form method="POST" action="{{ url_for('admin_users') }}">
+                    {{ form.hidden_tag() }}
+                    
+                    <div class="form-group">
+                        {{ form.name.label }}
+                        {{ form.name(class="form-control", placeholder="Enter full name") }}
+                        {% if form.name.errors %}
+                            <div class="errors">
+                                {% for error in form.name.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group">
+                        {{ form.email.label }}
+                        {{ form.email(class="form-control", type="email", placeholder="Enter email address") }}
+                        {% if form.email.errors %}
+                            <div class="errors">
+                                {% for error in form.email.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group">
+                        {{ form.password.label }}
+                        {{ form.password(class="form-control", placeholder="Enter password (min. 6 chars)") }}
+                        {% if form.password.errors %}
+                            <div class="errors">
+                                {% for error in form.password.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group">
+                        {{ form.confirm_password.label }}
+                        {{ form.confirm_password(class="form-control", placeholder="Confirm password") }}
+                        {% if form.confirm_password.errors %}
+                            <div class="errors">
+                                {% for error in form.confirm_password.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group">
+                        {{ form.submit(class="btn btn-primary") }}
+                    </div>
+                </form>
+                
+                <div class="security-note">
+                    <p><strong>🔒 Security:</strong> Passwords are securely hashed. Each admin should use their own account.</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Right column: Admin Users List -->
+        <div class="admin-list-column">
+            <div class="list-header">
+                <h3><i class="list-icon">👥</i> Admin Users ({{ admin_users|length }})</h3>
+                <div class="current-user">
+                    Logged in as: <strong>{{ session.admin_email }}</strong>
+                </div>
+            </div>
+            
+            {% if admin_users %}
+            <div class="table-responsive">
+                <table id="admin-users-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Created</th>
+                            <th>Last Login</th>
+                            <th>Created By</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in admin_users %}
+                        <tr data-id="{{ user._id }}" {% if user.email == session.admin_email %}class="current-user-row"{% endif %}>
+                            <td>
+                                {{ user.name }}
+                                {% if user.email == session.admin_email %}
+                                <span class="badge badge-you">You</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ user.email }}</td>
+                            <td>
+                                {% if user.created_at %}
+                                {{ user.created_at.strftime('%Y-%m-%d') }}
+                                {% else %}
+                                N/A
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if user.last_login %}
+                                {{ user.last_login.strftime('%Y-%m-%d %H:%M') }}
+                                {% else %}
+                                Never
+                                {% endif %}
+                            </td>
+                            <td>{{ user.created_by or 'System' }}</td>
+                            <td>
+                                <div class="action-buttons">
+                                    {% if user.email != session.admin_email %}
+                                    <button class="btn btn-sm btn-info reset-password-btn" 
+                                            data-id="{{ user._id }}"
+                                            data-email="{{ user.email }}">
+                                        Reset Password
+                                    </button>
+                                    
+                                    <button class="btn btn-sm btn-danger delete-user-btn" 
+                                            data-id="{{ user._id }}"
+                                            data-email="{{ user.email }}">
+                                        Delete
+                                    </button>
+                                    {% else %}
+                                    <span class="text-muted">Current User</span>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="no-users">
+                <p>No admin users found.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Reset Password Modal -->
+<div id="resetPasswordModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h3>Reset Password</h3>
+        <div id="resetPasswordForm">
+            <div class="form-group">
+                <label for="new_password">New Password:</label>
+                <input type="password" id="new_password" class="form-control" 
+                       placeholder="Enter new password (min. 6 chars)" minlength="6">
+                <small class="form-text">Minimum 6 characters</small>
+            </div>
+            <div class="form-group">
+                <label for="confirm_new_password">Confirm Password:</label>
+                <input type="password" id="confirm_new_password" class="form-control" 
+                       placeholder="Confirm new password">
+            </div>
+            <div class="form-group">
+                <button id="confirmResetBtn" class="btn btn-primary">Reset Password</button>
+                <button id="cancelResetBtn" class="btn btn-secondary">Cancel</button>
+            </div>
+            <div id="resetPasswordMessage" class="alert" style="display: none;"></div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    let currentUserId = null;
+    
+    // Show reset password modal
+    document.querySelectorAll('.reset-password-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            currentUserId = this.dataset.id;
+            const email = this.dataset.email;
+            
+            document.getElementById('resetPasswordModal').style.display = 'block';
+            document.querySelector('#resetPasswordModal h3').textContent = `Reset Password for ${email}`;
+            
+            // Clear form
+            document.getElementById('new_password').value = '';
+            document.getElementById('confirm_new_password').value = '';
+            document.getElementById('resetPasswordMessage').style.display = 'none';
+        });
+    });
+    
+    // Delete user
+    document.querySelectorAll('.delete-user-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const userId = this.dataset.id;
+            const email = this.dataset.email;
+            
+            if (confirm(`Are you sure you want to delete admin user "${email}"? This action cannot be undone.`)) {
+                deleteUser(userId);
+            }
+        });
+    });
+    
+    // Modal close buttons
+    document.querySelectorAll('.modal .close').forEach(closeBtn => {
+        closeBtn.addEventListener('click', function() {
+            this.closest('.modal').style.display = 'none';
+        });
+    });
+    
+    document.getElementById('cancelResetBtn').addEventListener('click', function() {
+        document.getElementById('resetPasswordModal').style.display = 'none';
+    });
+    
+    // Confirm reset password
+    document.getElementById('confirmResetBtn').addEventListener('click', function() {
+        const newPassword = document.getElementById('new_password').value;
+        const confirmPassword = document.getElementById('confirm_new_password').value;
+        const messageDiv = document.getElementById('resetPasswordMessage');
+        
+        // Validate
+        if (newPassword.length < 6) {
+            showMessage('Password must be at least 6 characters', 'error', messageDiv);
+            return;
+        }
+        
+        if (newPassword !== confirmPassword) {
+            showMessage('Passwords do not match', 'error', messageDiv);
+            return;
+        }
+        
+        // Send request
+        const meta = document.querySelector('meta[name="csrf-token"]');
+        const csrfToken = meta.getAttribute("content");
+        fetch(`/admin/users/${currentUserId}/reset-password`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
+            },
+            body: JSON.stringify({ new_password: newPassword })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showMessage('Password reset successfully', 'success', messageDiv);
+                setTimeout(() => {
+                    document.getElementById('resetPasswordModal').style.display = 'none';
+                    location.reload();
+                }, 1500);
+            } else {
+                showMessage('Error: ' + data.message, 'error', messageDiv);
+            }
+        })
+        .catch(error => {
+            showMessage('Network error: ' + error, 'error', messageDiv);
+        });
+    });
+    
+    function deleteUser(userId) {
+        const meta = document.querySelector('meta[name="csrf-token"]');
+        const csrfToken = meta.getAttribute("content");
+        fetch(`/admin/users/${userId}/delete`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message);
+                location.reload();
+            } else {
+                alert('Error: ' + data.message);
+            }
+        });
+    }
+    
+    function showMessage(message, type, element) {
+        element.textContent = message;
+        element.className = `alert alert-${type}`;
+        element.style.display = 'block';
+        
+        // Scroll to message
+        element.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+    
+    // Close modal when clicking outside
+    window.addEventListener('click', function(event) {
+        if (event.target.classList.contains('modal')) {
+            event.target.style.display = 'none';
+        }
+    });
+</script>
+{% endblock %}

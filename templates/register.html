@@ -80,6 +80,19 @@
             {% endif %}
         </div>
 
+        <div class="form-group" id="submission-link-group" style="display:none;">
+            {{ form.submission_link.label }}
+            {{ form.submission_link(class="form-control") }}
+            {% if form.submission_link.errors %}
+                <div class="errors">
+                    {% for error in form.submission_link.errors %}
+                        <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+
+
         <div class="form-group">
             {{ form.ca_ref.label }}
             {{ form.ca_ref(class="form-control", type="text") }}
@@ -170,13 +183,21 @@
             fetch(`/api/segments/${segmentId}/type`)
                 .then(response => response.json())
                 .then(data => {
-                    console.log(data.type);
+                    const nameLabel = document.querySelector("body > div > div > form > div:nth-child(4) > label");
+
                     if (data.type == "Team") {
-                        const nameLabel = document.querySelector("body > div > div > form > div:nth-child(4) > label");
                         nameLabel.innerHTML = "Team Name"
                     } else {
-                        const nameLabel = document.querySelector("body > div > div > form > div:nth-child(4) > label");
                         nameLabel.innerHTML = "Full Name"
+                    }
+
+                    // ✅ submission link logic
+                    const submissionDiv = document.getElementById("submission-link-group");
+
+                    if (data.type === "submission") {
+                        submissionDiv.style.display = "block";
+                    } else {
+                        submissionDiv.style.display = "none";
                     }
                 });
         }

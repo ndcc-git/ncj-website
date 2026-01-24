@@ -219,33 +219,43 @@ def register():
     form = RegistrationForm()
     
     # Get segments for dropdown
-    segments = list(segments_collection.find({}, {'_id': 1, 'name': 1, 'price': 1, 'categories': 1}))
+    segments = list(segments_collection.find({}, {'_id': 1, 'name': 1, 'price': 1, 'categories': 1, 'type': 1}))
     form.segment.choices = [(str(seg['_id']), f"{seg['name']} - ${seg['price']}") for seg in segments]
     
     if form.validate_on_submit():
         # Generate CSRF token for this submission
         csrf_token = generate_csrf_token()
         
-        # Check if segment exists and has capacity
+        # Fetch selected segment
         segment = segments_collection.find_one({'_id': ObjectId(form.segment.data)})
         if not segment:
             flash('Selected segment not found', 'error')
             return redirect(url_for('register'))
         
+        # Check if segment has capacity
         if segment.get('current_participants', 0) >= segment.get('max_participants', float('inf')):
             flash('This segment is full', 'error')
             return redirect(url_for('register'))
         
-        # Check for duplicate registration (same email for same segment)
+        # Check for duplicate registration
         existing = registrations_collection.find_one({
             'email': form.email.data,
             'segment_id': ObjectId(form.segment.data),
             'verified': True
         })
-        
         if existing:
             flash('You have already registered for this segment', 'error')
             return redirect(url_for('register'))
+        
+        # ✅ Conditional category validation
+        if segment.get('categories') and not form.category.data:
+            form.category.errors.append("Category is required for this segment.")
+            return render_template('register.html', form=form, segments=segments)
+        
+        # ✅ Conditional submission link validation
+        if segment.get('type') == "submission" and not form.submission_link.data:
+            form.submission_link.errors.append("Submission link is required for this segment.")
+            return render_template('register.html', form=form, segments=segments)
         
         # Create registration
         registration_data = {
@@ -254,7 +264,8 @@ def register():
             'institution': form.institution.data,
             'segment_id': ObjectId(form.segment.data),
             'segment_name': segment['name'],
-            'category': form.category.data,
+            'category': form.category.data if segment.get('categories') else None,
+            'submission_link': form.submission_link.data if segment.get('type') == "submission" else None,
             'ca_ref': form.ca_ref.data,
             'bkash_number': form.bkash_number.data,
             'transaction_id': form.transaction_id.data,
@@ -288,6 +299,7 @@ def register():
         form.email.data = session['last_registration']['email']
     
     return render_template('register.html', form=form, segments=segments)
+
 
 @app.route('/registration-success/<registration_id>')
 def registration_success(registration_id):

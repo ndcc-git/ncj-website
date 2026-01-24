@@ -48,13 +48,21 @@
                                         <code>{{ registration.transaction_id }}</code>
                                     </p>
                                 </div>
-
+                                {% if registration.verified %}
+                                <article class="message is-primary is-light mt-4">
+                                    <div class="message-body">
+                                        ⏳ Status: <strong>Registration verified</strong><br>
+                                        Check your email. Don't forget to check your spam box.
+                                    </div>
+                                </article>
+                                {% else %}
                                 <article class="message is-warning is-light mt-4">
                                     <div class="message-body">
                                         ⏳ Status: <strong>Pending verification</strong><br>
                                         You will receive an email once approved.
                                     </div>
                                 </article>
+                                {% endif %}
                             </div>
 
                             <!-- QR -->

@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SelectField, RadioField, TextAreaField, HiddenField, SubmitField
-from wtforms.validators import DataRequired, Email, Length, Regexp, Optional, EqualTo
+from wtforms.validators import DataRequired, Email, Length, Regexp, Optional, EqualTo, URL
 from flask_wtf.file import FileField, FileAllowed
 from wtforms.widgets import TextArea
 
@@ -29,7 +29,13 @@ class RegistrationForm(FlaskForm):
         ('S', 'School (S)'),
         ('HS', 'High School (HS)'),
         ('A', 'Adult (A)')
-    ], validators=[DataRequired()])
+    ], validators=[Optional()])
+
+    submission_link = StringField('Submission Link', validators=[
+    Optional(),
+    URL(message="Enter a valid URL")
+    ])
+
 
     ca_ref = StringField('CA Reference', validators=[
         Length(min=2),

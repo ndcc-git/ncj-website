@@ -299,6 +299,19 @@ def registration_success(registration_id):
     
     return render_template('success.html', registration=registration)
 
+@app.route('/gallery', methods=['GET'])
+def gallery():
+    return {"Hello": "adawd"}
+
+@app.route('/about', methods=['GET'])
+def about():
+    return {"Hello": "adawd"}
+
+@app.route('/events', methods=['GET'])
+def events():
+    return {"Hello": "adawd"}
+
+
 
 @app.route('/contact', methods=['GET', 'POST'])
 def contact():

@@ -1,122 +1,154 @@
 {% extends "base.html" %}
-
 {% block title %}CA Application Successful{% endblock %}
 
-{% block content %}
-<div class="ca-success">
-    <div class="success-header">
-        <h2>Campus Ambassador Application Successful!</h2>
-        <div class="confetti">🎉</div>
-    </div>
-    
-    <div class="ca-details-card">
-        <div class="ca-code-display">
-            <h3>Your Unique CA Code</h3>
-            <div class="ca-code">{{ ca_registration.ca_code }}</div>
-            <p class="code-note">Keep this code confidential. Use it when referring participants.</p>
-        </div>
-        
-        <div class="application-summary">
-            <h3>Application Details</h3>
-            <div class="details-grid">
-                <div class="detail-item">
-                    <span class="detail-label">Name:</span>
-                    <span class="detail-value">{{ ca_registration.full_name }}</span>
-                </div>
-                <div class="detail-item">
-                    <span class="detail-label">CA Code:</span>
-                    <span class="detail-value">{{ ca_registration.ca_code }}</span>
-                </div>
-                <div class="detail-item">
-                    <span class="detail-label">Email:</span>
-                    <span class="detail-value">{{ ca_registration.email }}</span>
-                </div>
-                <div class="detail-item">
-                    <span class="detail-label">Phone:</span>
-                    <span class="detail-value">{{ ca_registration.phone }}</span>
-                </div>
-                <div class="detail-item">
-                    <span class="detail-label">Institution:</span>
-                    <span class="detail-value">{{ ca_registration.institution }}</span>
-                </div>
-                <div class="detail-item">
-                    <span class="detail-label">Class/Year:</span>
-                    <span class="detail-value">{{ ca_registration.class }}</span>
-                </div>
-                <div class="detail-item full-width">
-                    <span class="detail-label">Application Status:</span>
-                    <span class="detail-value status-{{ ca_registration.status }}">
-                        {{ ca_registration.status|title }}
-                    </span>
-                </div>
-            </div>
-        </div>
-        
-        <div class="next-steps">
-            <h3>What's Next?</h3>
-            <ol>
-                <li>Your application is now <strong>{{ ca_registration.status }}</strong></li>
-                <li>You will receive an email confirmation shortly</li>
-                <li>The organizing committee will review your application within 3-5 business days</li>
-                <li>If approved, you'll receive:
-                    <ul>
-                        <li>CA Welcome Kit</li>
-                        <li>Detailed guidelines</li>
-                        <li>Access to CA portal</li>
-                    </ul>
-                </li>
-            </ol>
-        </div>
-        
-        <div class="ca-actions">
-            <a href="{{ url_for('index') }}" class="btn btn-primary">Back to Home</a>
-            <a href="{{ url_for('ca_register') }}" class="btn btn-secondary">Apply Again (for friend)</a>
-            <button onclick="copyCACode()" class="btn btn-success">Copy CA Code</button>
-        </div>
-    </div>
-    
-    <div class="ca-instructions">
-        <h3>How to Use Your CA Code?</h3>
-        <div class="instructions-grid">
-            <div class="instruction">
-                <div class="instruction-icon">1️⃣</div>
-                <h4>Share Your Code</h4>
-                <p>Give your CA code to participants when they register</p>
-            </div>
-            <div class="instruction">
-                <div class="instruction-icon">2️⃣</div>
-                <h4>Track Registrations</h4>
-                <p>Each registration with your code will be tracked to your account</p>
-            </div>
-            <div class="instruction">
-                <div class="instruction-icon">3️⃣</div>
-                <h4>Earn Rewards</h4>
-                <p>Get rewards based on the number of successful registrations</p>
-            </div>
-            <div class="instruction">
-                <div class="instruction-icon">4️⃣</div>
-                <h4>Receive Certificate</h4>
-                <p>Get a certificate of appreciation for your efforts</p>
-            </div>
-        </div>
-    </div>
-</div>
+
+{% block head %}
+
 {% endblock %}
+
+{% block content %}
+
+<section class="section">
+    <div class="container">
+
+        <!-- Success Hero -->
+        <div class="notification is-success is-light has-text-centered">
+            <h1 class="title is-3">🎉 Campus Ambassador Application Successful!</h1>
+            <p class="subtitle is-6">Thank you for applying to become a Campus Ambassador</p>
+        </div>
+
+        <div class="columns is-centered mt-5">
+            <div class="column is-10">
+
+                <!-- Main Card -->
+                <div class="card">
+                    <div class="card-content">
+
+                        <!-- Profile + CA Code -->
+                        <div class="columns is-vcentered">
+                            <div class="column is-4 has-text-centered">
+                                <figure class="image is-128x128 is-inline-block">
+                                    <img class="is-rounded"
+                                        src="/static/uploads/ca_profiles/{{ ca_registration.profile_picture }}"
+                                        alt="Profile Picture">
+                                </figure>
+                                <p class="has-text-weight-semibold mt-2">{{ ca_registration.full_name }}</p>
+                                <span class="tag mt-1
+                                    {% if ca_registration.status == 'approved' %} is-success is-light
+                                    {% elif ca_registration.status == 'pending' %} is-warning is-light
+                                    {% elif ca_registration.status == 'rejected' %} is-danger is-light
+                                    {% else %} is-info is-light
+                                    {% endif %}">
+                                        {{ ca_registration.status|title }}
+                                </span>
+
+                            </div>
+
+                            {% if ca_registration.status == 'approved' %}
+                            <div class="column is-8">
+                                <div class="box has-background-primary-light has-text-centered">
+                                    <p class="has-text-grey">Your Unique CA Code</p>
+                                    <p class="title is-2 has-text-primary" id="caCode">
+                                        {{ ca_registration.ca_code }}
+                                    </p>
+                                    <p class="is-size-7">Keep this code confidential. Use it when referring
+                                        participants.</p>
+
+                                    <button onclick="copyCACode()" class="button is-primary is-small mt-3">
+                                        📋 Copy CA Code
+                                    </button>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <hr>
+
+                        <!-- Application Details -->
+                        <h3 class="title is-5">📄 Application Details</h3>
+
+                        <div class="columns is-multiline">
+                            <div class="column is-6"><strong>Email:</strong> {{ ca_registration.email }}</div>
+                            <div class="column is-6"><strong>Phone:</strong> {{ ca_registration.phone }}</div>
+                            <div class="column is-6"><strong>Institution:</strong> {{ ca_registration.institution }}
+                            </div>
+                            <div class="column is-6"><strong>Class/Year:</strong> {{ ca_registration.class }}</div>
+                        </div>
+
+                        <hr>
+
+                        <!-- Next Steps -->
+                        <h3 class="title is-5">🚀 What’s Next?</h3>
+                        <div class="content">
+                            <ol>
+                                <li>Your application is <strong>{{ ca_registration.status }}</strong></li>
+                                <li>You will receive an email confirmation shortly</li>
+                                <li>Review time: 3–5 business days</li>
+                                <li>If approved, you’ll receive:
+                                    <ul>
+                                        <li>CA Welcome Kit</li>
+                                        <li>Detailed guidelines</li>
+                                        <li>Access to CA portal</li>
+                                    </ul>
+                                </li>
+                            </ol>
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="buttons is-centered mt-4">
+                            <a href="{{ url_for('index') }}" class="button is-link is-light">🏠 Back to Home</a>
+                            <a href="{{ url_for('ca_register') }}" class="button is-info is-light">➕ Apply for a
+                                Friend</a>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Instructions -->
+                <div class="box mt-5">
+                    <h3 class="title is-5 has-text-centered">📌 How to Use Your CA Code</h3>
+
+                    <div class="columns has-text-centered mt-4">
+                        <div class="column">
+                            <p class="title is-4">1️⃣</p>
+                            <p class="has-text-weight-semibold">Share Your Code</p>
+                            <p class="is-size-7">Give your CA code to participants</p>
+                        </div>
+                        <div class="column">
+                            <p class="title is-4">2️⃣</p>
+                            <p class="has-text-weight-semibold">Track Registrations</p>
+                            <p class="is-size-7">Each signup is linked to you</p>
+                        </div>
+                        <div class="column">
+                            <p class="title is-4">3️⃣</p>
+                            <p class="has-text-weight-semibold">Earn Rewards</p>
+                            <p class="is-size-7">Top CAs get special prizes</p>
+                        </div>
+                        <div class="column">
+                            <p class="title is-4">4️⃣</p>
+                            <p class="has-text-weight-semibold">Get Certificate</p>
+                            <p class="is-size-7">Official recognition of your work</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
+
 
 {% block scripts %}
 <script>
     function copyCACode() {
-        const caCode = '{{ ca_registration.ca_code }}';
-        navigator.clipboard.writeText(caCode)
-            .then(() => {
-                alert(`CA Code "${caCode}" copied to clipboard!`);
-            })
-            .catch(err => {
-                console.error('Failed to copy: ', err);
-            });
+        const caCode = "{{ ca_registration.ca_code }}";
+        navigator.clipboard.writeText(caCode).then(() => {
+            alert("CA Code copied: " + caCode);
+        });
     }
-    
-    // Save CA code to localStorage for future reference
-    localStorage.setItem('last_ca_code', '{{ ca_registration.ca_code }}');
+
+    localStorage.setItem("last_ca_code", "{{ ca_registration.ca_code }}");
 </script>
 {% endblock %}

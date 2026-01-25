@@ -145,15 +145,15 @@
 
                             <td data-label="Verified">
                                 {% if reg.verified %}
-                                <span class="is-primary">Yes</span>
+                                <span class="tag is-primary">Yes</span>
                                 {% else %}
-                                <span class="is-danger">No</span>
+                                <span class="tag is-danger">No</span>
                                 {% endif %}
                             </td>
 
                             <td class="is-actions-cell">
                                 {% if not reg.verified %}
-                                <div class="buttons is-right verify-btn">
+                                <div class="buttons is-right verify-btn" data-id="{{ reg._id }}">
                                     <button class="button is-small is-primary" type="button">
                                         Verify
                                     </button>

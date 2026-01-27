@@ -18,66 +18,67 @@
 </section>
 
 <form method="GET" action="{{ url_for('admin.admin_registrations') }}">
-    <div class="field is-grouped is-align-items-center">
-
+    <div class="field is-grouped is-align-items-flex-end is-flex-wrap-wrap">
+        
         <!-- Segment -->
-        <div class="field is-horizontal mx-3">
-            <div class="field-label is-normal">
-                <label class="label">Segment:</label>
-            </div>
-            <div class="field-body">
-                <div class="field">
-                    <div class="control">
-                        <div class="select">
-                            <select name="segment_id">
-                                <option value="">All Segments</option>
-                                {% for segment in segments %}
-                                <option value="{{ segment._id }}" {% if segment_id==segment._id|string %}selected{%
-                                    endif %}>
-                                    {{ segment.name }}
-                                </option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                    </div>
-                </div>
+        <div class="control mr-4 mb-2">
+            <label class="label is-size-7 mb-1">Segment:</label>
+            <div class="select">
+                <select name="segment_id">
+                    <option value="">All Segments</option>
+                    {% for segment in segments %}
+                    <option value="{{ segment._id }}" {% if segment_id==segment._id|string %}selected{% endif %}>
+                        {{ segment.name }}
+                    </option>
+                    {% endfor %}
+                </select>
             </div>
         </div>
 
         <!-- Verified -->
-        <div class="field is-horizontal mr-3">
-            <div class="field-label is-normal">
-                <label class="label">Verified:</label>
-            </div>
-            <div class="field-body">
-                <div class="field">
-                    <div class="control">
-                        <div class="select">
-                            <select name="verified" id="verified">
-                                <option value="">All</option>
-                                <option value="true" {% if verified_filter=='true' %}selected{% endif %}>Verified
-                                </option>
-                                <option value="false" {% if verified_filter=='false' %}selected{% endif %}>Not Verified
-                                </option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
+        <div class="control mr-4 mb-2">
+            <label class="label is-size-7 mb-1">Verified:</label>
+            <div class="select">
+                <select name="verified" id="verified">
+                    <option value="">All</option>
+                    <option value="true" {% if verified_filter=='true' %}selected{% endif %}>Verified</option>
+                    <option value="false" {% if verified_filter=='false' %}selected{% endif %}>Not Verified</option>
+                </select>
             </div>
         </div>
 
         <!-- Buttons -->
-        <div class="field is-grouped">
-            <div class="control mr-3">
+        <div class="field is-grouped mb-2">
+            <div class="control">
                 <button type="submit" class="button is-link">Filter</button>
             </div>
-            <div class="control">
+            <div class="control ml-2">
                 <button type="button" id="bulk-verify-btn" class="button is-link is-light bulk-verify-btn">
                     Bulk Verify Selected
                 </button>
             </div>
         </div>
 
+    </div>
+</form>
+
+<form method="GET" action="{{ url_for('admin.admin_registrations') }}" class="mb-3">
+    <div class="field has-addons is-align-items-center">
+        <div class="control">
+            <span class="button is-static">
+                <span class="icon is-small">
+                    <i class="mdi mdi-magnify"></i>
+                </span>
+            </span>
+        </div>
+        
+        <div class="control">
+            <input class="input" type="text" placeholder="Search" name="search">
+        </div>
+        
+        <div class="control">
+            <button type="submit" class="button is-link">Search</button>
+        </div>
     </div>
 </form>
 

@@ -54,6 +54,26 @@
     </div>
 </form>
 
+<form method="GET" action="{{ url_for('admin.admin_ca_registrations') }}" class="ml-3 mb-3">
+    <div class="field has-addons is-align-items-center">
+        <div class="control">
+            <span class="button is-static">
+                <span class="icon is-small">
+                    <i class="mdi mdi-magnify"></i>
+                </span>
+            </span>
+        </div>
+        
+        <div class="control">
+            <input class="input" type="text" placeholder="Search" name="search">
+        </div>
+        
+        <div class="control">
+            <button type="submit" class="button is-link">Search</button>
+        </div>
+    </div>
+</form>
+
 
 
 <div class="card has-table">

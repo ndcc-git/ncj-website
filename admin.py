@@ -2,6 +2,7 @@ from datetime import datetime
 from functools import wraps
 import json
 from bson import ObjectId, json_util
+from bson.errors import InvalidId
 from flask import Blueprint
 from flask import render_template, request, jsonify, redirect, url_for, flash, session, current_app
 import jwt
@@ -250,25 +251,51 @@ def admin_registrations():
     """View and manage registrations"""
     segment_id = request.args.get('segment_id')
     verified_filter = request.args.get('verified')
-    
+    search = request.args.get('search')
+
     query = {}
-    
+
+    # Normal filters
     if segment_id:
         query['segment_id'] = ObjectId(segment_id)
-    
+
     if verified_filter == 'true':
         query['verified'] = True
     elif verified_filter == 'false':
         query['verified'] = False
-    
-    registrations = list(db.registrations.find(query).sort('registration_date', -1))
+
+    # Search filter (same input for _id or other fields)
+    if search:
+        search = search.strip()
+        or_conditions = [
+            {"full_name": {"$regex": search, "$options": "i"}},
+            {"email": {"$regex": search, "$options": "i"}},
+            {"bkash_number": {"$regex": search, "$options": "i"}},
+            {"transaction_id": {"$regex": search, "$options": "i"}},
+        ]
+
+        # Try adding _id search if valid ObjectId
+        try:
+            or_conditions.append({"_id": ObjectId(search)})
+        except InvalidId:
+            pass
+
+        query["$or"] = or_conditions
+
+    registrations = list(
+        db.registrations.find(query).sort('registration_date', -1)
+    )
     segments = list(db.segments.find({}))
-    
-    return render_template('admin/registrations.html',
-                         registrations=registrations,
-                         segments=segments,
-                         segment_id=segment_id,
-                         verified_filter=verified_filter)
+
+    return render_template(
+        'admin/registrations.html',
+        registrations=registrations,
+        segments=segments,
+        segment_id=segment_id,
+        verified_filter=verified_filter,
+        search=search
+    )
+
 
 @admin_bp.route('/verify-registration/<registration_id>', methods=['POST'])
 @admin_required
@@ -322,16 +349,43 @@ def bulk_verify():
 def admin_ca_registrations():
     """View and manage CA registrations"""
     status_filter = request.args.get('status', 'all')
-    
+    search = request.args.get('search')
+
     query = {}
+
+    # Status filter
     if status_filter != 'all':
         query['status'] = status_filter
-    
-    ca_registrations = list(db.ca_registrations.find(query).sort('registration_date', -1))
-    
-    return render_template('admin/ca_registrations.html',
-                         ca_registrations=ca_registrations,
-                         status_filter=status_filter)
+
+    # Search filter (same input for _id or other fields)
+    if search:
+        search = search.strip()
+        or_conditions = [
+            {"full_name": {"$regex": search, "$options": "i"}},
+            {"email": {"$regex": search, "$options": "i"}},
+            {"phone": {"$regex": search, "$options": "i"}},
+            {"institution": {"$regex": search, "$options": "i"}},
+            {"ca_code": {"$regex": search, "$options": "i"}},
+        ]
+
+        # If valid ObjectId, also search by _id
+        try:
+            or_conditions.append({"_id": ObjectId(search)})
+        except InvalidId:
+            pass
+
+        query["$or"] = or_conditions
+
+    ca_registrations = list(
+        db.ca_registrations.find(query).sort('registration_date', -1)
+    )
+
+    return render_template(
+        'admin/ca_registrations.html',
+        ca_registrations=ca_registrations,
+        status_filter=status_filter,
+        search=search
+    )
 
 @admin_bp.route('/update-ca-status/<ca_id>', methods=['POST'])
 @admin_required

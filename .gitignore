@@ -9,3 +9,4 @@ venv/
 .DS_Store
 *.db
 instance/
+gen.py

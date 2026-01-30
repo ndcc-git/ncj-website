@@ -17,7 +17,9 @@
             <h3>{{ segment.name }}</h3>
             <p class="segment-type">{{ segment.type }}</p>
             <p class="segment-price">Price: ${{ segment.price }}</p>
-            <a href="{{ url_for('register') }}" class="btn btn-secondary">Register for this segment</a>
+            <a href="{{ url_for('register', segment_id=segment._id|string) }}" class="btn btn-secondary">
+            Register for this segment
+            </a>
         </div>
         {% endfor %}
     </div>

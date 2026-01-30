@@ -223,6 +223,19 @@
         document.getElementById('email').addEventListener('blur', function () {
             localStorage.setItem('festival_registration_email', this.value);
         });
+
+        const segmentSelect = document.getElementById('segment-select');
+        
+        // Check if we have a preselected segment
+        {% if preselected_segment_id %}
+            const preselectedSegmentId = '{{ preselected_segment_id }}';
+            
+            // Set the segment dropdown value
+            segmentSelect.value = preselectedSegmentId;
+            
+            // Trigger the change event to load categories
+            segmentSelect.dispatchEvent(new Event('change'));
+        {% endif %}
     });
 </script>
 {% endblock %}

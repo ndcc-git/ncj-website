@@ -221,7 +221,9 @@ def register():
     # Get segments for dropdown
     segments = list(segments_collection.find({}, {'_id': 1, 'name': 1, 'price': 1, 'categories': 1, 'type': 1}))
     form.segment.choices = [(str(seg['_id']), f"{seg['name']} - ${seg['price']}") for seg in segments]
-    
+    segment_id = request.args.get('segment_id')
+
+
     if form.validate_on_submit():
         # Generate CSRF token for this submission
         csrf_token = generate_csrf_token()
@@ -297,6 +299,24 @@ def register():
     if 'last_registration' in session:
         form.full_name.data = session['last_registration']['full_name']
         form.email.data = session['last_registration']['email']
+
+    if segment_id:
+        try:
+            # Check if segment_id is valid ObjectId
+            ObjectId(segment_id)
+            # Check if segment_id exists in segments
+            segment_exists = any(str(seg['_id']) == segment_id for seg in segments)
+            if segment_exists:
+                form.segment.data = segment_id
+                
+                # Trigger category loading via JavaScript
+                # We'll pass this to the template
+                return render_template('register.html', 
+                                     form=form, 
+                                     segments=segments,
+                                     preselected_segment_id=segment_id)
+        except:
+            pass  # Invalid segment_id, just continue normally
     
     return render_template('register.html', form=form, segments=segments)
 

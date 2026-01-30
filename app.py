@@ -1,23 +1,16 @@
-import json
 import os
 import random
 import string
+import uuid
 from flask import Flask, render_template, request, jsonify, redirect, url_for, flash, session, blueprints
 from flask_wtf.csrf import CSRFProtect
 from pymongo import MongoClient
 from datetime import datetime, timedelta
-import jwt
-from functools import wraps
 from bson.objectid import ObjectId
-from bson import json_util
-import pandas as pd
-from io import BytesIO
 from werkzeug.utils import secure_filename
 from config import Config
-from forms import RegistrationForm, AdminLoginForm, CARegistrationForm, ContactForm, AdminUserForm
-from utils.security import hash_password, verify_password, generate_csrf_token, verify_csrf_token
-from utils.email_service import send_verification_email, send_bulk_emails, send_ca_approval_email
-from utils.export_service import export_ca_to_csv, export_to_excel, export_to_csv
+from forms import RegistrationForm, CARegistrationForm, ContactForm
+from utils.security import hash_password, generate_csrf_token
 import extensions
 
 app = Flask(__name__)
@@ -127,7 +120,8 @@ def init_db():
     db.contact_messages.create_index([('archived', 1)])
 
 
-
+ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'png'}
+MAX_FILE_SIZE = 2 * 1024 * 1024
 
 @app.route('/')
 def index():
@@ -140,6 +134,26 @@ def ca_register():
     """CA Registration page"""
     form = CARegistrationForm()
     
+    # File upload security configurations
+    ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'png', 'gif'}
+    MAX_FILE_SIZE = 2 * 1024 * 1024  # 5MB
+    UPLOAD_FOLDER = os.path.join(app.root_path, 'static', 'uploads', 'ca_profiles')
+    
+    # Ensure upload directory exists and is secure
+    os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+    
+    # Function to validate file
+    def allowed_file(filename):
+        return '.' in filename and \
+               filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+    
+    def validate_file_size(file):
+        # Get file size by seeking to end
+        file.seek(0, 2)  # Seek to end
+        file_size = file.tell()
+        file.seek(0)  # Reset to beginning
+        return file_size <= MAX_FILE_SIZE
+    
     if form.validate_on_submit():
         # Check if email already registered as CA
         existing_ca = db.ca_registrations.find_one({'email': form.email.data})
@@ -150,20 +164,107 @@ def ca_register():
         # Generate CA code
         ca_code = generate_ca_code(form.full_name.data)
         
-        # Handle profile picture upload
+        # Handle profile picture upload with security checks
         profile_pic_filename = None
         if form.profile_picture.data:
             file = form.profile_picture.data
-            filename = secure_filename(file.filename)
-            # Create unique filename with CA code
-            file_ext = os.path.splitext(filename)[1]
-            profile_pic_filename = f"ca_{ca_code}_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}{file_ext}"
             
-            # Save file (in production, use cloud storage)
-            upload_folder = os.path.join(app.root_path, 'static', 'uploads', 'ca_profiles')
-            os.makedirs(upload_folder, exist_ok=True)
-            file_path = os.path.join(upload_folder, profile_pic_filename)
-            file.save(file_path)
+            # 1. Check if file has a name
+            if file.filename == '':
+                flash('No file selected', 'error')
+                return redirect(url_for('ca_register'))
+            
+            # 2. Validate file extension
+            if not allowed_file(file.filename):
+                flash('Only JPG, JPEG, PNG, and GIF files are allowed', 'error')
+                return redirect(url_for('ca_register'))
+            
+            # 3. Validate file size
+            if not validate_file_size(file):
+                flash(f'File size exceeds {MAX_FILE_SIZE // (1024*1024)}MB limit', 'error')
+                return redirect(url_for('ca_register'))
+            
+            # 4. Secure the filename
+            original_filename = secure_filename(file.filename)
+            
+            # 5. Generate unique filename to prevent overwrites and directory traversal
+            # Extract file extension safely
+            file_ext = ''
+            if '.' in original_filename:
+                file_ext = original_filename.rsplit('.', 1)[1].lower()
+            
+            # Generate unique filename with UUID and timestamp
+            unique_id = uuid.uuid4().hex[:8]
+            timestamp = datetime.utcnow().strftime('%Y%m%d_%H%M%S')
+            profile_pic_filename = f"ca_{ca_code}_{timestamp}_{unique_id}"
+            
+            # Add extension if present
+            if file_ext:
+                profile_pic_filename = f"{profile_pic_filename}.{file_ext}"
+            else:
+                # Default to .jpg if no extension (shouldn't happen due to validation)
+                profile_pic_filename = f"{profile_pic_filename}.jpg"
+            
+            # 6. Validate that filename doesn't contain path traversal attempts
+            if '..' in profile_pic_filename or '/' in profile_pic_filename or '\\' in profile_pic_filename:
+                flash('Invalid filename', 'error')
+                return redirect(url_for('ca_register'))
+            
+            # 7. Build safe file path
+            safe_filename = secure_filename(profile_pic_filename)
+            file_path = os.path.join(UPLOAD_FOLDER, safe_filename)
+            
+            # 8. Ensure we're not writing outside the upload directory
+            upload_root = os.path.abspath(UPLOAD_FOLDER)
+            file_abs_path = os.path.abspath(file_path)
+            
+            if not file_abs_path.startswith(upload_root):
+                flash('Invalid file path', 'error')
+                return redirect(url_for('ca_register'))
+            
+            try:
+                # 9. Check if file already exists (unlikely with UUID but safe)
+                if os.path.exists(file_path):
+                    # Generate another unique name
+                    unique_id = uuid.uuid4().hex[:8]
+                    safe_filename = secure_filename(f"ca_{ca_code}_{timestamp}_{unique_id}.{file_ext}")
+                    file_path = os.path.join(UPLOAD_FOLDER, safe_filename)
+                    profile_pic_filename = safe_filename
+                
+                # 10. Save the file
+                file.save(file_path)
+                
+                # 11. Verify the saved file is an actual image (optional but recommended)
+                try:
+                    from PIL import Image
+                    with Image.open(file_path) as img:
+                        img.verify()  # Verify it's a valid image
+                except ImportError:
+                    # PIL not installed, skip verification
+                    pass
+                except Exception as e:
+                    # Invalid image file, delete it
+                    os.remove(file_path)
+                    flash('Invalid image file', 'error')
+                    return redirect(url_for('ca_register'))
+                    
+                # 12. Optional: Resize image to prevent overly large dimensions
+                try:
+                    from PIL import Image
+                    with Image.open(file_path) as img:
+                        # Resize if image is too large
+                        max_dimension = 1200
+                        if img.width > max_dimension or img.height > max_dimension:
+                            img.thumbnail((max_dimension, max_dimension), Image.Resampling.LANCZOS)
+                            img.save(file_path, optimize=True, quality=85)
+                except:
+                    pass  # If resize fails, keep original
+                    
+            except Exception as e:
+                # Log the error in production
+                app.logger.error(f'File upload error: {str(e)}')
+                flash('Error uploading file. Please try again.', 'error')
+                return redirect(url_for('ca_register'))
         
         # Create CA registration
         ca_data = {
@@ -178,7 +279,8 @@ def ca_register():
             'status': 'pending',  # pending, approved, rejected
             'registration_date': datetime.utcnow(),
             'ip_address': request.remote_addr,
-            'user_agent': request.user_agent.string
+            'user_agent': request.user_agent.string,
+            'file_uploaded': bool(profile_pic_filename)
         }
         
         # Insert into database
@@ -202,6 +304,7 @@ def ca_register():
         form.institution.data = session['last_ca_registration']['institution']
     
     return render_template('ca_register.html', form=form)
+
 
 @app.route('/ca-registration-success/<ca_id>')
 def ca_registration_success(ca_id):
@@ -255,7 +358,7 @@ def register():
             return render_template('register.html', form=form, segments=segments)
         
         # ✅ Conditional submission link validation
-        if segment.get('type') == "submission" and not form.submission_link.data:
+        if segment.get('type') == "Submission" and not form.submission_link.data:
             form.submission_link.errors.append("Submission link is required for this segment.")
             return render_template('register.html', form=form, segments=segments)
         
@@ -267,7 +370,7 @@ def register():
             'segment_id': ObjectId(form.segment.data),
             'segment_name': segment['name'],
             'category': form.category.data if segment.get('categories') else None,
-            'submission_link': form.submission_link.data if segment.get('type') == "submission" else None,
+            'submission_link': form.submission_link.data if segment.get('type') == "Submission" else None,
             'ca_ref': form.ca_ref.data,
             'bkash_number': form.bkash_number.data,
             'transaction_id': form.transaction_id.data,

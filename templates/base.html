@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,6 +11,7 @@
     <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet" type="text/css">
     {% block head %}{% endblock %}
 </head>
+
 <body>
     <nav>
         <div class="container">
@@ -24,70 +26,101 @@
                 {% if session.get('admin_token') %}
                 <a href="{{ url_for('admin.admin_contact_messages') }}">Contact Messages</a>
                 <a href="{{ url_for('admin.admin_ca_registrations') }}">CA Management</a>
-                    <a href="{{ url_for('admin.admin_dashboard') }}">Dashboard</a>
-                    <a href="{{ url_for('admin.admin_logout') }}">Logout</a>
+                <a href="{{ url_for('admin.admin_dashboard') }}">Dashboard</a>
+                <a href="{{ url_for('admin.admin_logout') }}">Logout</a>
                 {% else %}
-                    <a href="{{ url_for('admin.admin_login') }}">Admin Login</a>
+                <a href="{{ url_for('admin.admin_login') }}">Admin Login</a>
                 {% endif %}
             </div>
         </div>
     </nav>
-    
+
     <div class="container">
-        
+
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
-            <div class="container mt-4">
+        <div class="container mt-4">
             {% for category, message in messages %}
-                
-                {% if category == 'success' %}
-                {% set color = 'is-success' %}
-                {% set icon = 'fa-circle-check' %}
-                {% elif category == 'error' %}
-                {% set color = 'is-danger' %}
-                {% set icon = 'fa-circle-xmark' %}
-                {% elif category == 'warning' %}
-                {% set color = 'is-warning' %}
-                {% set icon = 'fa-triangle-exclamation' %}
-                {% else %}
-                {% set color = 'is-info' %}
-                {% set icon = 'fa-circle-info' %}
-                {% endif %}
 
-                <article class="notification {{ color }} is-light">
+            {% if category == 'success' %}
+            {% set color = 'is-success' %}
+            {% set icon = 'fa-circle-check' %}
+            {% elif category == 'error' %}
+            {% set color = 'is-danger' %}
+            {% set icon = 'fa-circle-xmark' %}
+            {% elif category == 'warning' %}
+            {% set color = 'is-warning' %}
+            {% set icon = 'fa-triangle-exclamation' %}
+            {% else %}
+            {% set color = 'is-info' %}
+            {% set icon = 'fa-circle-info' %}
+            {% endif %}
+
+            <article class="notification {{ color }} is-light">
                 <div class="is-flex is-align-items-center is-justify-content-space-between">
 
                     <!-- Left: icon + text -->
                     <div class="is-flex is-align-items-center">
-                    <span class="icon mr-2">
-                        <i class="fas {{ icon }}"></i>
-                    </span>
-                    <span>{{ message }}</span>
+                        <span class="icon mr-2">
+                            <i class="fas {{ icon }}"></i>
+                        </span>
+                        <span>{{ message }}</span>
                     </div>
 
                     <!-- Right: close -->
                     <button class="delete ml-3" aria-label="delete"
-                            onclick="this.closest('.notification').remove()"></button>
+                        onclick="this.closest('.notification').remove()"></button>
 
                 </div>
-                </article>
+            </article>
 
             {% endfor %}
-            </div>
+        </div>
         {% endif %}
         {% endwith %}
 
 
-        
+
         {% block content %}{% endblock %}
     </div>
-    
+
     <footer>
         <div class="container">
             <p>&copy; 2026 Notre Dame Cultural Club. All rights reserved.</p>
         </div>
     </footer>
-    
+
     {% block scripts %}{% endblock %}
+
+    <script>
+        // Handle segment pre-selection
+        document.addEventListener('DOMContentLoaded', function () {
+            // Check for saved segment_id in localStorage
+            const savedSegmentId = localStorage.getItem('selected_segment_id');
+
+            if (savedSegmentId) {
+                const segmentSelect = document.getElementById('segment-select');
+                if (segmentSelect) {
+                    segmentSelect.value = savedSegmentId;
+                    segmentSelect.dispatchEvent(new Event('change'));
+
+                    // Clear saved segment_id after use
+                    localStorage.removeItem('selected_segment_id');
+                }
+            }
+
+            // Add click handlers to segment registration buttons
+            document.querySelectorAll('.register-segment-btn').forEach(btn => {
+                btn.addEventListener('click', function (e) {
+                    const segmentId = this.getAttribute('data-segment-id');
+                    if (segmentId) {
+                        localStorage.setItem('selected_segment_id', segmentId);
+                    }
+                });
+            });
+        });
+    </script>
+
 </body>
+
 </html>

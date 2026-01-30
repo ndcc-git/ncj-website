@@ -82,7 +82,7 @@
             <div class="form-group">
                 {{ form.profile_picture.label }}
                 {{ form.profile_picture(class="form-control") }}
-                <small class="form-text">Optional. Max 2MB. JPG, JPEG, PNG only.</small>
+                <small class="form-text">Max 2MB. JPG, JPEG, PNG only.</small>
                 {% if form.profile_picture.errors %}
                     <div class="errors">
                         {% for error in form.profile_picture.errors %}

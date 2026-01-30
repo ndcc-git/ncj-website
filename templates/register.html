@@ -138,11 +138,6 @@
 
 {% block scripts %}
 <script>
-
-
-
-
-
     document.getElementById('segment-select').addEventListener('change', function () {
         const segmentId = this.value;
         if (segmentId) {
@@ -153,7 +148,7 @@
                     const categoryDiv = document.getElementById('category-options');
                     categoryDiv.innerHTML = '';
 
-                    // ✅ hide if empty, show otherwise
+                    // hide if empty, show otherwise
                     if (!data.categories || data.categories.length === 0) {
                         categoryWrapper.style.display = 'none';
                         return;
@@ -191,7 +186,7 @@
                         nameLabel.innerHTML = "Full Name"
                     }
 
-                    // ✅ submission link logic
+                    // submission link logic
                     const submissionDiv = document.getElementById("submission-link-group");
 
                     if (data.type === "submission") {
@@ -223,19 +218,6 @@
         document.getElementById('email').addEventListener('blur', function () {
             localStorage.setItem('festival_registration_email', this.value);
         });
-
-        const segmentSelect = document.getElementById('segment-select');
-        
-        // Check if we have a preselected segment
-        {% if preselected_segment_id %}
-            const preselectedSegmentId = '{{ preselected_segment_id }}';
-            
-            // Set the segment dropdown value
-            segmentSelect.value = preselectedSegmentId;
-            
-            // Trigger the change event to load categories
-            segmentSelect.dispatchEvent(new Event('change'));
-        {% endif %}
     });
 </script>
 {% endblock %}

@@ -89,8 +89,9 @@ class CARegistrationForm(FlaskForm):
         Length(min=20, max=1000)
     ], widget=TextArea(), render_kw={"rows": 6})
     
-    profile_picture = FileField('Profile Picture (Optional)', validators=[
-        FileAllowed(['jpg', 'jpeg', 'png'], 'Images only! (jpg, jpeg, png)')
+    profile_picture = FileField('Profile Picture', validators=[
+        FileAllowed(['jpg', 'jpeg', 'png'], 'Images only! (jpg, jpeg, png)'),
+        DataRequired()
     ])
     
     submit = SubmitField('Apply as CA')

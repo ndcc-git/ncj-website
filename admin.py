@@ -107,6 +107,42 @@ def admin_required(f):
     return role_required('admin', 'executive', 'organizer', 'moderator')(f)
 
 
+def get_default_permissions(role):
+    """Get default permissions based on role"""
+    permissions = {
+        'admin': ['*'],  # All permissions
+        'executive': [
+            'view_dashboard',
+            'manage_registrations',
+            'verify_registrations',
+            'manage_ca',
+            'approve_ca',
+            'view_analytics',
+            'send_emails',
+            'export_data',
+            'view_contact_messages',
+            'manage_admin_users',
+            'view_segments'
+        ],
+        'organizer': [
+            'view_dashboard',
+            'view_registrations',
+            'view_ca',
+            'view_analytics',
+            'view_contact_messages',
+            'export_data',
+            'view_segments'
+        ],
+        'moderator': [
+            'view_dashboard',
+            'view_registrations',
+            'view_ca',
+            'export_data',
+            'view_segments'
+        ]
+    }
+    return permissions.get(role, [])
+
 @admin_bp.route('/login', methods=['GET', 'POST'])
 def admin_login():
     """Admin login page"""

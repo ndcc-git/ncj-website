@@ -13,27 +13,27 @@
 </head>
 
 <body>
-    <nav>
-        <div class="container">
-            <a href="{{ url_for('index') }}" class="logo">10th NCJ</a>
-            <div class="nav-links">
-                <a href="{{ url_for('index') }}">Home</a>
-                <a href="{{ url_for('register') }}">Register</a>
-                <!-- Add to navigation links -->
-                <a href="{{ url_for('ca_register') }}">Become a CA</a>
-                <!-- Add to navigation links -->
-                <a href="{{ url_for('contact') }}">Contact Us</a>
-                {% if session.get('admin_token') %}
-                <a href="{{ url_for('admin.admin_contact_messages') }}">Contact Messages</a>
-                <a href="{{ url_for('admin.admin_ca_registrations') }}">CA Management</a>
+    <!-- Add role badge in navigation -->
+<nav>
+    <div class="container">
+        <a href="{{ url_for('index') }}" class="logo">Festival 2024</a>
+        <div class="nav-links">
+            <a href="{{ url_for('index') }}">Home</a>
+            <a href="{{ url_for('register') }}">Register</a>
+            <a href="{{ url_for('ca_register') }}">Become CA</a>
+            <a href="{{ url_for('contact') }}">Contact</a>
+            {% if session.get('admin_token') %}
                 <a href="{{ url_for('admin.admin_dashboard') }}">Dashboard</a>
+                <span class="role-badge role-{{ session.get('admin_role', 'moderator') }}">
+                    {{ session.get('admin_role', 'moderator')|title }}
+                </span>
                 <a href="{{ url_for('admin.admin_logout') }}">Logout</a>
-                {% else %}
+            {% else %}
                 <a href="{{ url_for('admin.admin_login') }}">Admin Login</a>
-                {% endif %}
-            </div>
+            {% endif %}
         </div>
-    </nav>
+    </div>
+</nav>
 
     <div class="container">
 

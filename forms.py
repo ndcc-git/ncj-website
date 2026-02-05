@@ -148,6 +148,13 @@ class AdminUserForm(FlaskForm):
         Length(max=100)
     ])
     
+    role = SelectField('Role', choices=[
+        ('admin', 'Admin - Full Access'),
+        ('executive', 'Executive - Management Access'),
+        ('organizer', 'Organizer - View & Export Access'),
+        ('moderator', 'Moderator - Basic View Access')
+    ], validators=[DataRequired()])
+    
     password = PasswordField('Password', validators=[
         DataRequired(),
         Length(min=6, message='Password must be at least 6 characters')
@@ -158,4 +165,4 @@ class AdminUserForm(FlaskForm):
         EqualTo('password', message='Passwords must match')
     ])
     
-    submit = SubmitField('Add Admin User')
+    submit = SubmitField('Add User')

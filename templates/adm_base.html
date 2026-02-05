@@ -96,11 +96,14 @@
                     </div> -->
                     <a href="https://justboil.me/bulma-admin-template/free-html-dashboard/" title="About"
                         class="navbar-item has-divider is-desktop-icon-only">
-                        <span class="icon"><i class="mdi mdi-help-circle-outline"></i></span>
-                        <span>About</span>
+                        Logged in as: <strong>{{ session.admin_email }}</strong>
+                        <span class="role-badge role-{{ session.admin_role }}">
+                            {{ session.admin_role|title }}
+                        </span>
                     </a>
                     {% if session.get('admin_token') %}
-                    <a title="Log out" href="{{ url_for('admin.admin_logout') }}" class="navbar-item is-desktop-icon-only">
+                    <a title="Log out" href="{{ url_for('admin.admin_logout') }}"
+                        class="navbar-item is-desktop-icon-only">
                         <span class="icon"><i class="mdi mdi-logout"></i></span>
                         <span>Log out</span>
                     </a>
@@ -165,18 +168,18 @@
                     </li>
 
                     <li>
-                        <a class="has-icon has-dropdown-icon" href="{{ url_for('admin.admin_export') }}" >
+                        <a class="has-icon has-dropdown-icon" href="{{ url_for('admin.admin_export') }}">
                             <span class="icon"><i class="mdi mdi-export"></i></span>
                             <span class="menu-item-label">Export</span>
-                            
+
                         </a>
                     </li>
 
                     <li>
-                        <a class="has-icon has-dropdown-icon" href="{{ url_for('admin.admin_users') }}" >
+                        <a class="has-icon has-dropdown-icon" href="{{ url_for('admin.admin_users') }}">
                             <span class="icon"><i class="mdi mdi-account-multiple"></i></span>
                             <span class="menu-item-label">Accounts</span>
-                            
+
                         </a>
                     </li>
 
@@ -198,6 +201,44 @@
                 </ul>
             </div>
         </aside>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="container mt-4">
+
+            {% for category, message in messages %}
+
+            {% if category == 'success' %}
+            {% set color = 'is-success' %}
+            {% set icon = 'fa-circle-check' %}
+            {% elif category == 'error' %}
+            {% set color = 'is-danger' %}
+            {% set icon = 'fa-circle-xmark' %}
+            {% elif category == 'warning' %}
+            {% set color = 'is-warning' %}
+            {% set icon = 'fa-triangle-exclamation' %}
+            {% else %}
+            {% set color = 'is-info' %}
+            {% set icon = 'fa-circle-info' %}
+            {% endif %}
+
+            <div class="notification {{ color }} is-light">
+
+                <button class="delete" aria-label="delete" onclick="this.parentElement.remove()"></button>
+
+                <span class="icon mr-2">
+                    <i class="fas {{ icon }}"></i>
+                </span>
+
+                {{ message }}
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+        {% endif %}
+        {% endwith %}
 
 
         {% block content %}{% endblock %}

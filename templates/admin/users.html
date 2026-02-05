@@ -5,16 +5,16 @@
 {% block content %}
 
 <section class="section is-title-bar">
-    <div class="level">
-        <div class="level-left">
-            <div class="level-item">
-                <ul>
-                    <li>Admin</li>
-                    <li>Accounts</li>
-                </ul>
-            </div>
-        </div>
+  <div class="level">
+    <div class="level-left">
+      <div class="level-item">
+        <ul>
+          <li>Admin</li>
+          <li>Accounts</li>
+        </ul>
+      </div>
     </div>
+  </div>
 </section>
 
 <section class="section">
@@ -81,6 +81,36 @@
                 {% endfor %}
               </div>
 
+              <div class="field">
+                {{ form.role.label(class="label") }}
+
+                <div class="control">
+                  {{ form.role(class="input", id="role") }}
+                </div>
+
+                {% for e in form.role.errors %}
+                <p class="help is-danger">{{ e }}</p>
+                {% endfor %}
+              </div>
+
+              {% if current_user_role != 'admin' %}
+              <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                  const roleSelect = document.getElementById('role');
+
+                  if (!roleSelect) return;
+
+                  // remove admin option for non-admin users
+                  for (let i = 0; i < roleSelect.options.length; i++) {
+                    if (roleSelect.options[i].value === 'admin') {
+                      roleSelect.remove(i);
+                      break;
+                    }
+                  }
+                });
+              </script>
+              {% endif %}
+
               <div class="field mt-4">
                 <button class="button is-link is-fullwidth">
                   Create Admin
@@ -115,41 +145,46 @@
                   <tr>
                     <th>Name</th>
                     <th>Email</th>
+                    <th>Role</th>
                     <th>Created</th>
                     <th>Last Login</th>
                     <th>By</th>
                     <th>Actions</th>
                   </tr>
                 </thead>
+
                 <tbody>
                   {% for user in admin_users %}
-                  <tr {% if user.email == session.admin_email %}class="has-background-link-light"{% endif %}>
+                  <tr {% if user.email==session.admin_email %}class="has-background-link-light" {% endif %}>
                     <td>
                       {{ user.name }}
                       {% if user.email == session.admin_email %}
-                        <span class="tag is-link is-light ml-2">You</span>
+                      <span class="tag is-link is-light ml-2">You</span>
                       {% endif %}
                     </td>
                     <td>{{ user.email }}</td>
+                    <td>
+                    <span class="role-badge role-{{ user.role }}">
+                      {{ user.role|title }}
+                    </span>
+                  </td>
                     <td>{{ user.created_at.strftime('%Y-%m-%d') if user.created_at else 'N/A' }}</td>
                     <td>{{ user.last_login.strftime('%Y-%m-%d %H:%M') if user.last_login else 'Never' }}</td>
                     <td>{{ user.created_by or 'System' }}</td>
                     <td>
                       {% if user.email != session.admin_email %}
-                        <div class="buttons are-small">
-                          <button class="button is-info reset-password-btn"
-                                  data-id="{{ user._id }}"
-                                  data-email="{{ user.email }}">
-                            Reset
-                          </button>
-                          <button class="button is-danger delete-user-btn"
-                                  data-id="{{ user._id }}"
-                                  data-email="{{ user.email }}">
-                            Delete
-                          </button>
-                        </div>
+                      <div class="buttons are-small">
+                        <button class="button is-info reset-password-btn" data-id="{{ user._id }}"
+                          data-email="{{ user.email }}">
+                          Reset
+                        </button>
+                        <button class="button is-danger delete-user-btn" data-id="{{ user._id }}"
+                          data-email="{{ user.email }}">
+                          Delete
+                        </button>
+                      </div>
                       {% else %}
-                        <span class="has-text-grey">Current</span>
+                      <span class="has-text-grey">Current</span>
                       {% endif %}
                     </td>
                   </tr>
@@ -158,7 +193,7 @@
               </table>
             </div>
             {% else %}
-              <p class="has-text-grey has-text-centered">No admin users found.</p>
+            <p class="has-text-grey has-text-centered">No admin users found.</p>
             {% endif %}
           </div>
         </div>
@@ -205,132 +240,132 @@
 {% block scripts %}
 
 <script>
-let currentUserId = null;
+  let currentUserId = null;
 
-/* ------------------------------
-   Bulma modal helpers
------------------------------- */
-function openModal() {
-  document.getElementById('resetPasswordModal').classList.add('is-active');
-}
+  /* ------------------------------
+     Bulma modal helpers
+  ------------------------------ */
+  function openModal() {
+    document.getElementById('resetPasswordModal').classList.add('is-active');
+  }
 
-function closeModal() {
-  document.getElementById('resetPasswordModal').classList.remove('is-active');
-}
+  function closeModal() {
+    document.getElementById('resetPasswordModal').classList.remove('is-active');
+  }
 
-/* ------------------------------
-   Open reset password modal
------------------------------- */
-document.querySelectorAll('.reset-password-btn').forEach(btn => {
-  btn.addEventListener('click', function () {
-    currentUserId = this.dataset.id;
-    const email = this.dataset.email;
+  /* ------------------------------
+     Open reset password modal
+  ------------------------------ */
+  document.querySelectorAll('.reset-password-btn').forEach(btn => {
+    btn.addEventListener('click', function () {
+      currentUserId = this.dataset.id;
+      const email = this.dataset.email;
 
-    document.querySelector('#resetPasswordModal .modal-card-title').textContent =
-      `Reset Password for ${email}`;
+      document.querySelector('#resetPasswordModal .modal-card-title').textContent =
+        `Reset Password for ${email}`;
 
-    document.getElementById('new_password').value = '';
-    document.getElementById('confirm_new_password').value = '';
+      document.getElementById('new_password').value = '';
+      document.getElementById('confirm_new_password').value = '';
 
-    const msg = document.getElementById('resetPasswordMessage');
-    msg.className = 'notification is-hidden';
-    msg.textContent = '';
+      const msg = document.getElementById('resetPasswordMessage');
+      msg.className = 'notification is-hidden';
+      msg.textContent = '';
 
-    openModal();
+      openModal();
+    });
   });
-});
 
-/* ------------------------------
-   Close modal buttons
------------------------------- */
-document.querySelectorAll('.close-modal, .modal-background').forEach(el => {
-  el.addEventListener('click', closeModal);
-});
+  /* ------------------------------
+     Close modal buttons
+  ------------------------------ */
+  document.querySelectorAll('.close-modal, .modal-background').forEach(el => {
+    el.addEventListener('click', closeModal);
+  });
 
-/* ------------------------------
-   Confirm reset password
------------------------------- */
-document.getElementById('confirmResetBtn').addEventListener('click', function () {
-  const newPassword = document.getElementById('new_password').value;
-  const confirmPassword = document.getElementById('confirm_new_password').value;
-  const messageDiv = document.getElementById('resetPasswordMessage');
+  /* ------------------------------
+     Confirm reset password
+  ------------------------------ */
+  document.getElementById('confirmResetBtn').addEventListener('click', function () {
+    const newPassword = document.getElementById('new_password').value;
+    const confirmPassword = document.getElementById('confirm_new_password').value;
+    const messageDiv = document.getElementById('resetPasswordMessage');
 
-  if (newPassword.length < 6) {
-    return showMessage('Password must be at least 6 characters', false, messageDiv);
-  }
-
-  if (newPassword !== confirmPassword) {
-    return showMessage('Passwords do not match', false, messageDiv);
-  }
-
-  const meta = document.querySelector('meta[name="csrf-token"]');
-  const csrfToken = meta ? meta.getAttribute("content") : "";
-
-  fetch(`/admin/users/${currentUserId}/reset-password`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-CSRFToken': csrfToken
-    },
-    body: JSON.stringify({ new_password: newPassword })
-  })
-  .then(res => res.json())
-  .then(data => {
-    if (data.success) {
-      showMessage('Password reset successfully', true, messageDiv);
-      setTimeout(() => {
-        closeModal();
-        location.reload();
-      }, 1200);
-    } else {
-      showMessage(data.message || 'Reset failed', false, messageDiv);
+    if (newPassword.length < 6) {
+      return showMessage('Password must be at least 6 characters', false, messageDiv);
     }
-  })
-  .catch(err => {
-    showMessage('Network error: ' + err, false, messageDiv);
-  });
-});
 
-/* ------------------------------
-   Delete admin user
------------------------------- */
-document.querySelectorAll('.delete-user-btn').forEach(btn => {
-  btn.addEventListener('click', function () {
-    const userId = this.dataset.id;
-    const email = this.dataset.email;
-
-    if (!confirm(`Delete admin user "${email}"? This cannot be undone.`)) return;
+    if (newPassword !== confirmPassword) {
+      return showMessage('Passwords do not match', false, messageDiv);
+    }
 
     const meta = document.querySelector('meta[name="csrf-token"]');
     const csrfToken = meta ? meta.getAttribute("content") : "";
 
-    fetch(`/admin/users/${userId}/delete`, {
-      method: 'DELETE',
+    fetch(`/admin/users/${currentUserId}/reset-password`, {
+      method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'X-CSRFToken': csrfToken
-      }
+      },
+      body: JSON.stringify({ new_password: newPassword })
     })
-    .then(res => res.json())
-    .then(data => {
-      if (data.success) {
-        location.reload();
-      } else {
-        alert(data.message || 'Delete failed');
-      }
-    })
-    .catch(err => alert('Network error: ' + err));
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          showMessage('Password reset successfully', true, messageDiv);
+          setTimeout(() => {
+            closeModal();
+            location.reload();
+          }, 1200);
+        } else {
+          showMessage(data.message || 'Reset failed', false, messageDiv);
+        }
+      })
+      .catch(err => {
+        showMessage('Network error: ' + err, false, messageDiv);
+      });
   });
-});
 
-/* ------------------------------
-   Bulma-style message helper
------------------------------- */
-function showMessage(message, success, element) {
-  element.textContent = message;
-  element.className = `notification ${success ? 'is-success' : 'is-danger'}`;
-  element.classList.remove('is-hidden');
-}
+  /* ------------------------------
+     Delete admin user
+  ------------------------------ */
+  document.querySelectorAll('.delete-user-btn').forEach(btn => {
+    btn.addEventListener('click', function () {
+      const userId = this.dataset.id;
+      const email = this.dataset.email;
+
+      if (!confirm(`Delete admin user "${email}"? This cannot be undone.`)) return;
+
+      const meta = document.querySelector('meta[name="csrf-token"]');
+      const csrfToken = meta ? meta.getAttribute("content") : "";
+
+      fetch(`/admin/users/${userId}/delete`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': csrfToken
+        }
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            location.reload();
+          } else {
+            alert(data.message || 'Delete failed');
+          }
+        })
+        .catch(err => alert('Network error: ' + err));
+    });
+  });
+
+  /* ------------------------------
+     Bulma-style message helper
+  ------------------------------ */
+  function showMessage(message, success, element) {
+    element.textContent = message;
+    element.className = `notification ${success ? 'is-success' : 'is-danger'}`;
+    element.classList.remove('is-hidden');
+  }
 </script>
 
 

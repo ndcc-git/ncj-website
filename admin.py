@@ -46,6 +46,67 @@ def admin_required(f):
     return decorated_function
 
 
+def role_required(*allowed_roles):
+    """Decorator to require specific role(s)"""
+    def decorator(f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            token = session.get('admin_token')
+            
+            if not token:
+                flash('Authentication required', 'error')
+                return redirect(url_for('admin.admin_login'))
+            
+            try:
+                payload = jwt.decode(token, current_app.config['JWT_SECRET_KEY'], algorithms=['HS256'])
+                user_role = payload.get('role')
+                
+                if user_role not in allowed_roles:
+                    flash('Insufficient permissions', 'error')
+                    return redirect(url_for('admin.admin_dashboard'))
+                
+                # Store user info in session
+                session['admin_role'] = user_role
+                session['admin_email'] = payload.get('email')
+                
+            except jwt.ExpiredSignatureError:
+                flash('Session expired. Please login again.', 'error')
+                return redirect(url_for('admin.admin_login'))
+            except jwt.InvalidTokenError:
+                flash('Invalid token. Please login again.', 'error')
+                return redirect(url_for('admin.admin_login'))
+            
+            return f(*args, **kwargs)
+        return decorated_function
+    return decorator
+
+def has_permission(permission):
+    """Check if current user has specific permission"""
+    if 'admin_role' not in session:
+        return False
+    
+    user_role = session['admin_role']
+    
+    # Admin has all permissions
+    if user_role == 'admin':
+        return True
+    
+    # Get user from database to check permissions
+    user = db.users.find_one({'email': session['admin_email']})
+    if not user:
+        return False
+    
+    # Check if user has the permission
+    permissions = user.get('permissions', [])
+    return permission in permissions or '*' in permissions
+
+
+# Update admin_required to use role_required
+def admin_required(f):
+    """Decorator to require admin authentication (for backward compatibility)"""
+    return role_required('admin', 'executive', 'organizer', 'moderator')(f)
+
+
 @admin_bp.route('/login', methods=['GET', 'POST'])
 def admin_login():
     """Admin login page"""
@@ -55,37 +116,38 @@ def admin_login():
     form = AdminLoginForm()
     
     if form.validate_on_submit():
-        admin_user = db.users.find_one({'email': form.email.data, 'role': 'admin'})
-        
-        if admin_user and verify_password(admin_user['password'], form.password.data):
+        user = db.users.find_one({'email': form.email.data})
+
+        if user and verify_password(user['password'], form.password.data):
             # Check if account is active
-            if not admin_user.get('active', True):
-                flash('Your account has been deactivated. Please contact another admin.', 'error')
+            if not user.get('active', True):
+                flash('Your account has been deactivated. Please contact an admin.', 'error')
                 return redirect(url_for('admin.admin_login'))
             
             # Update last login
             db.users.update_one(
-                {'_id': admin_user['_id']},
+                {'_id': user['_id']},
                 {'$set': {'last_login': datetime.utcnow()}}
             )
             
-            # Generate JWT token with email
+            # Generate JWT token with role
             token_payload = {
-                'email': admin_user['email'],
-                'role': 'admin',
+                'email': user['email'],
+                'role': user.get('role', 'moderator'),
                 'exp': datetime.utcnow() + current_app.config['JWT_ACCESS_TOKEN_EXPIRES']
             }
             token = jwt.encode(token_payload, current_app.config['JWT_SECRET_KEY'], algorithm='HS256')
             
             session['admin_token'] = token
-            session['admin_email'] = admin_user['email']
-            flash('Logged in successfully', 'success')
+            session['admin_role'] = user.get('role', 'moderator')
+            session['admin_email'] = user['email']
+            
+            flash(f'Logged in successfully as {user.get("role", "moderator").title()}', 'success')
             return redirect(url_for('admin.admin_dashboard'))
         else:
             flash('Invalid email or password', 'error')
     
     return render_template('admin/login.html', form=form)
-
 
 @admin_bp.route('/logout')
 def admin_logout():
@@ -95,7 +157,7 @@ def admin_logout():
     return redirect(url_for('admin.admin_login'))
 
 @admin_bp.route('/dashboard')
-@admin_required
+@role_required('admin', 'executive', 'organizer', 'moderator')
 def admin_dashboard():
     """Admin dashboard overview"""
     # Get statistics
@@ -132,7 +194,7 @@ def admin_dashboard():
 
 
 @admin_bp.route('/analytics')
-@admin_required
+@role_required('admin', 'executive', 'organizer', 'moderator')
 def admin_analytics():
     """Analytics dashboard"""
     # Registration statistics by day
@@ -177,7 +239,7 @@ def admin_analytics():
 ####  Contact Message Routes
 
 @admin_bp.route('/contact-messages')
-@admin_required
+@role_required('admin', 'executive', 'organizer', 'moderator')
 def admin_contact_messages():
     """View and manage contact messages"""
     status_filter = request.args.get('status', 'all')
@@ -203,7 +265,7 @@ def admin_contact_messages():
                          total_messages=total_messages)
 
 @admin_bp.route('/update-message-status/<message_id>', methods=['POST'])
-@admin_required
+@role_required('admin', 'executive')
 def update_message_status(message_id):
     """Update contact message status"""
     status = request.json.get('status')
@@ -230,7 +292,7 @@ def update_message_status(message_id):
         return jsonify({'success': False, 'message': str(e)}), 500
 
 @admin_bp.route('/delete-message/<message_id>', methods=['DELETE'])
-@admin_required
+@role_required('admin', 'executive')
 def delete_message(message_id):
     """Delete a contact message"""
     try:
@@ -246,7 +308,7 @@ def delete_message(message_id):
 #### Registration Routes
 
 @admin_bp.route('/registrations')
-@admin_required
+@role_required('admin', 'executive', 'organizer', 'moderator')
 def admin_registrations():
     """View and manage registrations"""
     segment_id = request.args.get('segment_id')
@@ -298,7 +360,7 @@ def admin_registrations():
 
 
 @admin_bp.route('/verify-registration/<registration_id>', methods=['POST'])
-@admin_required
+@role_required('admin', 'executive')  # Only admin/executive can verify
 def verify_registration(registration_id):
     """Verify a single registration"""
     try:
@@ -317,7 +379,7 @@ def verify_registration(registration_id):
         return jsonify({'success': False}), 500
 
 @admin_bp.route('/bulk-verify', methods=['POST'])
-@admin_required
+@role_required('admin', 'executive')
 def bulk_verify():
     """Bulk verify registrations"""
     registration_ids = request.json.get('registration_ids', [])
@@ -345,7 +407,7 @@ def bulk_verify():
 
 ### CA Registration Routes
 @admin_bp.route('/ca-registrations')
-@admin_required
+@role_required('admin', 'executive', 'organizer', 'moderator')
 def admin_ca_registrations():
     """View and manage CA registrations"""
     status_filter = request.args.get('status', 'all')
@@ -388,7 +450,7 @@ def admin_ca_registrations():
     )
 
 @admin_bp.route('/update-ca-status/<ca_id>', methods=['POST'])
-@admin_required
+@role_required('admin', 'executive')  # Only admin/executive can approve/reject
 def update_ca_status(ca_id):
     """Update CA status (approve/reject)"""
     status = request.json.get('status')
@@ -414,7 +476,7 @@ def update_ca_status(ca_id):
 
 
 @admin_bp.route('/export')
-@admin_required
+@role_required('admin', 'executive', 'organizer', 'moderator')
 def admin_export():
     segments = list(db.segments.find({}))
     return render_template(
@@ -423,7 +485,7 @@ def admin_export():
     )
 
 @admin_bp.route('/reg-export')
-@admin_required
+@role_required('admin', 'executive', 'organizer', 'moderator')
 def admin_reg_export():
     format_type = request.args.get('format', 'csv')
     verified = request.args.get('verified')  # "true", "false", or None
@@ -446,7 +508,7 @@ def admin_reg_export():
 
 
 @admin_bp.route('/ca-export')
-@admin_required
+@role_required('admin', 'executive', 'organizer', 'moderator')
 def admin_ca_export():
     """Export data page"""
     format_type = request.args.get('format', 'csv')
@@ -467,25 +529,35 @@ def admin_ca_export():
 
 # Replace both admin_users and add_admin_user routes with this combined route:
 @admin_bp.route('/users', methods=['GET', 'POST'])
-@admin_required
+@role_required('admin', 'executive')  # Only admin and executive can manage users
 def admin_users():
     """View all admin users and add new ones"""
     form = AdminUserForm()
     
-    # Handle form submission for adding new admin
+    # Handle form submission for adding new user
     if form.validate_on_submit():
         # Check if email already exists
         existing_user = db.users.find_one({'email': form.email.data})
         if existing_user:
-            flash('Email already registered as an admin', 'error')
+            flash('Email already registered', 'error')
             return redirect(url_for('admin.admin_users'))
         
-        # Create new admin user
-        admin_user = {
+        # Check if current user can create this role
+        current_user_role = session.get('admin_role')
+        target_role = form.role.data
+        
+        # Only admin can create other admins
+        if target_role == 'admin' and current_user_role != 'admin':
+            flash('Only admin can create other admin users', 'error')
+            return redirect(url_for('admin.admin_users'))
+        
+        # Create new user with default permissions
+        new_user = {
             'name': form.name.data,
             'email': form.email.data,
             'password': hash_password(form.password.data),
-            'role': 'admin',
+            'role': target_role,
+            'permissions': get_default_permissions(target_role),
             'created_at': datetime.utcnow(),
             'created_by': session.get('admin_email', 'system'),
             'active': True,
@@ -493,23 +565,30 @@ def admin_users():
         }
         
         # Insert into database
-        db.users.insert_one(admin_user)
+        db.users.insert_one(new_user)
         
-        flash(f'Admin user {form.email.data} added successfully', 'success')
+        flash(f'{target_role.title()} user {form.email.data} added successfully', 'success')
         return redirect(url_for('admin.admin_users'))
     
-    # Get all admin users for display
-    admin_users_list = list(db.users.find({'role': 'admin'}).sort('created_at', -1))
+    # Get all users for display (filter based on current user's role)
+    current_user_role = session.get('admin_role')
+    
+    if current_user_role == 'admin':
+        # Admin can see all users
+        admin_users_list = list(db.users.find().sort('created_at', -1))
+    else:
+        # Others can only see non-admin users
+        admin_users_list = list(db.users.find({'role': {'$ne': 'admin'}}).sort('created_at', -1))
     
     return render_template('admin/users.html', 
                          form=form, 
-                         admin_users=admin_users_list)
-
+                         admin_users=admin_users_list,
+                         current_user_role=current_user_role)
 # Remove the add_admin_user route entirely
 
 # Keep the other admin user management routes (delete, reset password)
 @admin_bp.route('/users/<user_id>/reset-password', methods=['POST'])
-@admin_required
+@role_required('admin', 'executive')
 def reset_admin_password(user_id):
     """Reset admin user password"""
     try:
@@ -537,20 +616,33 @@ def reset_admin_password(user_id):
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)}), 500
 
+# Update delete user route with role checks
 @admin_bp.route('/users/<user_id>/delete', methods=['DELETE'])
-@admin_required
+@role_required('admin', 'executive')
 def delete_admin_user(user_id):
     """Delete admin user"""
     try:
-        user = db.users.find_one({'_id': ObjectId(user_id), 'role': 'admin'})
+        user = db.users.find_one({'_id': ObjectId(user_id)})
         
         if not user:
             return jsonify({'success': False, 'message': 'User not found'}), 404
         
+        current_user_role = session.get('admin_role')
+        current_user_email = session.get('admin_email')
+        
         # Prevent deleting own account
-        current_admin_email = session.get('admin_email')
-        if user['email'] == current_admin_email:
+        if user['email'] == current_user_email:
             return jsonify({'success': False, 'message': 'Cannot delete your own account'}), 400
+        
+        # Check permissions based on roles
+        if user['role'] == 'admin':
+            # Only admin can delete other admins
+            if current_user_role != 'admin':
+                return jsonify({'success': False, 'message': 'Only admin can delete admin users'}), 403
+        else:
+            # Executive can delete non-admin users
+            if current_user_role not in ['admin', 'executive']:
+                return jsonify({'success': False, 'message': 'Insufficient permissions'}), 403
         
         # Delete user
         result = db.users.delete_one({'_id': ObjectId(user_id)})

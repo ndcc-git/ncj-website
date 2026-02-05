@@ -61,6 +61,42 @@ def generate_ca_code(full_name):
     return code
 
 
+def get_default_permissions(role):
+    """Get default permissions based on role"""
+    permissions = {
+        'admin': ['*'],  # All permissions
+        'executive': [
+            'view_dashboard',
+            'manage_registrations',
+            'verify_registrations',
+            'manage_ca',
+            'approve_ca',
+            'view_analytics',
+            'send_emails',
+            'export_data',
+            'view_contact_messages',
+            'manage_admin_users',
+            'view_segments'
+        ],
+        'organizer': [
+            'view_dashboard',
+            'view_registrations',
+            'view_ca',
+            'view_analytics',
+            'view_contact_messages',
+            'export_data',
+            'view_segments'
+        ],
+        'moderator': [
+            'view_dashboard',
+            'view_registrations',
+            'view_ca',
+            'export_data',
+            'view_segments'
+        ]
+    }
+    return permissions.get(role, [])
+
 
 def init_db():
     """Initialize database with sample data if empty"""
@@ -106,11 +142,37 @@ def init_db():
         admin_user = {
             'email': 'admin@festival.com',
             'password': hash_password('admin123'),
-            'full_name': 'System Administrator',
+            'name': 'System Administrator',
             'role': 'admin',
-            'created_at': datetime.utcnow()
+            'created_at': datetime.utcnow(),
+            'created_by': 'system',
+            'active': True,
+            'last_login': None,
+            'permissions': ['*']  # All permissions
         }
         users_collection.insert_one(admin_user)
+
+    # Create sample users with different roles
+    sample_roles = ['executive', 'organizer', 'moderator']
+    for role in sample_roles:
+        if users_collection.count_documents({'role': role}) == 0:
+            sample_user = {
+                'email': f'{role}@festival.com',
+                'password': hash_password(f'{role}123'),
+                'name': f'{role.title()} User',
+                'role': role,
+                'created_at': datetime.utcnow(),
+                'created_by': 'system',
+                'active': True,
+                'last_login': None,
+                'permissions': get_default_permissions(role)
+            }
+            users_collection.insert_one(sample_user)
+
+    users_collection.create_index([('email', 1)], unique=True)
+    users_collection.create_index([('role', 1)])
+    users_collection.create_index([('active', 1)])
+    users_collection.create_index([('created_at', -1)])
 
     db.ca_registrations.create_index([('email', 1)], unique=False)
     db.ca_registrations.create_index([('ca_code', 1)], unique=True)
@@ -570,6 +632,6 @@ def page_not_found(e):
     return render_template('errors/404.html'), 404
 
 if __name__ == '__main__':
-    # with app.app_context():
-    #     init_db()
+    with app.app_context():
+        init_db()
     app.run(debug=True, port=5000)

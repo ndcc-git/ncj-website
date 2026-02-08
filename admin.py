@@ -9,7 +9,7 @@ import jwt
 from pymongo import MongoClient
 from forms import AdminLoginForm, AdminUserForm
 from utils.email_service import send_bulk_emails, send_ca_approval_email, send_verification_email
-from utils.export_service import export_ca_to_csv, export_to_csv, export_to_excel
+from utils.export_service import export_ca_to_csv, export_ca_to_excel, export_to_csv, export_to_excel
 from utils.security import hash_password, verify_password
 from extensions import db
 
@@ -560,7 +560,7 @@ def admin_ca_export():
         csv_data = export_ca_to_csv(ca_data)
         return csv_data
     else:
-        excel_data = export_to_excel(ca_data)
+        excel_data = export_ca_to_excel(ca_data)
         return excel_data
 
 # Replace both admin_users and add_admin_user routes with this combined route:

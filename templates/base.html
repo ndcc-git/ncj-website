@@ -22,13 +22,21 @@
             <a href="{{ url_for('register') }}">Register</a>
             <a href="{{ url_for('ca_register') }}">Become CA</a>
             <a href="{{ url_for('contact') }}">Contact</a>
-            {% if session.get('admin_token') %}
+
+            {% if session.get('user_id') %}
+                <!-- User is logged in -->
+                <a href="{{ url_for('user_profile') }}">My Profile</a>
+                <a href="{{ url_for('user_logout') }}">Logout</a>
+                <span class="user-badge">{{ session.user_name }}</span>
+            {% elif session.get('admin_token') %}
                 <a href="{{ url_for('admin.admin_dashboard') }}">Dashboard</a>
                 <span class="role-badge role-{{ session.get('admin_role', 'moderator') }}">
                     {{ session.get('admin_role', 'moderator')|title }}
                 </span>
                 <a href="{{ url_for('admin.admin_logout') }}">Logout</a>
             {% else %}
+                <a href="{{ url_for('user_login') }}">Login</a>
+                <a href="{{ url_for('user_signup') }}">Sign Up</a>
                 <a href="{{ url_for('admin.admin_login') }}">Admin Login</a>
             {% endif %}
         </div>

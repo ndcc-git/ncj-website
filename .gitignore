@@ -10,3 +10,4 @@ venv/
 *.db
 instance/
 gen.py
+ncjtest.json

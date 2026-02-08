@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block title %}My Profile - Festival Registration{% endblock %}
+
+{% block content %}
+<div class="user-profile">
+    <div class="profile-header">
+        <h2>My Profile</h2>
+        <div class="profile-actions">
+            <a href="{{ url_for('edit_profile') }}" class="btn btn-primary">Edit Profile</a>
+            <a href="{{ url_for('change_password') }}" class="btn btn-secondary">Change Password</a>
+        </div>
+    </div>
+    
+    <div class="profile-container">
+        <!-- User Info Card -->
+        <div class="profile-card">
+            <div class="profile-info">
+                {% if user.profile_picture %}
+                <div class="profile-picture">
+                    <img src="{{ url_for('static', filename='uploads/user_profiles/' + user.profile_picture) }}" 
+                         alt="{{ user.full_name }}" class="profile-img">
+                </div>
+                {% endif %}
+                
+                <div class="profile-details">
+                    <h3>{{ user.full_name }}</h3>
+                    <div class="detail-item">
+                        <strong>Email:</strong> {{ user.email }}
+                        {% if not user.email_verified %}
+                        <span class="badge badge-warning">Not Verified</span>
+                        <a href="{{ url_for('verify_email') }}" class="btn btn-sm btn-outline-warning">Verify Email</a>
+                        {% else %}
+                        <span class="badge badge-success">Verified</span>
+                        {% endif %}
+                    </div>
+                    <div class="detail-item">
+                        <strong>Mobile:</strong> {{ user.mobile }}
+                    </div>
+                    <div class="detail-item">
+                        <strong>Institution:</strong> {{ user.institution }}
+                    </div>
+                    <div class="detail-item">
+                        <strong>Class:</strong> {{ user.class_level }}
+                    </div>
+                    <div class="detail-item">
+                        <strong>Address:</strong> {{ user.address }}
+                    </div>
+                    {% if user.facebook_link %}
+                    <div class="detail-item">
+                        <strong>Facebook:</strong> 
+                        <a href="{{ user.facebook_link }}" target="_blank">{{ user.facebook_link }}</a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- My Registrations -->
+        <div class="registrations-card">
+            <h3>My Event Registrations</h3>
+            {% if registrations %}
+            <div class="registrations-list">
+                {% for reg in registrations %}
+                <div class="registration-item">
+                    <div class="reg-info">
+                        <h4>{{ reg.segment_name }}</h4>
+                        <p>Registered on: {{ reg.registration_date.strftime('%Y-%m-%d') }}</p>
+                        <p>Status: 
+                            {% if reg.verified %}
+                            <span class="badge badge-success">Verified</span>
+                            {% else %}
+                            <span class="badge badge-warning">Pending Verification</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                    <div class="reg-actions">
+                        <a href="{{ url_for('registration_success', registration_id=reg._id|string) }}" 
+                           class="btn btn-sm btn-info">View Details</a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="text-muted">No registrations yet.</p>
+            <a href="{{ url_for('register') }}" class="btn btn-primary">Register for an Event</a>
+            {% endif %}
+        </div>
+        
+        <!-- My CA Applications -->
+        <div class="ca-applications-card">
+            <h3>My CA Applications</h3>
+            {% if ca_applications %}
+            <div class="ca-applications-list">
+                {% for ca in ca_applications %}
+                <div class="ca-application-item">
+                    <div class="ca-info">
+                        <h4>CA Code: {{ ca.ca_code }}</h4>
+                        <p>Applied on: {{ ca.registration_date.strftime('%Y-%m-%d') }}</p>
+                        <p>Status: 
+                            <span class="status-badge status-{{ ca.status }}">
+                                {{ ca.status|title }}
+                            </span>
+                        </p>
+                    </div>
+                    <div class="ca-actions">
+                        <a href="{{ url_for('ca_registration_success', ca_id=ca._id|string) }}" 
+                           class="btn btn-sm btn-info">View Details</a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="text-muted">No CA applications yet.</p>
+            <a href="{{ url_for('ca_register') }}" class="btn btn-primary">Apply as Campus Ambassador</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

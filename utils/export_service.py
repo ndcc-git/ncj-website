@@ -21,7 +21,9 @@ def export_to_excel(registrations):
             'Transaction ID': reg.get('transaction_id', ''),
             'Verified': 'Yes' if reg.get('verified') else 'No',
             'Registration Date': reg.get('registration_date', ''),
-            'Verified At': reg.get('verified_at', '')
+            'Verified At': reg.get('verified_at', ''),
+            'Firebase uid': reg.get('firebase_uid', ''),
+            'IP Address': reg.get('ip_address', '')
         })
     
     df = pd.DataFrame(data)
@@ -57,7 +59,9 @@ def export_to_csv(registrations):
             'Transaction ID': reg.get('transaction_id', ''),
             'Verified': 'Yes' if reg.get('verified') else 'No',
             'Registration Date': reg.get('registration_date', ''),
-            'Verified At': reg.get('verified_at', '')
+            'Verified At': reg.get('verified_at', ''),
+            'Firebase uid': reg.get('firebase_uid', ''),
+            'IP Address': reg.get('ip_address', '')
         })
     
     df = pd.DataFrame(data)
@@ -89,7 +93,9 @@ def export_ca_to_csv(ca_data):
             'Phone Number': ca.get('phone', ''),
             'Status': ca.get('status'),
             'Why CA': ca.get('why_ca', ''),
-            'Registration Date': ca.get('registration_date', '')
+            'Registration Date': ca.get('registration_date', ''),
+            'Firebase uid': ca.get('firebase_uid', ''),
+            'IP Address': ca.get('ip_address', '')
         })
     
     df = pd.DataFrame(data)
@@ -103,4 +109,40 @@ def export_ca_to_csv(ca_data):
         output.getvalue(),
         mimetype='text/csv',
         headers={'Content-Disposition': 'attachment;filename=ca.csv'}
+    )
+
+def export_ca_to_excel(ca_data):
+    """Export registrations to CSV format"""
+    # Convert to DataFrame
+    data = []
+    for ca in ca_data:
+        data.append({
+            'ID': str(ca.get('_id', '')),
+            'CA Code': ca.get('ca_code', ''),
+            'Profile': ca.get('profile_picture', ''),
+            'Full Name': ca.get('full_name', ''),
+            'Email': ca.get('email', ''),
+            'Institution': ca.get('institution', ''),
+            'Class': ca.get('class', ''),
+            'Phone Number': ca.get('phone', ''),
+            'Status': ca.get('status'),
+            'Why CA': ca.get('why_ca', ''),
+            'Registration Date': ca.get('registration_date', ''),
+            'Firebase uid': ca.get('firebase_uid', ''),
+            'IP Address': ca.get('ip_address', '')
+        })
+    
+    df = pd.DataFrame(data)
+    
+    # Create Excel file in memory
+    output = BytesIO()
+    with pd.ExcelWriter(output, engine='openpyxl') as writer:
+        df.to_excel(writer, sheet_name='Registrations', index=False)
+    
+    output.seek(0)
+    
+    return Response(
+        output.getvalue(),
+        mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        headers={'Content-Disposition': 'attachment;filename=registrations.xlsx'}
     )

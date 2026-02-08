@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+
+{% block title %}Sign Up - Festival Registration{% endblock %}
+
+{% block content %}
+<div class="user-auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <h2>Create Account</h2>
+            <p>Sign up to register for events or become a Campus Ambassador</p>
+        </div>
+        
+        <form method="POST" action="{{ url_for('user_signup') }}">
+            {{ form.hidden_tag() }}
+            
+            <div class="form-row">
+                <div class="form-group">
+                    {{ form.full_name.label }}
+                    {{ form.full_name(class="form-control", placeholder="Your full name") }}
+                    {% if form.full_name.errors %}
+                        <div class="errors">
+                            {% for error in form.full_name.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    {{ form.email.label }}
+                    {{ form.email(class="form-control", type="email", placeholder="Your email address") }}
+                    {% if form.email.errors %}
+                        <div class="errors">
+                            {% for error in form.email.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="form-group">
+                {{ form.address.label }}
+                {{ form.address(class="form-control", placeholder="Your complete address") }}
+                {% if form.address.errors %}
+                    <div class="errors">
+                        {% for error in form.address.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    {{ form.mobile.label }}
+                    {{ form.mobile(class="form-control", placeholder="01XXXXXXXXX") }}
+                    {% if form.mobile.errors %}
+                        <div class="errors">
+                            {% for error in form.mobile.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    {{ form.class_level.label }}
+                    {{ form.class_level(class="form-control") }}
+                    {% if form.class_level.errors %}
+                        <div class="errors">
+                            {% for error in form.class_level.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="form-group">
+                {{ form.institution.label }}
+                {{ form.institution(class="form-control", placeholder="Your school, college or university") }}
+                {% if form.institution.errors %}
+                    <div class="errors">
+                        {% for error in form.institution.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                {{ form.facebook_link.label }}
+                {{ form.facebook_link(class="form-control", placeholder="https://facebook.com/yourprofile") }}
+                <small class="form-text">Optional</small>
+                {% if form.facebook_link.errors %}
+                    <div class="errors">
+                        {% for error in form.facebook_link.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    {{ form.password.label }}
+                    {{ form.password(class="form-control", placeholder="At least 8 characters") }}
+                    <small class="form-text">Must contain uppercase, lowercase, and numbers</small>
+                    {% if form.password.errors %}
+                        <div class="errors">
+                            {% for error in form.password.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    {{ form.confirm_password.label }}
+                    {{ form.confirm_password(class="form-control", placeholder="Confirm your password") }}
+                    {% if form.confirm_password.errors %}
+                        <div class="errors">
+                            {% for error in form.confirm_password.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="form-group">
+                {{ form.submit(class="btn btn-primary btn-lg btn-block") }}
+            </div>
+        </form>
+        
+        <div class="auth-footer">
+            <p>Already have an account? <a href="{{ url_for('user_login') }}">Login here</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}

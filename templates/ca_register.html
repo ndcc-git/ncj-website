@@ -133,28 +133,5 @@
 {% endblock %}
 
 {% block scripts %}
-<script>
-    // Auto-fill from localStorage
-    document.addEventListener('DOMContentLoaded', function() {
-        const savedName = localStorage.getItem('ca_registration_name');
-        const savedEmail = localStorage.getItem('ca_registration_email');
-        const savedPhone = localStorage.getItem('ca_registration_phone');
-        const savedInstitution = localStorage.getItem('ca_registration_institution');
-        
-        if (savedName) document.getElementById('full_name').value = savedName;
-        if (savedEmail) document.getElementById('email').value = savedEmail;
-        if (savedPhone) document.getElementById('phone').value = savedPhone;
-        if (savedInstitution) document.getElementById('institution').value = savedInstitution;
-        
-        // Save to localStorage on blur
-        ['full_name', 'email', 'phone', 'institution'].forEach(fieldId => {
-            const field = document.getElementById(fieldId);
-            if (field) {
-                field.addEventListener('blur', function() {
-                    localStorage.setItem(`ca_registration_${fieldId}`, this.value);
-                });
-            }
-        });
-    });
-</script>
+
 {% endblock %}

@@ -238,7 +238,10 @@
 
     document.querySelectorAll('.view-btn').forEach(btn => {
         btn.addEventListener('click', function () {
+            const meta = document.querySelector('meta[name="csrf-token"]');
+            const csrfToken = meta.getAttribute("content");
             const caId = this.dataset.id;
+            console.log(caId)
             fetch(`/api/ca-details/${caId}`)
                 .then(response => response.json())
                 .then(data => {

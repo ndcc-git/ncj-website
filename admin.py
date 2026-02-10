@@ -689,3 +689,19 @@ def delete_admin_user(user_id):
             return jsonify({'success': False, 'message': 'Failed to delete user'}), 500
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)}), 500
+    
+
+@admin_bp.route('/settings', methods=['GET', 'POST'])
+@role_required('admin', 'executive')
+def admin_settings():
+    """Admin settings management - Simple version"""
+    settings = db.settings.find_one({'name': 'system_settings'})
+    
+    # Default settings if not found
+    if not settings:
+        settings = {
+            'registration_enabled': True,
+            'ca_registration_enabled': True
+        }
+    
+    return render_template('admin/settings.html', settings=settings)

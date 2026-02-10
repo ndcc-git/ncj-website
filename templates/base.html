@@ -10,13 +10,14 @@
     <link rel="dns-prefetch" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet" type="text/css">
     {% block head %}{% endblock %}
+    {% block styles %}{% endblock %}
 </head>
 
 <body>
     <!-- Add role badge in navigation -->
 <nav>
     <div class="container">
-        <a href="{{ url_for('index') }}" class="logo">Festival 2024</a>
+        <a href="{{ url_for('index') }}" class="logo">Festival 2026</a>
         <div class="nav-links">
             <a href="{{ url_for('index') }}">Home</a>
             <a href="{{ url_for('register') }}">Register</a>

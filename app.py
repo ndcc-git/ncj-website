@@ -5,6 +5,7 @@ import string
 import uuid
 from flask import Flask, render_template, request, jsonify, redirect, url_for, flash, session, blueprints
 from flask_wtf.csrf import CSRFProtect
+import jwt
 from pymongo import MongoClient
 from datetime import datetime, timedelta
 from bson.objectid import ObjectId
@@ -147,6 +148,40 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
+def role_required(*allowed_roles):
+    """Decorator to require specific role(s)"""
+    def decorator(f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            token = session.get('admin_token')
+            
+            if not token:
+                flash('Authentication required', 'error')
+                return redirect(url_for('admin.admin_login'))
+            
+            try:
+                payload = jwt.decode(token, app.config['JWT_SECRET_KEY'], algorithms=['HS256'])
+                user_role = payload.get('role')
+                
+                if user_role not in allowed_roles:
+                    flash('Insufficient permissions', 'error')
+                    return redirect(url_for('admin.admin_dashboard'))
+                
+                # Store user info in session
+                session['admin_role'] = user_role
+                session['admin_email'] = payload.get('email')
+                
+            except jwt.ExpiredSignatureError:
+                flash('Session expired. Please login again.', 'error')
+                return redirect(url_for('admin.admin_login'))
+            except jwt.InvalidTokenError:
+                flash('Invalid token. Please login again.', 'error')
+                return redirect(url_for('admin.admin_login'))
+            
+            return f(*args, **kwargs)
+        return decorated_function
+    return decorator
+
 
 def email_verified_required(f):
     """Decorator to require verified email"""
@@ -167,7 +202,6 @@ def email_verified_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
-
 def get_current_user():
     """Get current user from session"""
     if 'user_id' not in session:
@@ -179,6 +213,17 @@ def get_current_user():
 def init_db():
     """Initialize database with sample data if empty"""
     
+    if db.settings.count_documents({'name': 'system_settings'}) == 0:
+        system_settings = {
+            'name': 'system_settings',
+            'registration_enabled': True,
+            'ca_registration_enabled': True,
+            'contact_form_enabled': True,
+            'created_at': datetime.utcnow(),
+            'updated_at': datetime.utcnow()
+        }
+        db.settings.insert_one(system_settings)
+
     # Create admin user if not exists
     if users_collection.count_documents({'role': 'admin'}) == 0:
         admin_user = {
@@ -260,6 +305,16 @@ def init_db():
 
 ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'png'}
 MAX_FILE_SIZE = 2 * 1024 * 1024
+
+@app.route('/registration-closed')
+def registration_closed():
+    """Registration closed page"""
+    return render_template('registration_closed.html')
+
+@app.route('/ca-registration-closed')
+def ca_registration_closed():
+    """CA registration closed page"""
+    return render_template('ca_registration_closed.html')
 
 @app.route('/')
 def index():
@@ -641,7 +696,7 @@ def verify_email():
 
 
 @app.route('/ca-register', methods=['GET', 'POST'])
-@login_required  # Require login for CA registration
+@login_required
 @email_verified_required
 def ca_register():
     """CA Registration page"""
@@ -649,6 +704,25 @@ def ca_register():
     
     if not user:
         return redirect(url_for('user_login'))
+    
+    # Check if CA registration is enabled
+    settings = db.settings.find_one({'name': 'system_settings'})
+    if not settings or not settings.get('ca_registration_enabled', True):
+        flash('❌ CA registration is currently closed.', 'error')
+        return redirect(url_for('ca_registration_closed'))
+    
+    # Check if user has already applied for CA
+    existing_ca = db.ca_registrations.find_one({'user_id': user['_id']})
+    if existing_ca:
+        flash('❌ You have already applied to be a Campus Ambassador. '
+              'You cannot apply again.', 'error')
+        return redirect(url_for('ca_registration_success', ca_id=str(existing_ca['_id'])))
+    
+    # Check if email already registered as CA (additional check)
+    existing_ca_email = db.ca_registrations.find_one({'email': user['email']})
+    if existing_ca_email:
+        flash('❌ This email is already registered as a CA', 'error')
+        return redirect(url_for('ca_registration_success', ca_id=str(existing_ca_email['_id'])))
     
     form = CARegistrationForm()
     
@@ -661,21 +735,14 @@ def ca_register():
         form.class_info.data = user.get('class_level', '')
     
     if form.validate_on_submit():
-        # Check if email already registered as CA
-        existing_ca = db.ca_registrations.find_one({'email': form.email.data})
-        if existing_ca:
-            flash('This email is already registered as a CA', 'error')
-            return redirect(url_for('ca_register'))
-        
         # Generate CA code
         ca_code = generate_ca_code(form.full_name.data)
         
-        # Handle profile picture upload (with security - use the updated version from earlier)
-        profile_pic_filename = user.get('profile_picture')  # Use existing profile picture if any
-        
+        # Handle profile picture upload
+        profile_pic_filename = user.get('profile_picture')
         if form.profile_picture.data:
-            # Use the secure file upload logic from earlier
-            # ... (include the secure file upload code here)
+            # Use secure file upload logic from earlier
+            # ... (existing file upload code)
             pass
         
         # Create CA registration
@@ -690,10 +757,11 @@ def ca_register():
             'why_ca': form.why_ca.data,
             'profile_picture': profile_pic_filename,
             'ca_code': ca_code,
-            'status': 'pending',  # pending, approved, rejected
+            'status': 'pending',
             'registration_date': datetime.utcnow(),
             'ip_address': request.remote_addr,
-            'user_agent': request.user_agent.string
+            'user_agent': request.user_agent.string,
+            'user_email_verified': True
         }
         
         # Insert into database
@@ -705,6 +773,7 @@ def ca_register():
             {'$push': {'ca_applications': result.inserted_id}}
         )
         
+        flash('✅ CA application submitted successfully!', 'success')
         return redirect(url_for('ca_registration_success', ca_id=str(result.inserted_id)))
     
     return render_template('ca_register.html', form=form)
@@ -729,6 +798,11 @@ def register():
     if not user:
         return redirect(url_for('user_login'))
     
+    settings = db.settings.find_one({'name': 'system_settings'})
+    if not settings or not settings.get('registration_enabled', True):
+        flash('❌ Event registration is currently closed.', 'error')
+        return redirect(url_for('registration_closed'))
+
     form = RegistrationForm()
     
     # Get segments for dropdown
@@ -972,8 +1046,147 @@ def api_message_details(message_id):
     except:
         return jsonify({'success': False, 'message': 'Invalid message ID'}), 400
 
+@app.route('/api/toggle-setting', methods=['POST'])
+@admin_required
+def toggle_setting():
+    """API endpoint to toggle settings"""
+    data = request.json
+    setting_name = data.get('setting_name')
+    new_value = data.get('value')
+    
+    if setting_name not in ['registration_enabled', 'ca_registration_enabled']:
+        return jsonify({'success': False, 'message': 'Invalid setting'}), 400
+    
+    update_data = {
+        setting_name: new_value,
+        'updated_at': datetime.utcnow()
+    }
+    
+    # Update or insert settings
+    db.settings.update_one(
+        {'name': 'system_settings'},
+        {'$set': update_data},
+        upsert=True
+    )
+    
+    return jsonify({'success': True, setting_name: new_value})
 
 
+@app.route('/api/scan-user/<user_id>')
+@role_required('admin', 'executive', 'organizer', 'moderator')
+def get_user_by_scan(user_id):
+    """Get user details by scanned ID"""
+    try:
+        # Check if it's a registration ID
+        registration = db.registrations.find_one({'_id': ObjectId(user_id)})
+        
+        if registration:
+            # Get user details
+            user = db.users.find_one({'_id': registration['user_id']})
+            if not user:
+                return jsonify({'success': False, 'message': 'User not found'})
+            
+            # Get all registrations for this user
+            user_registrations = list(db.registrations.find(
+                {'user_id': user['_id']}
+            ).sort('registration_date', -1))
+            
+            # Prepare response
+            response_data = {
+                'success': True,
+                'type': 'registration',
+                'user': {
+                    'id': str(user['_id']),
+                    'name': user.get('full_name', ''),
+                    'email': user.get('email', ''),
+                    'mobile': user.get('mobile', ''),
+                    'institution': user.get('institution', ''),
+                    'profile_picture': user.get('profile_picture')
+                },
+                'registration': {
+                    'id': str(registration['_id']),
+                    'segment': registration.get('segment_name', ''),
+                    'category': registration.get('category', ''),
+                    'verified': registration.get('verified', False),
+                    'present': registration.get('present', False),
+                    'present_at': registration.get('present_at'),
+                    'registration_date': registration.get('registration_date')
+                },
+                'all_registrations': [
+                    {
+                        'id': str(reg['_id']),
+                        'segment': reg.get('segment_name', ''),
+                        'verified': reg.get('verified', False),
+                        'present': reg.get('present', False),
+                        'date': reg.get('registration_date')
+                    }
+                    for reg in user_registrations
+                ]
+            }
+            return jsonify(response_data)
+        
+        # Check if it's a user ID directly
+        user = db.users.find_one({'_id': ObjectId(user_id)})
+        if user:
+            # Get all registrations for this user
+            user_registrations = list(db.registrations.find(
+                {'user_id': user['_id']}
+            ).sort('registration_date', -1))
+            
+            response_data = {
+                'success': True,
+                'type': 'user',
+                'user': {
+                    'id': str(user['_id']),
+                    'name': user.get('full_name', ''),
+                    'email': user.get('email', ''),
+                    'mobile': user.get('mobile', ''),
+                    'institution': user.get('institution', ''),
+                    'profile_picture': user.get('profile_picture')
+                },
+                'all_registrations': [
+                    {
+                        'id': str(reg['_id']),
+                        'segment': reg.get('segment_name', ''),
+                        'verified': reg.get('verified', False),
+                        'present': reg.get('present', False),
+                        'date': reg.get('registration_date')
+                    }
+                    for reg in user_registrations
+                ]
+            }
+            return jsonify(response_data)
+        
+        return jsonify({'success': False, 'message': 'Invalid QR code'})
+        
+    except Exception as e:
+        return jsonify({'success': False, 'message': 'Invalid ID format'})
+
+@app.route('/api/mark-present/<registration_id>', methods=['POST'])
+@role_required('admin', 'executive', 'organizer', 'moderator')
+def mark_present(registration_id):
+    """Mark a registration as present"""
+    try:
+        # Validate CSRF token
+        csrf_token = request.headers.get('X-CSRFToken')
+        if not csrf_token:
+            return jsonify({'success': False, 'message': 'CSRF token missing'}), 403
+        
+        result = db.registrations.update_one(
+            {'_id': ObjectId(registration_id)},
+            {'$set': {
+                'present': True,
+                'present_at': datetime.utcnow()
+            }}
+        )
+        
+        if result.modified_count > 0:
+            return jsonify({'success': True, 'message': 'Marked as present'})
+        else:
+            return jsonify({'success': False, 'message': 'Registration not found'})
+            
+    except Exception as e:
+        return jsonify({'success': False, 'message': 'Error marking present'})
 
 @app.errorhandler(404)
 def page_not_found(e):

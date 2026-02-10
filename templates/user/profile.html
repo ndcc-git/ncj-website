@@ -68,9 +68,9 @@
                         <p>Registered on: {{ reg.registration_date.strftime('%Y-%m-%d') }}</p>
                         <p>Status: 
                             {% if reg.verified %}
-                            <span class="badge badge-success">Verified</span>
+                            <span class="status-badge status-approved">Verified</span>
                             {% else %}
-                            <span class="badge badge-warning">Pending Verification</span>
+                            <span class="status-badge status-pending">Pending Verification</span>
                             {% endif %}
                         </p>
                     </div>

@@ -1,0 +1,234 @@
+{% extends "base.html" %}
+
+{% block title %}Registration Closed - Festival Registration{% endblock %}
+
+{% block content %}
+<div class="registration-closed-container">
+    <div class="closed-card">
+        <div class="closed-icon">
+            <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+                <circle cx="40" cy="40" r="38" stroke="#e74c3c" stroke-width="4"/>
+                <path d="M30 30L50 50M30 50L50 30" stroke="#e74c3c" stroke-width="6" stroke-linecap="round"/>
+                <path d="M40 25V40" stroke="#e74c3c" stroke-width="4" stroke-linecap="round"/>
+                <circle cx="40" cy="55" r="3" fill="#e74c3c"/>
+            </svg>
+        </div>
+        
+        <h2>Event Registration Closed</h2>
+        
+        <div class="closed-message">
+            <p>Registration for festival events is currently closed.</p>
+            
+            <div class="reasons">
+                <h3><i class="reason-icon">📅</i> Possible Reasons:</h3>
+                <ul>
+                    <li>Registration period has ended</li>
+                    <li>All available slots have been filled</li>
+                    <li>Temporary maintenance is in progress</li>
+                    <li>Registration will open soon</li>
+                </ul>
+            </div>
+            
+            <div class="whats-next">
+                <h3><i class="next-icon">🔮</i> What You Can Do:</h3>
+                <div class="actions-grid">
+                    <div class="action-item">
+                        <div class="action-icon">👀</div>
+                        <h4>Check Back Later</h4>
+                        <p>Registration might open again soon</p>
+                    </div>
+                    <div class="action-item">
+                        <div class="action-icon">📧</div>
+                        <h4>Contact Us</h4>
+                        <p>Get updates about registration</p>
+                    </div>
+                    <div class="action-item">
+                        <div class="action-icon">👥</div>
+                        <h4>Become a CA</h4>
+                        <p>Apply as Campus Ambassador</p>
+                    </div>
+                    <div class="action-item">
+                        <div class="action-icon">🏠</div>
+                        <h4>Return Home</h4>
+                        <p>Explore other festival activities</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="closed-actions">
+                <a href="{{ url_for('index') }}" class="btn btn-primary">
+                    <i class="action-icon">🏠</i> Back to Home
+                </a>
+                <a href="{{ url_for('contact') }}" class="btn btn-secondary">
+                    <i class="action-icon">📧</i> Contact Organizers
+                </a>
+                <a href="{{ url_for('ca_register') }}" class="btn btn-success">
+                    <i class="action-icon">👥</i> Apply as CA
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block styles %}
+<style>
+.registration-closed-container {
+    max-width: 800px;
+    margin: 3rem auto;
+    padding: 0 1rem;
+}
+
+.closed-card {
+    background: white;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+.closed-icon {
+    margin-bottom: 1.5rem;
+}
+
+.closed-icon svg {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+.closed-card h2 {
+    color: #e74c3c;
+    margin-bottom: 1rem;
+}
+
+.closed-message {
+    margin-top: 1.5rem;
+}
+
+.closed-message p {
+    font-size: 1.1rem;
+    color: #666;
+    margin-bottom: 2rem;
+}
+
+.reasons {
+    text-align: left;
+    margin: 2rem 0;
+    padding: 1.5rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border-left: 4px solid #e74c3c;
+}
+
+.reasons h3 {
+    color: #e74c3c;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.reasons ul {
+    margin-left: 1.5rem;
+    color: #666;
+}
+
+.reasons li {
+    margin-bottom: 0.5rem;
+}
+
+.whats-next {
+    margin: 2rem 0;
+}
+
+.whats-next h3 {
+    color: #2c3e50;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.actions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1rem;
+}
+
+.action-item {
+    text-align: center;
+    padding: 1.5rem 1rem;
+    background: white;
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+    transition: transform 0.3s ease;
+}
+
+.action-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.action-icon {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    display: block;
+}
+
+.action-item h4 {
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+}
+
+.action-item p {
+    color: #666;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+.closed-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 2rem;
+    flex-wrap: wrap;
+}
+
+.reason-icon,
+.next-icon,
+.action-icon {
+    font-size: 1.2rem;
+}
+
+@media (max-width: 768px) {
+    .closed-card {
+        padding: 1.5rem;
+    }
+    
+    .actions-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .closed-actions {
+        flex-direction: column;
+    }
+    
+    .closed-actions .btn {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .actions-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+{% endblock %}

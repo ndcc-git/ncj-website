@@ -1,0 +1,188 @@
+{% extends "adm_base.html" %}
+
+{% block title %}Admin Site Settings{% endblock %}
+
+{% block content %}
+
+<section class="section is-title-bar">
+    <div class="level">
+        <div class="level-left">
+            <div class="level-item">
+                <ul>
+                    <li>Admin</li>
+                    <li>Settings</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+  <div class="container is-max-desktop">
+
+    <!-- Header -->
+    <div class="mb-5">
+      <h1 class="title is-4">System Settings</h1>
+      <p class="subtitle is-6 has-text-grey">
+        Manage registrations and platform availability
+      </p>
+    </div>
+
+    <!-- Card -->
+    <div class="card">
+      <div class="card-content">
+
+        <!-- Setting 1 -->
+        <div class="level mb-5">
+          <div class="level-left">
+            <div>
+              <p class="has-text-weight-semibold">🎪 Event Registration</p>
+              <p class="is-size-7 has-text-grey">
+                Allow users to register for festival events
+              </p>
+            </div>
+          </div>
+
+          <div class="level-right is-flex is-align-items-center">
+
+            <!-- Bulma switch -->
+            <label class="switch is-rounded mr-3">
+              <input type="checkbox" id="registration-toggle"
+                {% if settings.registration_enabled %}checked{% endif %}>
+              <span class="check"></span>
+            </label>
+
+            <!-- Status tag -->
+            <span id="registration-status"
+              class="tag {% if settings.registration_enabled %}is-success{% else %}is-danger{% endif %} is-light">
+              {{ 'Enabled' if settings.registration_enabled else 'Disabled' }}
+            </span>
+          </div>
+        </div>
+
+        <hr>
+
+        <!-- Setting 2 -->
+        <div class="level">
+          <div class="level-left">
+            <div>
+              <p class="has-text-weight-semibold">👥 CA Registration</p>
+              <p class="is-size-7 has-text-grey">
+                Allow users to apply as Campus Ambassadors
+              </p>
+            </div>
+          </div>
+
+          <div class="level-right is-flex is-align-items-center">
+
+            <label class="switch is-rounded mr-3">
+              <input type="checkbox" id="ca-registration-toggle"
+                {% if settings.ca_registration_enabled %}checked{% endif %}>
+              <span class="check"></span>
+            </label>
+
+            <span id="ca-status"
+              class="tag {% if settings.ca_registration_enabled %}is-success{% else %}is-danger{% endif %} is-light">
+              {{ 'Enabled' if settings.ca_registration_enabled else 'Disabled' }}
+            </span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Footer buttons -->
+      <footer class="card-footer">
+        <a id="save-settings" class="card-footer-item has-text-weight-semibold">
+          💾 Save
+        </a>
+        <a id="refresh-page" class="card-footer-item">
+          🔄 Refresh
+        </a>
+      </footer>
+    </div>
+
+    <!-- Status message -->
+    <div id="status-message" class="notification is-hidden mt-4"></div>
+
+  </div>
+</section>
+
+
+{% endblock %}
+
+{% block scripts %}
+
+<script>
+let currentSettings = {
+  registration_enabled: {{ 'true' if settings.registration_enabled else 'false' }},
+  ca_registration_enabled: {{ 'true' if settings.ca_registration_enabled else 'false' }}
+};
+
+const regToggle = document.getElementById('registration-toggle');
+const caToggle = document.getElementById('ca-registration-toggle');
+
+const regStatus = document.getElementById('registration-status');
+const caStatus = document.getElementById('ca-status');
+
+function updateTag(tag, enabled){
+  tag.className = `tag ${enabled ? 'is-success' : 'is-danger'} is-light`;
+  tag.textContent = enabled ? 'Enabled' : 'Disabled';
+}
+
+regToggle.addEventListener('change', () => {
+  currentSettings.registration_enabled = regToggle.checked;
+  updateTag(regStatus, regToggle.checked);
+});
+
+caToggle.addEventListener('change', () => {
+  currentSettings.ca_registration_enabled = caToggle.checked;
+  updateTag(caStatus, caToggle.checked);
+});
+
+document.getElementById('refresh-page').onclick = () => location.reload();
+
+document.getElementById('save-settings').onclick = async function () {
+  const btn = this;
+  btn.textContent = "Saving...";
+
+  const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+
+  try {
+    const res = await Promise.all([
+      fetch('/api/toggle-setting', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json','X-CSRFToken':csrfToken},
+        body: JSON.stringify({setting_name:'registration_enabled', value:currentSettings.registration_enabled})
+      }),
+      fetch('/api/toggle-setting', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json','X-CSRFToken':csrfToken},
+        body: JSON.stringify({setting_name:'ca_registration_enabled', value:currentSettings.ca_registration_enabled})
+      })
+    ]);
+
+    const results = await Promise.all(res.map(r => r.json()));
+
+    if(results.every(r => r.success)){
+      showMessage("Settings saved successfully", "is-success");
+      setTimeout(()=>location.reload(), 1000);
+    } else throw new Error();
+
+  } catch {
+    showMessage("Failed to save settings", "is-danger");
+    btn.textContent = "💾 Save";
+  }
+};
+
+function showMessage(text, color){
+  const box = document.getElementById('status-message');
+  box.className = `notification ${color}`;
+  box.textContent = text;
+  box.classList.remove('is-hidden');
+
+  setTimeout(()=>box.classList.add('is-hidden'), 3000);
+}
+</script>
+
+
+{% endblock %}

@@ -1,0 +1,356 @@
+{% extends "base.html" %}
+
+{% block title %}System Settings - Admin{% endblock %}
+
+{% block head %}
+{% endblock %}
+
+{% block content %}
+<div class="admin-settings">
+    <h2>System Settings</h2>
+    
+    <div class="settings-simple">
+        <!-- Toggle Section -->
+        <div class="toggle-section">
+            <div class="toggle-item">
+                <div class="toggle-label">
+                    <h4>🎪 Event Registration</h4>
+                    <p>Allow users to register for festival events</p>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="registration-toggle" 
+                           {% if settings.registration_enabled %}checked{% endif %}>
+                    <span class="toggle-slider"></span>
+                </label>
+                <span class="toggle-status">
+                    {% if settings.registration_enabled %}
+                    <span class="badge badge-success">Enabled</span>
+                    {% else %}
+                    <span class="badge badge-danger">Disabled</span>
+                    {% endif %}
+                </span>
+            </div>
+            
+            <div class="toggle-item">
+                <div class="toggle-label">
+                    <h4>👥 CA Registration</h4>
+                    <p>Allow users to apply as Campus Ambassadors</p>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="ca-registration-toggle" 
+                           {% if settings.ca_registration_enabled %}checked{% endif %}>
+                    <span class="toggle-slider"></span>
+                </label>
+                <span class="toggle-status">
+                    {% if settings.ca_registration_enabled %}
+                    <span class="badge badge-success">Enabled</span>
+                    {% else %}
+                    <span class="badge badge-danger">Disabled</span>
+                    {% endif %}
+                </span>
+            </div>
+        </div>
+        
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+            <button id="save-settings" class="btn btn-primary">
+                💾 Save Settings
+            </button>
+            <button id="refresh-page" class="btn btn-secondary">
+                🔄 Refresh
+            </button>
+        </div>
+        
+        <!-- Status Message -->
+        <div id="status-message" class="alert" style="display: none; margin-top: 1rem;"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Get current settings state
+    let currentSettings = {
+        registration_enabled: {{ 'true' if settings.registration_enabled else 'false' }},
+        ca_registration_enabled: {{ 'true' if settings.ca_registration_enabled else 'false' }}
+    };
+    
+    // Update toggle status display
+    function updateToggleStatus() {
+        const registrationBadge = document.querySelector('.toggle-item:nth-child(1) .toggle-status .badge');
+        const caBadge = document.querySelector('.toggle-item:nth-child(2) .toggle-status .badge');
+        
+        if (currentSettings.registration_enabled) {
+            registrationBadge.className = 'badge badge-success';
+            registrationBadge.textContent = 'Enabled';
+        } else {
+            registrationBadge.className = 'badge badge-danger';
+            registrationBadge.textContent = 'Disabled';
+        }
+        
+        if (currentSettings.ca_registration_enabled) {
+            caBadge.className = 'badge badge-success';
+            caBadge.textContent = 'Enabled';
+        } else {
+            caBadge.className = 'badge badge-danger';
+            caBadge.textContent = 'Disabled';
+        }
+    }
+    
+    // Toggle switch event listeners
+    document.getElementById('registration-toggle').addEventListener('change', function() {
+        currentSettings.registration_enabled = this.checked;
+        updateToggleStatus();
+    });
+    
+    document.getElementById('ca-registration-toggle').addEventListener('change', function() {
+        currentSettings.ca_registration_enabled = this.checked;
+        updateToggleStatus();
+    });
+    
+    // Save settings
+    document.getElementById('save-settings').addEventListener('click', function() {
+        const button = this;
+        const originalText = button.textContent;
+        console.log('lel')
+        const meta = document.querySelector('meta[name="csrf-token"]');
+        const csrfToken = meta.getAttribute("content");
+        
+        // Disable button and show loading
+        button.disabled = true;
+        button.innerHTML = '⏳ Saving...';
+        
+        // Save both settings
+        Promise.all([
+            fetch('/api/toggle-setting', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                },
+                body: JSON.stringify({
+                    setting_name: 'registration_enabled',
+                    value: currentSettings.registration_enabled
+                })
+            }),
+            fetch('/api/toggle-setting', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                },
+                body: JSON.stringify({
+                    setting_name: 'ca_registration_enabled',
+                    value: currentSettings.ca_registration_enabled
+                })
+            })
+        ])
+        .then(responses => Promise.all(responses.map(r => r.json())))
+        .then(results => {
+            if (results.every(r => r.success)) {
+                showMessage('✅ Settings saved successfully!', 'success');
+                
+                // Reset button after delay
+                setTimeout(() => {
+                    button.disabled = false;
+                    button.innerHTML = originalText;
+                    
+                    // Reload page to show updated state
+                    setTimeout(() => location.reload(), 1000);
+                }, 1500);
+            } else {
+                throw new Error('Failed to save some settings');
+            }
+        })
+        .catch(error => {
+            showMessage('❌ Error: ' + error.message, 'error');
+            button.disabled = false;
+            button.innerHTML = originalText;
+        });
+    });
+    
+    // Refresh page
+    document.getElementById('refresh-page').addEventListener('click', function() {
+        location.reload();
+    });
+    
+    // Show message
+    function showMessage(message, type) {
+        const messageDiv = document.getElementById('status-message');
+        messageDiv.textContent = message;
+        messageDiv.className = `alert alert-${type}`;
+        messageDiv.style.display = 'block';
+        
+        // Auto-hide after 5 seconds
+        setTimeout(() => {
+            messageDiv.style.display = 'none';
+        }, 5000);
+    }
+</script>
+{% endblock %}
+
+{% block styles %}
+<style>
+.admin-settings {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 1rem;
+}
+
+.settings-simple {
+    background: white;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.toggle-section {
+    margin-bottom: 2rem;
+}
+
+.toggle-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border-left: 4px solid #3498db;
+}
+
+.toggle-label {
+    flex-grow: 1;
+    margin-right: 1rem;
+}
+
+.toggle-label h4 {
+    color: #2c3e50;
+    margin-bottom: 0.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.toggle-label p {
+    color: #666;
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+/* Toggle Switch */
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+    margin: 0 1rem;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 34px;
+}
+
+.toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .toggle-slider {
+    background-color: #28a745;
+}
+
+input:checked + .toggle-slider:before {
+    transform: translateX(26px);
+}
+
+.toggle-status {
+    min-width: 80px;
+    text-align: center;
+}
+
+/* Action Buttons */
+.action-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.action-buttons .btn {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+/* Badges */
+.badge {
+    padding: 0.35rem 0.65rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.badge-success {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.badge-danger {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .settings-simple {
+        padding: 1.5rem;
+    }
+    
+    .toggle-item {
+        flex-direction: column;
+        text-align: center;
+        gap: 1rem;
+    }
+    
+    .toggle-label {
+        margin-right: 0;
+        text-align: center;
+    }
+    
+    .toggle-label h4 {
+        justify-content: center;
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+    }
+    
+    .action-buttons .btn {
+        width: 100%;
+    }
+}
+</style>
+{% endblock %}

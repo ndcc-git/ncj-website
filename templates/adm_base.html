@@ -182,6 +182,13 @@
 
                         </a>
                     </li>
+                    <li>
+                        <a class="has-icon has-dropdown-icon" href="{{ url_for('admin.admin_settings') }}">
+                            <span class="icon"><i class="mdi mdi-cog"></i></span>
+                            <span class="menu-item-label">Settings</span>
+
+                        </a>
+                    </li>
 
                 </ul>
                 <p class="menu-label">About</p>
@@ -248,7 +255,7 @@
     <!-- Scripts below are for demo only -->
     <script type="text/javascript" src="{{ url_for('static', filename='js/main.js') }}"></script>
 
-    <link rel="stylesheet" href="https://cdn.materialdesignicons.com/4.9.95/css/materialdesignicons.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css">
     {% block scripts %}{% endblock %}
 </body>
 

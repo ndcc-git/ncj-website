@@ -708,23 +708,40 @@ def ca_register():
     # Check if CA registration is enabled
     settings = db.settings.find_one({'name': 'system_settings'})
     if not settings or not settings.get('ca_registration_enabled', True):
-        flash('❌ CA registration is currently closed.', 'error')
+        flash('CA registration is currently closed.', 'error')
         return redirect(url_for('ca_registration_closed'))
     
     # Check if user has already applied for CA
     existing_ca = db.ca_registrations.find_one({'user_id': user['_id']})
     if existing_ca:
-        flash('❌ You have already applied to be a Campus Ambassador. '
+        flash('You have already applied to be a Campus Ambassador. '
               'You cannot apply again.', 'error')
         return redirect(url_for('ca_registration_success', ca_id=str(existing_ca['_id'])))
     
     # Check if email already registered as CA (additional check)
     existing_ca_email = db.ca_registrations.find_one({'email': user['email']})
     if existing_ca_email:
-        flash('❌ This email is already registered as a CA', 'error')
+        flash('This email is already registered as a CA', 'error')
         return redirect(url_for('ca_registration_success', ca_id=str(existing_ca_email['_id'])))
     
     form = CARegistrationForm()
+    
+    # File upload configurations
+    UPLOAD_FOLDER = os.path.join(app.root_path, 'static', 'uploads', 'ca_profiles')
+    
+    # Ensure upload directory exists
+    os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+    
+    # Helper function to validate file
+    def allowed_file(filename):
+        return '.' in filename and \
+               filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+    
+    def validate_file_size(file):
+        file.seek(0, 2)  # Seek to end
+        file_size = file.tell()
+        file.seek(0)  # Reset to beginning
+        return file_size <= MAX_FILE_SIZE
     
     # Pre-fill form with user data
     if request.method == 'GET':
@@ -738,12 +755,82 @@ def ca_register():
         # Generate CA code
         ca_code = generate_ca_code(form.full_name.data)
         
-        # Handle profile picture upload
-        profile_pic_filename = user.get('profile_picture')
+        # Handle profile picture upload from form
+        profile_pic_filename = None
+        
         if form.profile_picture.data:
-            # Use secure file upload logic from earlier
-            # ... (existing file upload code)
-            pass
+            file = form.profile_picture.data
+            
+            # Check if file has a name
+            if file.filename == '':
+                flash('Profile picture is required', 'error')
+                return redirect(url_for('ca_register'))
+            
+            # Validate file extension
+            if not allowed_file(file.filename):
+                flash('Only JPG, JPEG, and PNG files are allowed', 'error')
+                return redirect(url_for('ca_register'))
+            
+            # Validate file size
+            if not validate_file_size(file):
+                flash(f'File size exceeds {MAX_FILE_SIZE // (1024*1024)}MB limit', 'error')
+                return redirect(url_for('ca_register'))
+            
+            # Secure the filename
+            original_filename = secure_filename(file.filename)
+            
+            # Extract file extension
+            file_ext = original_filename.rsplit('.', 1)[1].lower() if '.' in original_filename else 'jpg'
+            
+            # Generate unique filename with UUID and timestamp
+            unique_id = uuid.uuid4().hex[:8]
+            timestamp = datetime.utcnow().strftime('%Y%m%d_%H%M%S')
+            profile_pic_filename = f"ca_{ca_code}_{timestamp}_{unique_id}.{file_ext}"
+            
+            # Build safe file path
+            safe_filename = secure_filename(profile_pic_filename)
+            file_path = os.path.join(UPLOAD_FOLDER, safe_filename)
+            
+            # Ensure we're not writing outside the upload directory
+            upload_root = os.path.abspath(UPLOAD_FOLDER)
+            file_abs_path = os.path.abspath(file_path)
+            
+            if not file_abs_path.startswith(upload_root):
+                flash('Invalid file path', 'error')
+                return redirect(url_for('ca_register'))
+            
+            try:
+                # Save the file
+                file.save(file_path)
+                
+                # Verify the saved file is an actual image
+                try:
+                    from PIL import Image
+                    with Image.open(file_path) as img:
+                        img.verify()
+                        
+                        # Resize image if too large
+                        max_dimension = 800
+                        with Image.open(file_path) as img_resize:
+                            if img_resize.width > max_dimension or img_resize.height > max_dimension:
+                                img_resize.thumbnail((max_dimension, max_dimension), Image.Resampling.LANCZOS)
+                                img_resize.save(file_path, optimize=True, quality=85)
+                except ImportError:
+                    # PIL not installed, skip verification
+                    pass
+                except Exception as e:
+                    # Invalid image file, delete it
+                    os.remove(file_path)
+                    flash('Invalid image file. Please upload a valid image.', 'error')
+                    return redirect(url_for('ca_register'))
+                    
+            except Exception as e:
+                app.logger.error(f'File upload error: {str(e)}')
+                flash('Error uploading file. Please try again.', 'error')
+                return redirect(url_for('ca_register'))
+        else:
+            flash('Profile picture is required', 'error')
+            return redirect(url_for('ca_register'))
         
         # Create CA registration
         ca_data = {
@@ -773,10 +860,11 @@ def ca_register():
             {'$push': {'ca_applications': result.inserted_id}}
         )
         
-        flash('✅ CA application submitted successfully!', 'success')
+        flash('CA application submitted successfully!', 'success')
         return redirect(url_for('ca_registration_success', ca_id=str(result.inserted_id)))
     
     return render_template('ca_register.html', form=form)
+
 
 @app.route('/ca-registration-success/<ca_id>')
 def ca_registration_success(ca_id):
@@ -842,12 +930,12 @@ def register():
             flash('You have already registered for this segment', 'error')
             return redirect(url_for('register'))
         
-        # ✅ Conditional category validation
+        # Conditional category validation
         if segment.get('categories') and not form.category.data:
             form.category.errors.append("Category is required for this segment.")
             return render_template('register.html', form=form, segments=segments)
         
-        # ✅ Conditional submission link validation
+        # Conditional submission link validation
         if segment.get('type') == "Submission" and not form.submission_link.data:
             form.submission_link.errors.append("Submission link is required for this segment.")
             return render_template('register.html', form=form, segments=segments)
@@ -1185,76 +1273,6 @@ def get_user_by_scan(user_id):
                 'class': ca_application.get('class', ''),
                 'date': ca_application.get('registration_date'),
                 'profile_picture': ca_application.get('profile_picture')
-            }
-        
-        return jsonify(response_data)
-        
-    except Exception as e:
-        print(f"Scan error: {str(e)}")
-        return jsonify({'success': False, 'message': 'Error processing scan'})
-    """Get user details by scanned ID"""
-    try:
-        # Validate ObjectId
-        try:
-            obj_id = ObjectId(user_id)
-        except:
-            return jsonify({'success': False, 'message': 'Invalid QR code format'})
-        
-        # Step 1: Try to find user
-        user = db.users.find_one({'_id': obj_id})
-        
-        # Step 2: If not user, try to find registration and get its user
-        if not user:
-            registration = db.registrations.find_one({'_id': obj_id})
-            if registration:
-                user = db.users.find_one({'_id': registration.get('user_id')})
-        
-        # Step 3: If still no user, return error
-        if not user:
-            return jsonify({'success': False, 'message': 'User not found'})
-        
-        # Get all registrations for this user
-        user_registrations = list(db.registrations.find(
-            {'user_id': user['_id']}
-        ).sort('registration_date', -1))
-        
-        # Build response
-        response_data = {
-            'success': True,
-            'user': {
-                'id': str(user['_id']),
-                'name': user.get('full_name', user.get('name', '')),
-                'email': user.get('email', ''),
-                'mobile': user.get('mobile', ''),
-                'institution': user.get('institution', ''),
-                'profile_picture': user.get('profile_picture'),
-                'class_level': user.get('class_level', ''),
-                'email_verified': user.get('email_verified', False)
-            },
-            'all_registrations': [
-                {
-                    'id': str(reg['_id']),
-                    'segment': reg.get('segment_name', ''),
-                    'category': reg.get('category', ''),
-                    'verified': reg.get('verified', False),
-                    'present': reg.get('present', False),
-                    'present_at': reg.get('present_at'),
-                    'date': reg.get('registration_date')
-                }
-                for reg in user_registrations
-            ]
-        }
-        
-        # Add current registration if this scan was for a registration
-        registration = db.registrations.find_one({'_id': obj_id})
-        if registration and str(registration.get('user_id')) == str(user['_id']):
-            response_data['registration'] = {
-                'id': str(registration['_id']),
-                'segment': registration.get('segment_name', ''),
-                'category': registration.get('category', ''),
-                'verified': registration.get('verified', False),
-                'present': registration.get('present', False),
-                'present_at': registration.get('present_at')
             }
         
         return jsonify(response_data)

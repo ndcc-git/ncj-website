@@ -705,3 +705,8 @@ def admin_settings():
         }
     
     return render_template('admin/settings.html', settings=settings)
+
+@admin_bp.route('/scanner', methods=['GET', 'POST'])
+@role_required('admin', 'executive', 'organizer', 'moderator')
+def admin_scanner():
+    return render_template('admin/scanner.html')

@@ -1,0 +1,229 @@
+{% extends "adm_base.html" %}
+
+{% block title %}Admin Scanner{% endblock %}
+
+{% block head %}
+<script src="https://unpkg.com/html5-qrcode"></script>
+{% endblock %}
+
+{% block content %}
+
+<section class="section is-title-bar">
+    <div class="level">
+        <div class="level-left">
+            <div class="level-item">
+                <ul>
+                    <li>Admin</li>
+                    <li>Scanner</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+<div class="container" style="max-width: 650px;">
+
+  <h1 class="title has-text-centered">User Scanner</h1>
+
+  <!-- Manual input -->
+  <div class="field has-addons">
+    <div class="control is-expanded">
+      <input id="manualInput" class="input" placeholder="Enter User ID manually">
+    </div>
+    <div class="control">
+      <button class="button is-link" onclick="searchManual()">
+        Search
+      </button>
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- Camera -->
+  <div id="reader"></div>
+
+  <div class="has-text-centered mt-4">
+    <button id="scanBtn" class="button is-primary">
+      Scan QR
+    </button>
+  </div>
+
+</div>
+</section>
+
+<!-- ================= MODAL ================= -->
+<div id="userModal" class="modal">
+  <div class="modal-background"></div>
+
+  <div class="modal-card">
+    <header class="modal-card-head">
+      <p class="modal-card-title">User Details</p>
+      <button class="delete" onclick="closeModal()"></button>
+    </header>
+
+    <section class="modal-card-body" id="modalContent">
+    </section>
+
+    <footer class="modal-card-foot">
+      <button id="presentBtn" class="button is-success">
+        Mark Present
+      </button>
+      <button class="button" onclick="closeModal()">Close</button>
+    </footer>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+
+<script>
+let scanner = null;
+let lastId = null;
+
+/* -------------------- Scan Button -------------------- */
+document.getElementById("scanBtn").addEventListener("click", startScan);
+
+function startScan() {
+  document.getElementById("scanBtn").disabled = true;
+
+  if (scanner) {
+    scanner.clear();
+  }
+
+  scanner = new Html5Qrcode("reader");
+
+  scanner.start(
+    { facingMode: "environment" }, // back camera default
+    { fps: 10, qrbox: 250 },
+    (text) => {
+      scanner.stop().then(() => {
+        document.getElementById("scanBtn").disabled = false;
+      });
+
+      handleUser(text);
+    }
+  ).catch(err => {
+    alert("Camera error: " + err);
+    document.getElementById("scanBtn").disabled = false;
+  });
+}
+
+
+/* -------------------- Manual Search -------------------- */
+function searchManual() {
+  const id = document.getElementById("manualInput").value.trim();
+  if (!id) return;
+  handleUser(id);
+}
+
+
+/* -------------------- Fetch user -------------------- */
+function handleUser(id) {
+  lastId = id;
+
+  fetch(`/api/scan-user/${id}`)
+    .then(r => r.json())
+    .then(data => {
+      if (!data.success) {
+        alert("User not found");
+        return;
+      }
+      renderModal(data);
+      openModal();
+    });
+}
+
+
+/* -------------------- Modal Rendering -------------------- */
+function renderModal(data) {
+  const u = data.user;
+
+  // User Info Box
+  let html = `
+  <div class="box">
+
+    <h2 class="title is-5 mb-3">${u.name}</h2>
+
+    <div class="columns is-mobile is-multiline is-size-7">
+      <div class="column is-half"><b>Email:</b> ${u.email}</div>
+      <div class="column is-half"><b>Phone:</b> ${u.mobile}</div>
+      <div class="column is-half"><b>Institution:</b> ${u.institution}</div>
+      <div class="column is-half"><b>Class:</b> ${u.class_level}</div>
+      <div class="column is-half"><b>Status:</b> ${u.present ? '<span class="tag is-success">Present</span>' : '<span class="tag is-danger">Absent</span>'}</div>
+    </div>
+  </div>
+  `;
+
+  // Registrations Table (without individual present)
+  if (data.registrations.length) {
+    html += `<h4 class="title is-6">Registrations</h4>
+      <table class="table is-fullwidth is-striped is-small">
+      <thead>
+        <tr>
+          <th>Segment</th>
+          <th>Category</th>
+          <th>Verified</th>
+        </tr>
+      </thead><tbody>`;
+
+    data.registrations.forEach(r => {
+      html += `
+      <tr>
+        <td>${r.segment}</td>
+        <td>${r.category}</td>
+        <td>${r.verified ? "Yes" : "No"}</td>
+      </tr>`;
+    });
+
+    html += `</tbody></table>`;
+  }
+
+  // CA Application (if exists)
+  if (data.ca_applications.length) {
+    const ca = data.ca_applications[0];
+    html += `
+    <div class="box mt-4">
+      <h4 class="title is-6">CA Application</h4>
+      <p><b>Status:</b> ${ca.status}</p>
+      <p><b>Code:</b> ${ca.ca_code}</p>
+    </div>`;
+  }
+
+  document.getElementById("modalContent").innerHTML = html;
+}
+
+
+/* -------------------- Mark Present -------------------- */
+document.getElementById("presentBtn").onclick = function() {
+  fetch(`/api/mark-present/${lastId}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-CSRFToken": "{{ csrf_token() }}"
+    }
+  }).then(() => {
+    closeModal();
+  });
+};
+
+
+/* -------------------- Modal helpers -------------------- */
+function openModal() {
+  document.getElementById("userModal").classList.add("is-active");
+}
+
+function closeModal() {
+  document.getElementById("userModal").classList.remove("is-active");
+  lastId = null;
+
+  document.getElementById("scanBtn").disabled = false;
+
+  if (scanner) {
+    scanner.clear();
+  }
+}
+</script>
+
+{% endblock %}

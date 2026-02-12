@@ -1077,94 +1077,195 @@ def toggle_setting():
 def get_user_by_scan(user_id):
     """Get user details by scanned ID"""
     try:
-        # Check if it's a registration ID
-        registration = db.registrations.find_one({'_id': ObjectId(user_id)})
+        # Validate ObjectId
+        try:
+            obj_id = ObjectId(user_id)
+        except:
+            return jsonify({'success': False, 'message': 'Invalid QR code format'})
         
-        if registration:
-            # Get user details
-            user = db.users.find_one({'_id': registration['user_id']})
-            if not user:
-                return jsonify({'success': False, 'message': 'User not found'})
-            
-            # Get all registrations for this user
-            user_registrations = list(db.registrations.find(
-                {'user_id': user['_id']}
-            ).sort('registration_date', -1))
-            
-            # Prepare response
-            response_data = {
-                'success': True,
-                'type': 'registration',
-                'user': {
-                    'id': str(user['_id']),
-                    'name': user.get('full_name', ''),
-                    'email': user.get('email', ''),
-                    'mobile': user.get('mobile', ''),
-                    'institution': user.get('institution', ''),
-                    'profile_picture': user.get('profile_picture')
-                },
-                'registration': {
-                    'id': str(registration['_id']),
-                    'segment': registration.get('segment_name', ''),
-                    'category': registration.get('category', ''),
-                    'verified': registration.get('verified', False),
-                    'present': registration.get('present', False),
-                    'present_at': registration.get('present_at'),
-                    'registration_date': registration.get('registration_date')
-                },
-                'all_registrations': [
-                    {
-                        'id': str(reg['_id']),
-                        'segment': reg.get('segment_name', ''),
-                        'verified': reg.get('verified', False),
-                        'present': reg.get('present', False),
-                        'date': reg.get('registration_date')
-                    }
-                    for reg in user_registrations
-                ]
+        # Step 1: Try to find user
+        user = db.users.find_one({'_id': obj_id})
+        
+        # Step 2: If not user, try to find registration and get its user
+        if not user:
+            registration = db.registrations.find_one({'_id': obj_id})
+            if registration:
+                user = db.users.find_one({'_id': registration.get('user_id')})
+        
+        # Step 3: If still no user, try to find CA application and get its user
+        if not user:
+            ca_application = db.ca_registrations.find_one({'_id': obj_id})
+            if ca_application:
+                user = db.users.find_one({'_id': ca_application.get('user_id')})
+        
+        # Step 4: If still no user, return error
+        if not user:
+            return jsonify({'success': False, 'message': 'User not found'})
+        
+        # Get all registrations for this user
+        user_registrations = list(db.registrations.find(
+            {'user_id': user['_id']}
+        ).sort('registration_date', -1))
+        
+        # Get all CA applications for this user
+        user_ca_applications = list(db.ca_registrations.find(
+            {'user_id': user['_id']}
+        ).sort('registration_date', -1))
+        
+        # Build response
+        response_data = {
+            'success': True,
+            'user': {
+                'id': str(user['_id']),
+                'name': user.get('full_name', user.get('name', '')),
+                'present': user.get('present', False),
+                'email': user.get('email', ''),
+                'mobile': user.get('mobile', ''),
+                'institution': user.get('institution', ''),
+                'profile_picture': user.get('profile_picture'),
+                'class_level': user.get('class_level', ''),
+                'email_verified': user.get('email_verified', False),
+                'facebook_link': user.get('facebook_link', ''),
+                'address': user.get('address', ''),
+                'created_at': user.get('created_at')
+            },
+            'registrations': [
+                {
+                    'id': str(reg['_id']),
+                    'segment': reg.get('segment_name', ''),
+                    'category': reg.get('category', ''),
+                    'verified': reg.get('verified', False),
+                    'present': reg.get('present', False),
+                    'present_at': reg.get('present_at'),
+                    'date': reg.get('registration_date'),
+                    'transaction_id': reg.get('transaction_id', ''),
+                    'bkash_number': reg.get('bkash_number', '')
+                }
+                for reg in user_registrations
+            ],
+            'ca_applications': [
+                {
+                    'id': str(ca['_id']),
+                    'ca_code': ca.get('ca_code', ''),
+                    'status': ca.get('status', 'pending'),
+                    'phone': ca.get('phone', ''),
+                    'why_ca': ca.get('why_ca', ''),
+                    'class': ca.get('class', ''),
+                    'date': ca.get('registration_date'),
+                    'profile_picture': ca.get('profile_picture')
+                }
+                for ca in user_ca_applications
+            ]
+        }
+        
+        # Add current registration if this scan was for a registration
+        registration = db.registrations.find_one({'_id': obj_id})
+        if registration and str(registration.get('user_id')) == str(user['_id']):
+            response_data['current_registration'] = {
+                'id': str(registration['_id']),
+                'segment': registration.get('segment_name', ''),
+                'category': registration.get('category', ''),
+                'verified': registration.get('verified', False),
+                'present': registration.get('present', False),
+                'present_at': registration.get('present_at'),
+                'date': registration.get('registration_date'),
+                'transaction_id': registration.get('transaction_id', ''),
+                'bkash_number': registration.get('bkash_number', '')
             }
-            return jsonify(response_data)
         
-        # Check if it's a user ID directly
-        user = db.users.find_one({'_id': ObjectId(user_id)})
-        if user:
-            # Get all registrations for this user
-            user_registrations = list(db.registrations.find(
-                {'user_id': user['_id']}
-            ).sort('registration_date', -1))
-            
-            response_data = {
-                'success': True,
-                'type': 'user',
-                'user': {
-                    'id': str(user['_id']),
-                    'name': user.get('full_name', ''),
-                    'email': user.get('email', ''),
-                    'mobile': user.get('mobile', ''),
-                    'institution': user.get('institution', ''),
-                    'profile_picture': user.get('profile_picture')
-                },
-                'all_registrations': [
-                    {
-                        'id': str(reg['_id']),
-                        'segment': reg.get('segment_name', ''),
-                        'verified': reg.get('verified', False),
-                        'present': reg.get('present', False),
-                        'date': reg.get('registration_date')
-                    }
-                    for reg in user_registrations
-                ]
+        # Add current CA application if this scan was for a CA application
+        ca_application = db.ca_registrations.find_one({'_id': obj_id})
+        if ca_application and str(ca_application.get('user_id')) == str(user['_id']):
+            response_data['current_ca_application'] = {
+                'id': str(ca_application['_id']),
+                'ca_code': ca_application.get('ca_code', ''),
+                'status': ca_application.get('status', 'pending'),
+                'phone': ca_application.get('phone', ''),
+                'why_ca': ca_application.get('why_ca', ''),
+                'class': ca_application.get('class', ''),
+                'date': ca_application.get('registration_date'),
+                'profile_picture': ca_application.get('profile_picture')
             }
-            return jsonify(response_data)
         
-        return jsonify({'success': False, 'message': 'Invalid QR code'})
+        return jsonify(response_data)
         
     except Exception as e:
-        return jsonify({'success': False, 'message': 'Invalid ID format'})
+        print(f"Scan error: {str(e)}")
+        return jsonify({'success': False, 'message': 'Error processing scan'})
+    """Get user details by scanned ID"""
+    try:
+        # Validate ObjectId
+        try:
+            obj_id = ObjectId(user_id)
+        except:
+            return jsonify({'success': False, 'message': 'Invalid QR code format'})
+        
+        # Step 1: Try to find user
+        user = db.users.find_one({'_id': obj_id})
+        
+        # Step 2: If not user, try to find registration and get its user
+        if not user:
+            registration = db.registrations.find_one({'_id': obj_id})
+            if registration:
+                user = db.users.find_one({'_id': registration.get('user_id')})
+        
+        # Step 3: If still no user, return error
+        if not user:
+            return jsonify({'success': False, 'message': 'User not found'})
+        
+        # Get all registrations for this user
+        user_registrations = list(db.registrations.find(
+            {'user_id': user['_id']}
+        ).sort('registration_date', -1))
+        
+        # Build response
+        response_data = {
+            'success': True,
+            'user': {
+                'id': str(user['_id']),
+                'name': user.get('full_name', user.get('name', '')),
+                'email': user.get('email', ''),
+                'mobile': user.get('mobile', ''),
+                'institution': user.get('institution', ''),
+                'profile_picture': user.get('profile_picture'),
+                'class_level': user.get('class_level', ''),
+                'email_verified': user.get('email_verified', False)
+            },
+            'all_registrations': [
+                {
+                    'id': str(reg['_id']),
+                    'segment': reg.get('segment_name', ''),
+                    'category': reg.get('category', ''),
+                    'verified': reg.get('verified', False),
+                    'present': reg.get('present', False),
+                    'present_at': reg.get('present_at'),
+                    'date': reg.get('registration_date')
+                }
+                for reg in user_registrations
+            ]
+        }
+        
+        # Add current registration if this scan was for a registration
+        registration = db.registrations.find_one({'_id': obj_id})
+        if registration and str(registration.get('user_id')) == str(user['_id']):
+            response_data['registration'] = {
+                'id': str(registration['_id']),
+                'segment': registration.get('segment_name', ''),
+                'category': registration.get('category', ''),
+                'verified': registration.get('verified', False),
+                'present': registration.get('present', False),
+                'present_at': registration.get('present_at')
+            }
+        
+        return jsonify(response_data)
+        
+    except Exception as e:
+        print(f"Scan error: {str(e)}")
+        return jsonify({'success': False, 'message': 'Error processing scan'})
 
-@app.route('/api/mark-present/<registration_id>', methods=['POST'])
+@app.route('/api/mark-present/<user_id>', methods=['POST'])
 @role_required('admin', 'executive', 'organizer', 'moderator')
-def mark_present(registration_id):
+def mark_present(user_id):
     """Mark a registration as present"""
     try:
         # Validate CSRF token
@@ -1172,8 +1273,8 @@ def mark_present(registration_id):
         if not csrf_token:
             return jsonify({'success': False, 'message': 'CSRF token missing'}), 403
         
-        result = db.registrations.update_one(
-            {'_id': ObjectId(registration_id)},
+        result = db.users.update_one(
+            {'_id': ObjectId(user_id)},
             {'$set': {
                 'present': True,
                 'present_at': datetime.utcnow()

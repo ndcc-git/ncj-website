@@ -1015,15 +1015,19 @@ def registration_success(registration_id):
 
 @app.route('/gallery', methods=['GET'])
 def gallery():
-    return {"Hello": "adawd"}
+    return render_template('gallery.html')
 
-@app.route('/about', methods=['GET'])
-def about():
-    return {"Hello": "adawd"}
+@app.route('/executives', methods=['GET'])
+def executives():
+    return render_template('executives.html')
+
+@app.route('/developers', methods=['GET'])
+def developers():
+    return render_template('developers.html')
 
 @app.route('/events', methods=['GET'])
 def events():
-    return {"Hello": "adawd"}
+    return render_template('events.html')
 
 
 

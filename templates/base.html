@@ -5,46 +5,64 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}10th NCJ{% endblock %}</title>
+    <!-- Bulma CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
-    <link rel="dns-prefetch" href="https://fonts.gstatic.com">
-    <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet" type="text/css">
+
     {% block head %}{% endblock %}
     {% block styles %}{% endblock %}
 </head>
 
 <body>
-    <!-- Add role badge in navigation -->
-<nav>
+      <nav class="navbar" role="navigation" aria-label="main navigation">
     <div class="container">
-        <a href="{{ url_for('index') }}" class="logo">Festival 2026</a>
-        <div class="nav-links">
-            <a href="{{ url_for('index') }}">Home</a>
-            <a href="{{ url_for('register') }}">Register</a>
-            <a href="{{ url_for('ca_register') }}">Become CA</a>
-            <a href="{{ url_for('contact') }}">Contact</a>
+      <div class="navbar-brand">
+        <a class="navbar-item" href="{{ url_for('index') }}">
+          <!-- <strong>10th NCJ</strong> -->
+          <img src="{{ url_for('static', filename='assets/logo.png') }}" alt="">
+        </a>
 
-            {% if session.get('user_id') %}
+        <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarMenu">
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+        </a>
+      </div>
+
+      <div id="navbarMenu" class="navbar-menu">
+        <div class="navbar-start">
+          <a class="navbar-item" href="{{ url_for('index') }}">Home</a>
+          <a class="navbar-item" href="#about">About</a>
+          <a class="navbar-item" href="{{ url_for('gallery') }}">Gallery</a>
+          <a class="navbar-item" href="{{ url_for('executives') }}">Executives</a>
+          <a class="navbar-item" href="#contact">Contact</a>
+        </div>
+
+        <div class="navbar-end">
+          <div class="navbar-item">
+            <!-- Guest View (Default) -->
+            <div class="navbar-auth-group auth-guest" id="auth-guest">
+                {% if session.get('user_id') %}
                 <!-- User is logged in -->
                 <a href="{{ url_for('user_profile') }}">My Profile</a>
                 <a href="{{ url_for('user_logout') }}">Logout</a>
-                <span class="user-badge">{{ session.user_name }}</span>
-            {% elif session.get('admin_token') %}
-                <a href="{{ url_for('admin.admin_dashboard') }}">Dashboard</a>
-                <span class="role-badge role-{{ session.get('admin_role', 'moderator') }}">
-                    {{ session.get('admin_role', 'moderator')|title }}
-                </span>
-                <a href="{{ url_for('admin.admin_logout') }}">Logout</a>
-            {% else %}
-                <a href="{{ url_for('user_login') }}">Login</a>
-                <a href="{{ url_for('user_signup') }}">Sign Up</a>
-                <a href="{{ url_for('admin.admin_login') }}">Admin Login</a>
-            {% endif %}
+                <!-- <span class="user-badge">{{ session.user_name }}</span> -->
+                {% else %}
+                <a class="button is-text-link" href="{{ url_for('user_login') }}">Sign In</a>
+                <a class="button is-primary" href="{{ url_for('user_signup') }}">
+                    <strong>Sign Up</strong>
+                </a>
+                {% endif %}
+              
+            </div>
+          </div>
         </div>
+      </div>
     </div>
-</nav>
-
-    <div class="container">
+  </nav>
 
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
@@ -91,16 +109,55 @@
 
 
         {% block content %}{% endblock %}
-    </div>
 
-    <footer>
-        <div class="container">
-            <p>&copy; 2026 Notre Dame Cultural Club. All rights reserved.</p>
+      <footer class="footer">
+    <div class="container">
+      <div class="columns">
+
+        <!-- About Column -->
+        <div class="column is-4">
+          <h3 class="footer-title">Organized By</h3>
+          <p>National Cultural Jubilation organized by Notre Dame Cultural Club</p>
         </div>
-    </footer>
+
+        <!-- Quick Links -->
+        <div class="column is-4">
+          <h3 class="footer-title">Quick Links</h3>
+          <ul>
+            <li><a href="{{ url_for('index') }}">Home</a></li>
+            <li><a href="{{ url_for('events') }}">Events</a></li>
+            <li><a href="gallery.html">Gallery</a></li>
+            <li><a href="#contact">Contact</a></li>
+            <li><a href="{{ url_for('executives') }}">Executives</a></li>
+            <li><a href="{{ url_for('developers') }}">Developers</a></li>
+          </ul>
+        </div>
+
+        <!-- Social Media -->
+        <div class="column is-4">
+          <h3 class="footer-title">Contact Us</h3>
+          <div class="social-icons">
+            <a target="_blank" href="https://www.facebook.com/NDCCDhaka" aria-label="Facebook"><i
+                class="fab fa-facebook"></i></a>
+            <a target="_blank" href="https://www.instagram.com/notredameculturalclub" aria-label="Instagram"><i
+                class="fab fa-instagram"></i></a>
+            <a target="_blank" href="mailto:notredameculturalclub.official@gmail.com" aria-label="Email"><i
+                class="fas fa-envelope"></i></a>
+            <a target="_blank" href="mailto:notredameculturalclub.official@gmail.com" aria-label="Email"><i
+                class="fas fa-phone"></i></a>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="copyright">
+        <p>&copy; 2026 Notre Dame Cultural Club. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
 
     {% block scripts %}{% endblock %}
-
+    <!-- for auto selecting segments in register page -->
     <script>
         // Handle segment pre-selection
         document.addEventListener('DOMContentLoaded', function () {
@@ -129,7 +186,7 @@
             });
         });
     </script>
-
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
 
 </html>

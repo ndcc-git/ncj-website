@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+
+{% block title %}Gallery{% endblock %}
+
+{% block content %}
+<!-- ========================================
+       GALLERY HERO
+       ======================================== -->
+    <section class="hero is-medium"
+        style="background: linear-gradient(to bottom, var(--primary-accent) 0%, var(--primary-accent) 40%, var(--secondary-accent) 70%, var(--bg-primary) 100%);">
+        <div class="hero-body">
+            <div class="container has-text-centered">
+                <h1 class="title is-1 animate-on-scroll"
+                    style="color: var(--text-primary); font-size: 4rem; font-weight: 900;">
+                    GALLERY
+                </h1>
+                <p class="subtitle is-4 animate-on-scroll" style="color: var(--text-primary);">
+                    Reliving the Moments
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================
+       GALLERY GRID
+       ======================================== -->
+    <section class="section">
+        <div class="container">
+
+            <div class="gallery-grid">
+
+                <!-- Gallery Item 1 -->
+                <div class="gallery-item animate-on-scroll">
+                    <img src="{{ url_for('static', filename='assets/gallery/1.jpg') }}" alt="NCJ Performance 1">
+                    <div class="gallery-overlay">
+                        <p class="gallery-caption">Battle of Bands 2025</p>
+                    </div>
+                </div>
+
+                <!-- Gallery Item 2 -->
+                <div class="gallery-item animate-on-scroll">
+                    <img src="{{ url_for('static', filename='assets/gallery/1.jpg') }} " alt="NCJ Performance 2">
+                    <div class="gallery-overlay">
+                        <p class="gallery-caption">Group Dance Championship</p>
+                    </div>
+                </div>
+
+                <!-- Gallery Item 3 -->
+                <div class="gallery-item animate-on-scroll">
+                    <img src="{{ url_for('static', filename='assets/gallery/1.jpg') }} " alt="NCJ Performance 3">
+                    <div class="gallery-overlay">
+                        <p class="gallery-caption">Stage Drama Finale</p>
+                    </div>
+                </div>
+
+                <!-- Gallery Item 4 -->
+                <div class="gallery-item animate-on-scroll">
+                    <img src="{{ url_for('static', filename='assets/gallery/1.jpg') }} " alt="NCJ Performance 4">
+                    <div class="gallery-overlay">
+                        <p class="gallery-caption">Solo Singing Competition</p>
+                    </div>
+                </div>
+
+                <!-- Gallery Item 5 -->
+                <div class="gallery-item animate-on-scroll">
+                    <img src="{{ url_for('static', filename='assets/gallery/1.jpg') }} " alt="NCJ Performance 5">
+                    <div class="gallery-overlay">
+                        <p class="gallery-caption">Crowd Moments</p>
+                    </div>
+                </div>
+
+                <!-- Gallery Item 6 -->
+                <div class="gallery-item animate-on-scroll">
+                    <img src="{{ url_for('static', filename='assets/gallery/1.jpg') }} " alt="NCJ Performance 6">
+                    <div class="gallery-overlay">
+                        <p class="gallery-caption">Art Exhibition</p>
+                    </div>
+                </div>
+
+                <!-- Gallery Item 7 -->
+                <div class="gallery-item animate-on-scroll">
+                    <img src="{{ url_for('static', filename='assets/gallery/1.jpg') }} " alt="NCJ Performance 7">
+                    <div class="gallery-overlay">
+                        <p class="gallery-caption">Instrumental Performance</p>
+                    </div>
+                </div>
+
+                <!-- Gallery Item 8 -->
+                <div class="gallery-item animate-on-scroll">
+                    <img src="{{ url_for('static', filename='assets/gallery/1.jpg') }} " alt="NCJ Performance 8">
+                    <div class="gallery-overlay">
+                        <p class="gallery-caption">Cultural Night</p>
+                    </div>
+                </div>
+
+                <!-- Gallery Item 9 -->
+                <div class="gallery-item animate-on-scroll">
+                    <img src="{{ url_for('static', filename='assets/gallery/1.jpg') }} " alt="NCJ Performance 9">
+                    <div class="gallery-overlay">
+                        <p class="gallery-caption">Awards Ceremony</p>
+                    </div>
+                </div>
+
+                <!-- Gallery Item 10 -->
+                <div class="gallery-item animate-on-scroll">
+                    <img src="{{ url_for('static', filename='assets/gallery/1.jpg') }} " alt="NCJ Performance 10">
+                    <div class="gallery-overlay">
+                        <p class="gallery-caption">Behind the Scenes</p>
+                    </div>
+                </div>
+
+                <!-- Gallery Item 11 -->
+                <div class="gallery-item animate-on-scroll">
+                    <img src="{{ url_for('static', filename='assets/gallery/1.jpg') }} " alt="NCJ Performance 11">
+                    <div class="gallery-overlay">
+                        <p class="gallery-caption">Mime Act</p>
+                    </div>
+                </div>
+
+                <!-- Gallery Item 12 -->
+                <div class="gallery-item animate-on-scroll">
+                    <img src="{{ url_for('static', filename='assets/gallery/1.jpg') }} " alt="NCJ Performance 12">
+                    <div class="gallery-overlay">
+                        <p class="gallery-caption">Winners Celebration</p>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ========================================
+       LIGHTBOX MODAL
+       ======================================== -->
+    <div id="gallery-modal" class="modal">
+        <div class="modal-background"></div>
+        <div class="modal-content">
+            <p class="image">
+                <img id="modal-image" src="" " alt="">
+            </p>
+        </div>
+        <button class="modal-close is-large" aria-label="close"></button>
+    </div>
+{% endblock %}

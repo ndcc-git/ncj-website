@@ -3,69 +3,289 @@
 {% block title %}10th NCJ - Home{% endblock %}
 
 {% block content %}
-<div class="hero">
-    <h1>10th NCJ oraganized by NDCC</h1>
-    <p>Join us for an exciting celebration of talent and creativity</p>
-    <a href="{{ url_for('register') }}" class="btn btn-primary">Register Now</a>
-</div>
 
-<div class="segments">
-    <h2>Available Segments</h2>
-    <div class="segment-grid">
-        {% for segment in segments %}
-        <div class="segment-card">
-            <h3>{{ segment.name }}</h3>
-            <p class="segment-type">{{ segment.type }}</p>
-            <p class="segment-price">Price: ${{ segment.price }}</p>
-            <a href="{{ url_for('register') }}" 
-            class="btn btn-secondary register-segment-btn" 
-            data-segment-id="{{ segment._id|string }}">
-                Register for this segment
-            </a>
+  <!-- ========================================
+       HERO SECTION
+       ======================================== -->
+  <section class="hero-section">
+    <div class="container">
+      <div class="has-text-centered">
+        <!-- Hero Artwork - Centered -->
+        <div class="hero-artwork parallax-element animate-on-scroll" style="margin-bottom: 3rem;">
+          <img
+            src="https://scontent.fdac138-1.fna.fbcdn.net/v/t1.15752-9/625017675_1676003873808809_1228699986677235644_n.jpg?_nc_cat=110&ccb=1-7&_nc_sid=9f807c&_nc_ohc=M6UpzngEzEwQ7kNvwH_BHTI&_nc_oc=AdmsFzRvEv1pTNlWT_ytHHtsaRZrg3Y9HlW7-DiusdumFNs4Ys5gLTpPrYa8QOyNsE4&_nc_zt=23&_nc_ht=scontent.fdac138-1.fna&oh=03_Q7cD4gHBvIBQg6ZgNp5j4n26-5gPHPwGP7D3eYDxyznrPUpejA&oe=69BBBF35"
+            alt="10th NCJ Festival Artwork" id="hero-image"
+            style="max-width: 800px; width: 100%; border-radius: var(--border-radius-card); box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
         </div>
-        {% endfor %}
-    </div>
-</div>
 
-<!-- Contact Form Section -->
-<div class="contact-section">
-    <h2>Contact Us</h2>
-    <p>Have questions or feedback? We'd love to hear from you!</p>
-    
-    <div class="contact-container">
-        <div class="contact-form-container">
-            <form method="POST" action="{{ url_for('contact') }}">
+        <!-- Event Info - Side by Side Layout -->
+        <div class="hero-event-info animate-on-scroll" style="margin-bottom: 2.5rem;">
+          <div class="hero-info-item">
+            <span class="hero-info-value">April 23-25, 2026</span>
+          </div>
+          <div class="hero-info-divider"></div>
+          <div class="hero-info-item">
+            <span class="hero-info-value">Notre Dame College, Dhaka</span>
+          </div>
+        </div>
+
+        <!-- Action Buttons - Smaller -->
+        <div class="buttons is-centered animate-on-scroll">
+          <a href="{{ url_for('register') }}" class="button is-primary is-medium">
+            <i class="fas fa-ticket-alt"></i>&nbsp; Register Now
+          </a>
+          <a href="{{ url_for('events') }}" class="button is-outlined-custom is-medium">
+            <i class="fas fa-calendar-alt"></i>&nbsp; View Events
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================
+       COUNTDOWN TIMER
+       ======================================== -->
+  <section class="countdown-section">
+    <div class="container">
+      <h2 class="section-title has-text-white">Event Starts In</h2>
+      <div class="countdown-container">
+        <div class="countdown-card animate-on-scroll">
+          <span id="countdown-days" class="countdown-number">00</span>
+          <span class="countdown-label">Days</span>
+        </div>
+        <div class="countdown-card animate-on-scroll">
+          <span id="countdown-hours" class="countdown-number">00</span>
+          <span class="countdown-label">Hours</span>
+        </div>
+        <div class="countdown-card animate-on-scroll">
+          <span id="countdown-minutes" class="countdown-number">00</span>
+          <span class="countdown-label">Minutes</span>
+        </div>
+        <div class="countdown-card animate-on-scroll">
+          <span id="countdown-seconds" class="countdown-number">00</span>
+          <span class="countdown-label">Seconds</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ========================================
+       ABOUT SECTION
+       ======================================== -->
+  <section class="section" id="about">
+    <div class="container">
+      <h2 class="section-title animate-on-scroll">About 10th NCJ</h2>
+      <div class="content is-medium has-text-centered animate-on-scroll" style="max-width: 800px; margin: 0 auto;">
+        <p>
+          The National Cultural Jubilation (NCJ) is a vibrant celebration of art, music, dance, and drama.
+          As we mark our 10th edition, we invite you to be part of this incredible journey. Experience
+          the energy, passion, and creativity that define our cultural festival.
+        </p>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ========================================
+       TICKET SECTION
+       ======================================== -->
+  <div class="is-flex is-justify-content-center is-align-items-center m-5 p-0">
+
+    <div class="hover-3d m-0 p-0">
+      <figure class="image is-256x256 m-0">
+        <img src="{{ url_for('static', filename='assets/ticket.png') }}" alt="3D card" style="border-radius:1.5rem;">
+      </figure>
+
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+    </div>
+
+  </div>
+
+  <!-- ========================================
+       SPONSORS MARQUEE
+       ======================================== -->
+  <section class="marquee-section">
+    <div class="container">
+      <h2 class="section-title animate-on-scroll">Our Sponsors</h2>
+    </div>
+    <div class="marquee-container">
+      <div class="marquee-content">
+        <div class="marquee-item"><img src="{{ url_for('static', filename='assets/sponsor1.png') }}" alt="Sponsor 1"></div>
+        <div class="marquee-item"><img src="{{ url_for('static', filename='assets/sponsor1.png') }}" alt="Sponsor 2"></div>
+        <div class="marquee-item"><img src="{{ url_for('static', filename='assets/sponsor1.png') }}" alt="Sponsor 3"></div>
+        <div class="marquee-item"><img src="{{ url_for('static', filename='assets/sponsor1.png') }}" alt="Sponsor 4"></div>
+        <div class="marquee-item"><img src="{{ url_for('static', filename='assets/sponsor1.png') }}" alt="Sponsor 5"></div>
+        <div class="marquee-item"><img src="{{ url_for('static', filename='assets/sponsor1.png') }}" alt="Sponsor 6"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================
+       SIGNATURE EVENTS
+       ======================================== -->
+  <section class="section">
+    <div class="container">
+      <h2 class="section-title animate-on-scroll">Signature Events</h2>
+
+      <div class="columns is-multiline is-centered">
+
+        <div class="column is-4">
+          <div class="event-card animate-on-scroll">
+            <img src="{{ url_for('static', filename='assets/event-dance.jpg') }}" alt="Battle of Bands" class="event-card-image">
+            <div class="event-card-content">
+              <h3 class="event-card-title">Battle of Bands</h3>
+              <p class="event-card-type">Team Event</p>
+              <div class="event-card-actions">
+                <a href="event-details.html" class="button is-secondary">Explore</a>
+                <a href="register.html" class="button is-primary">Register</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="column is-4">
+          <div class="event-card animate-on-scroll">
+            <img src="{{ url_for('static', filename='assets/event-dance.jpg') }}" alt="Dance Competition" class="event-card-image">
+            <div class="event-card-content">
+              <h3 class="event-card-title">Beatbox Brawl</h3>
+              <p class="event-card-type">Solo Event</p>
+              <div class="event-card-actions">
+                <a href="event-details.html" class="button is-secondary">Explore</a>
+                <a href="{{ url_for('register') }}" class="button is-primary">Register</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="has-text-centered" style="margin-top: 2rem;">
+        <a href="{{ url_for('events') }}" class="button is-primary is-large">View All Events</a>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ========================================
+       FAQ SECTION
+       ======================================== -->
+  <section class="faq-section">
+    <div class="container">
+      <h2 class="section-title animate-on-scroll">Frequently Asked Questions</h2>
+      <div class="animate-on-scroll" style="max-width: 800px; margin: 0 auto;">
+
+        <div class="faq-item">
+          <div class="faq-question">
+            <span>What is NCJ?</span>
+            <span class="faq-chevron">▼</span>
+          </div>
+          <div class="faq-answer">
+            <p>National Cultural Jubilation (NCJ) is an annual cultural festival organized by the Notre Dame Cultural
+              Club, celebrating art, music, dance, and drama.</p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question">
+            <span>When and where is the event?</span>
+            <span class="faq-chevron">▼</span>
+          </div>
+          <div class="faq-answer">
+            <p>The 10th NCJ will be held in April 05-07 2026 at Notre Dame College.</p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question">
+            <span>How do I register?</span>
+            <span class="faq-chevron">▼</span>
+          </div>
+          <div class="faq-answer">
+            <p>You can register online through our website by creating an account then by clicking the "Register"
+              button. Choose your event category
+              and fill in the required details.</p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question">
+            <span>What are the participation fees?</span>
+            <span class="faq-chevron">▼</span>
+          </div>
+          <div class="faq-answer">
+            <p>Participation fees vary by event category. Please check individual event pages for specific fee
+              information.</p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question">
+            <span>Can I participate in multiple events?</span>
+            <span class="faq-chevron">▼</span>
+          </div>
+          <div class="faq-answer">
+            <p>Yes! Participants are welcome to register for multiple events, subject to scheduling constraints.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================
+       CONTACT & LOCATION
+       ======================================== -->
+  <section class="contact-section" id="contact">
+    <div class="container">
+      <h2 class="section-title animate-on-scroll">Get in Touch</h2>
+      <div class="columns">
+
+        <!-- Contact Form -->
+        <div class="column is-6">
+          <form class="contact-form animate-on-scroll" id="contact-form" method="POST" action="{{ url_for('contact') }}">
                 {{ form.hidden_tag() }}
                 
-                <div class="form-row">
-                    <div class="form-group">
-                        {{ form.name.label }}
-                        {{ form.name(class="form-control", placeholder="Enter your full name") }}
-                        {% if form.name.errors %}
-                            <div class="errors">
-                                {% for error in form.name.errors %}
-                                    <span>{{ error }}</span>
-                                {% endfor %}
-                            </div>
-                        {% endif %}
+                <div class="field">
+                    <label class="label">Name *</label>
+                    <div class="control">
+                        {{ form.name(class="input", type="text", id="contact-name", placeholder="Your Name") }}
                     </div>
-                    
-                    <div class="form-group">
-                        {{ form.institution.label }}
-                        {{ form.institution(class="form-control", placeholder="Your school, college, or organization") }}
-                        {% if form.institution.errors %}
-                            <div class="errors">
-                                {% for error in form.institution.errors %}
-                                    <span>{{ error }}</span>
-                                {% endfor %}
-                            </div>
-                        {% endif %}
-                    </div>
+                    {% if form.name.errors %}
+                        <div class="errors">
+                            {% for error in form.name.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
                 </div>
-                
-                <div class="form-group">
-                    {{ form.email.label }}
-                    {{ form.email(class="form-control", type="email", placeholder="Your email address") }}
+
+                <div class="field">
+                    <label class="label">Institution</label>
+                    <div class="control">
+                        {{ form.institution(class="input", type="text", id="contact-institution", placeholder="Your Institution") }}
+                    </div>
+                    {% if form.institution.errors %}
+                        <div class="errors">
+                            {% for error in form.institution.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="field">
+                    <label class="label">Email *</label>
+                    <div class="control">
+                        {{ form.email(class="input", type="email", id="contact-email", placeholder="your@email.com") }}
+                    </div>
                     {% if form.email.errors %}
                         <div class="errors">
                             {% for error in form.email.errors %}
@@ -74,11 +294,12 @@
                         </div>
                     {% endif %}
                 </div>
-                
-                <div class="form-group">
-                    {{ form.message.label }}
-                    {{ form.message(class="form-control", placeholder="How can we help you?", rows=5) }}
-                    <small class="form-text">Please provide as much detail as possible so we can better assist you.</small>
+
+                <div class="field">
+                    <label class="label">Message *</label>
+                    <div class="control">
+                        {{ form.message(class="textarea", id="contact-message", placeholder="Your message...", rows="5") }}
+                    </div>
                     {% if form.message.errors %}
                         <div class="errors">
                             {% for error in form.message.errors %}
@@ -87,34 +308,25 @@
                         </div>
                     {% endif %}
                 </div>
-                
-                <div class="form-group">
-                    {{ form.submit(class="btn btn-primary") }}
+
+                <div class="control">
+                    <button type="submit" class="button is-primary is-fullwidth">Send Message</button>
                 </div>
             </form>
         </div>
-        
-        <div class="contact-info">
-            <div class="info-card">
-                <h3><i class="info-icon">📍</i> Our Office</h3>
-                <p>Festival Organizing Committee<br>
-                University Campus<br>
-                Dhaka, Bangladesh</p>
-            </div>
-            
-            <div class="info-card">
-                <h3><i class="info-icon">📧</i> Email</h3>
-                <p>info@festival2024.edu<br>
-                support@festival2024.edu</p>
-            </div>
-            
-            <div class="info-card">
-                <h3><i class="info-icon">⏰</i> Response Time</h3>
-                <p>We typically respond within<br>
-                24-48 hours during business days</p>
-            </div>
+
+        <!-- Map -->
+        <div class="column is-6">
+          <div class="map-container animate-on-scroll">
+            <iframe
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3651.9067834633866!2d90.38884831498207!3d23.750881094586844!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3755b8bda40a2647%3A0x4e912105a7c888a8!2sNotre%20Dame%20College!5e0!3m2!1sen!2sbd!4v1234567890123!5m2!1sen!2sbd"
+              allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade">
+            </iframe>
+          </div>
         </div>
+
+      </div>
     </div>
-</div>
+  </section>
 
 {% endblock %}

@@ -29,14 +29,6 @@
                 </select>
             </div>
             
-            <div class="filter-group">
-                <label for="archived">Show Archived:</label>
-                <select name="archived" id="archived">
-                    <option value="false" {% if not archived_filter %}selected{% endif %}>No</option>
-                    <option value="true" {% if archived_filter %}selected{% endif %}>Yes</option>
-                </select>
-            </div>
-            
             <button type="submit" class="btn btn-primary">Filter</button>
             <button type="button" id="mark-all-read" class="btn btn-secondary">Mark All as Read</button>
         </form>

@@ -320,7 +320,15 @@ def ca_registration_closed():
 def index():
     """Home page"""
     segments = list(segments_collection.find({}, {'_id': 1, 'name': 1, 'price': 1, 'type': 1}))
-    return render_template('index.html', segments=segments)
+    form = ContactForm()  # Add this line
+    
+    # Pre-fill form with session data if available
+    if 'last_contact' in session:
+        form.name.data = session['last_contact']['name']
+        form.email.data = session['last_contact']['email']
+        form.institution.data = session['last_contact']['institution']
+    
+    return render_template('index.html', segments=segments, form=form)  # Add form to template context
 
 
 # User Authentication Routes
@@ -916,9 +924,9 @@ def register():
             flash('Selected segment not found', 'error')
             return redirect(url_for('register'))
         
-        if segment.get('current_participants', 0) >= segment.get('max_participants', float('inf')):
-            flash('This segment is full', 'error')
-            return redirect(url_for('register'))
+        # if segment.get('current_participants', 0) >= segment.get('max_participants', float('inf')):
+        #     flash('This segment is full', 'error')
+        #     return redirect(url_for('register'))
         
         # Check for duplicate registration (same user for same segment)
         existing = registrations_collection.find_one({
@@ -1021,54 +1029,44 @@ def events():
 
 @app.route('/contact', methods=['GET', 'POST'])
 def contact():
-    """Contact form page"""
-    form = ContactForm()
+    """Contact form page - redirects to home or handles form submission"""
+    if request.method == 'POST':
+        # Handle form submission
+        form = ContactForm()
+        
+        if form.validate_on_submit():
+            # Check for spam/duplicate submissions
+            recent_submission = db.contact_messages.find_one({
+                'email': form.email.data,
+                'submitted_at': {'$gte': datetime.utcnow() - timedelta(hours=1)}
+            })
+            
+            if recent_submission:
+                flash('You have already submitted a message recently. Please wait before submitting again.', 'warning')
+                return redirect(url_for('index'))
+            
+            # Create contact message
+            contact_data = {
+                'name': form.name.data,
+                'institution': form.institution.data,
+                'email': form.email.data,
+                'message': form.message.data,
+                'submitted_at': datetime.utcnow(),
+                'ip_address': request.remote_addr,
+                'user_agent': request.user_agent.string,
+                'status': 'unread'
+            }
+            
+            # Insert into database
+            db.contact_messages.insert_one(contact_data)
+            
+            flash('Your message has been sent successfully! We will get back to you soon.', 'success')
+            
+            return redirect(url_for('index'))
     
-    if form.validate_on_submit():
-        # Check for spam/duplicate submissions
-        recent_submission = db.contact_messages.find_one({
-            'email': form.email.data,
-            'submitted_at': {'$gte': datetime.utcnow() - timedelta(hours=1)}
-        })
-        
-        if recent_submission:
-            flash('You have already submitted a message recently. Please wait before submitting again.', 'warning')
-            return redirect(url_for('contact'))
-        
-        # Create contact message
-        contact_data = {
-            'name': form.name.data,
-            'institution': form.institution.data,
-            'email': form.email.data,
-            'message': form.message.data,
-            'submitted_at': datetime.utcnow(),
-            'ip_address': request.remote_addr,
-            'user_agent': request.user_agent.string,
-            'status': 'unread',  # unread, read, replied
-            'archived': False
-        }
-        
-        # Insert into database
-        db.contact_messages.insert_one(contact_data)
-        
-        flash('Your message has been sent successfully! We will get back to you soon.', 'success')
-        
-        # Store in session for auto-fill
-        session['last_contact'] = {
-            'name': form.name.data,
-            'email': form.email.data,
-            'institution': form.institution.data
-        }
-        
-        return redirect(url_for('contact_success'))
-    
-    # Pre-fill form with session data if available
-    if 'last_contact' in session:
-        form.name.data = session['last_contact']['name']
-        form.email.data = session['last_contact']['email']
-        form.institution.data = session['last_contact']['institution']
-    
-    return render_template('contact.html', form=form)
+    # If GET request, redirect to home page
+    return redirect(url_for('index'))
+
 
 @app.route('/contact-success')
 def contact_success():

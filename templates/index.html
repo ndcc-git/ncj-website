@@ -26,4 +26,95 @@
         {% endfor %}
     </div>
 </div>
+
+<!-- Contact Form Section -->
+<div class="contact-section">
+    <h2>Contact Us</h2>
+    <p>Have questions or feedback? We'd love to hear from you!</p>
+    
+    <div class="contact-container">
+        <div class="contact-form-container">
+            <form method="POST" action="{{ url_for('contact') }}">
+                {{ form.hidden_tag() }}
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        {{ form.name.label }}
+                        {{ form.name(class="form-control", placeholder="Enter your full name") }}
+                        {% if form.name.errors %}
+                            <div class="errors">
+                                {% for error in form.name.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group">
+                        {{ form.institution.label }}
+                        {{ form.institution(class="form-control", placeholder="Your school, college, or organization") }}
+                        {% if form.institution.errors %}
+                            <div class="errors">
+                                {% for error in form.institution.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    {{ form.email.label }}
+                    {{ form.email(class="form-control", type="email", placeholder="Your email address") }}
+                    {% if form.email.errors %}
+                        <div class="errors">
+                            {% for error in form.email.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    {{ form.message.label }}
+                    {{ form.message(class="form-control", placeholder="How can we help you?", rows=5) }}
+                    <small class="form-text">Please provide as much detail as possible so we can better assist you.</small>
+                    {% if form.message.errors %}
+                        <div class="errors">
+                            {% for error in form.message.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    {{ form.submit(class="btn btn-primary") }}
+                </div>
+            </form>
+        </div>
+        
+        <div class="contact-info">
+            <div class="info-card">
+                <h3><i class="info-icon">📍</i> Our Office</h3>
+                <p>Festival Organizing Committee<br>
+                University Campus<br>
+                Dhaka, Bangladesh</p>
+            </div>
+            
+            <div class="info-card">
+                <h3><i class="info-icon">📧</i> Email</h3>
+                <p>info@festival2024.edu<br>
+                support@festival2024.edu</p>
+            </div>
+            
+            <div class="info-card">
+                <h3><i class="info-icon">⏰</i> Response Time</h3>
+                <p>We typically respond within<br>
+                24-48 hours during business days</p>
+            </div>
+        </div>
+    </div>
+</div>
+
 {% endblock %}

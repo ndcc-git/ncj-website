@@ -202,18 +202,13 @@ def admin_dashboard():
     total_segments = db.segments.count_documents({})
     
     # Get contact message statistics
-    contact_messages_count = db.contact_messages.count_documents({'archived': False})
+    contact_messages_count = db.contact_messages.count_documents({})
     unread_contact_messages = db.contact_messages.count_documents({
         'status': 'unread',
-        'archived': False
     })
     
     # Get recent registrations
     recent_registrations = list(db.registrations.find().sort('registration_date', -1).limit(10))
-    
-    # Get recent contact messages
-    recent_messages = list(db.contact_messages.find({'archived': False})
-                          .sort('submitted_at', -1).limit(5))
     
     # Get segment statistics
     segments = list(db.segments.find({}))
@@ -225,7 +220,6 @@ def admin_dashboard():
                          contact_messages_count=contact_messages_count,
                          unread_contact_messages=unread_contact_messages,
                          recent_registrations=recent_registrations,
-                         recent_messages=recent_messages,
                          segments=segments)
 
 
@@ -279,9 +273,8 @@ def admin_analytics():
 def admin_contact_messages():
     """View and manage contact messages"""
     status_filter = request.args.get('status', 'all')
-    archived_filter = request.args.get('archived', 'false') == 'true'
     
-    query = {'archived': archived_filter}
+    query = {}
     
     if status_filter != 'all':
         query['status'] = status_filter
@@ -296,7 +289,6 @@ def admin_contact_messages():
     return render_template('admin/contact_messages.html',
                          contact_messages=contact_messages,
                          status_filter=status_filter,
-                         archived_filter=archived_filter,
                          unread_count=unread_count,
                          total_messages=total_messages)
 

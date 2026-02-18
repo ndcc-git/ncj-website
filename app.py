@@ -195,8 +195,7 @@ def email_verified_required(f):
         
         # Check if email is verified
         if not user.get('email_verified', False):
-            flash('❌ Please verify your email address before accessing this feature. '
-                  'Check your inbox for the verification email or go to your profile to resend it.', 'error')
+            flash('Please verify your email address and then signin again before accessing this feature.', 'error')
             return redirect(url_for('user_profile'))
         
         return f(*args, **kwargs)

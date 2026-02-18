@@ -167,7 +167,7 @@ h6 {
     linear-gradient(rgba(0, 0, 0, 0.5),
       rgba(0, 0, 0, 0.5)),
 
-    url('https://scontent.fdac138-1.fna.fbcdn.net/v/t1.15752-9/625017675_1676003873808809_1228699986677235644_n.jpg?_nc_cat=110&ccb=1-7&_nc_sid=9f807c&_nc_ohc=M6UpzngEzEwQ7kNvwH_BHTI&_nc_oc=AdmsFzRvEv1pTNlWT_ytHHtsaRZrg3Y9HlW7-DiusdumFNs4Ys5gLTpPrYa8QOyNsE4&_nc_zt=23&_nc_ht=scontent.fdac138-1.fna&oh=03_Q7cD4gHBvIBQg6ZgNp5j4n26-5gPHPwGP7D3eYDxyznrPUpejA&oe=69BBBF35') center center / cover no-repeat;
+    url('../assets/gen-bg.png') center center / cover no-repeat;
 
   background-color: #FFFCF0;
 }

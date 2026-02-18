@@ -8,147 +8,398 @@
 
 {% block content %}
 
-<section class="section">
+<section class="section" style="padding-top: 3rem;">
     <div class="container">
 
-        <!-- Success Hero -->
-        <div class="notification is-success is-light has-text-centered">
-            <h1 class="title is-3">🎉 Campus Ambassador Application Successful!</h1>
-            <p class="subtitle is-6">Thank you for applying to become a Campus Ambassador</p>
+        <!-- Success Message -->
+        <div class="has-text-centered animate-on-scroll" style="margin-bottom: 2rem;">
+            <h1 class="title is-1" style="color: var(--text-primary);">ক্যাম্পাস অ্যাম্বাসেডর আবেদন সফল হয়েছে! 🎉
+            </h1>
+            <p class="subtitle is-4">আমাদের দলে যোগ দেওয়ার জন্য অভিনন্দন!</p>
         </div>
 
-        <div class="columns is-centered mt-5">
+        <!-- Dashboard Card -->
+        <div class="columns is-centered">
             <div class="column is-10">
+                <div class="dashboard-card animate-on-scroll">
 
-                <!-- Main Card -->
-                <div class="card">
-                    <div class="card-content">
+                    <div class="columns">
 
-                        <!-- Profile + CA Code -->
-                        <div class="columns is-vcentered">
-                            <div class="column is-4 has-text-centered">
-                                <figure class="image is-128x128 is-inline-block">
-                                    <img class="is-rounded"
-                                        src="/static/uploads/ca_profiles/{{ ca_registration.profile_picture }}"
-                                        alt="Profile Picture">
-                                </figure>
-                                <p class="has-text-weight-semibold mt-2">{{ ca_registration.full_name }}</p>
-                                <span class="tag mt-1
-                                    {% if ca_registration.status == 'approved' %} is-success is-light
-                                    {% elif ca_registration.status == 'pending' %} is-warning is-light
-                                    {% elif ca_registration.status == 'rejected' %} is-danger is-light
-                                    {% else %} is-info is-light
-                                    {% endif %}">
-                                        {{ ca_registration.status|title }}
-                                </span>
-
+                        <!-- Left: Profile + Application Details -->
+                        <div class="column is-6">
+                            <!-- Profile Section -->
+                            <div class="dashboard-profile" style="margin-bottom: 2rem;">
+                                {% if ca_registration.profile_picture %}
+                                <img src="{{ url_for('static', filename='uploads/ca_profiles/' + ca_registration.profile_picture) }}" 
+                                     alt="Profile Picture" class="dashboard-avatar" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover;">
+                                {% else %}
+                                <img src="https://ui-avatars.com/api/?name={{ ca_registration.full_name|urlencode }}&size=100&background=f097c3&color=fff&bold=true"
+                                     alt="Profile Picture" class="dashboard-avatar" style="border-radius: 50%;">
+                                {% endif %}
+                                <div class="dashboard-info">
+                                    <h3>{{ ca_registration.full_name }}</h3>
+                                    <span class="status-pill 
+                                        {% if ca_registration.status == 'approved' %}approved
+                                        {% elif ca_registration.status == 'pending' %}pending
+                                        {% elif ca_registration.status == 'rejected' %}rejected
+                                        {% endif %}">
+                                        {% if ca_registration.status == 'approved' %}
+                                            অনুমোদিত
+                                        {% elif ca_registration.status == 'pending' %}
+                                            বিচারাধীন
+                                        {% elif ca_registration.status == 'rejected' %}
+                                            বাতিল
+                                        {% else %}
+                                            {{ ca_registration.status }}
+                                        {% endif %}
+                                    </span>
+                                </div>
                             </div>
 
-                            {% if ca_registration.status == 'approved' %}
-                            <div class="column is-8">
-                                <div class="box has-background-primary-light has-text-centered">
-                                    <p class="has-text-grey">Your Unique CA Code</p>
-                                    <p class="title is-2 has-text-primary" id="caCode">
-                                        {{ ca_registration.ca_code }}
-                                    </p>
-                                    <p class="is-size-7">Keep this code confidential. Use it when referring
-                                        participants.</p>
+                            <!-- Application Details -->
+                            <div>
+                                <h4 class="title is-5" style="margin-bottom: 1rem; text-transform: uppercase;">
+                                    আবেদনের বিবরণ</h4>
+                                <div class="receipt-row">
+                                    <span class="receipt-label">ইমেইল:</span>
+                                    <span class="receipt-value">{{ ca_registration.email }}</span>
+                                </div>
+                                <div class="receipt-row">
+                                    <span class="receipt-label">ফোন:</span>
+                                    <span class="receipt-value">{{ ca_registration.phone }}</span>
+                                </div>
+                                <div class="receipt-row">
+                                    <span class="receipt-label">প্রতিষ্ঠান:</span>
+                                    <span class="receipt-value">{{ ca_registration.institution }}</span>
+                                </div>
+                                <div class="receipt-row">
+                                    <span class="receipt-label">শ্রেণী/বর্ষ:</span>
+                                    <span class="receipt-value">{{ ca_registration.class }}</span>
+                                </div>
+                            </div>
+                        </div>
 
-                                    <button onclick="copyCACode()" class="button is-primary is-small mt-3">
-                                        📋 Copy CA Code
-                                    </button>
+                        <!-- Right: CA Code Hero -->
+                        <div class="column is-6">
+                            {% if ca_registration.status == 'approved' and ca_registration.ca_code %}
+                            <div class="ca-code-hero">
+                                <div class="ca-code-label">আপনার সিএ কোড</div>
+                                <div class="ca-code-display" id="ca-code-text">{{ ca_registration.ca_code }}</div>
+                                <button class="copy-button" id="copy-ca-code" onclick="copyCACode()">
+                                    <i class="fas fa-copy"></i> সিএ কোড কপি করুন
+                                </button>
+                                <p class="is-size-7 has-text-grey mt-2">কোডটি গোপন রাখুন। অংশগ্রহণকারীদের রেফার করার সময় ব্যবহার করুন।</p>
+                            </div>
+                            {% else %}
+                            <div class="ca-code-hero" style="background: var(--bg-secondary);">
+                                <div class="ca-code-label">সিএ স্ট্যাটাস</div>
+                                <div style="padding: 2rem; text-align: center;">
+                                    <span class="tag is-medium 
+                                        {% if ca_registration.status == 'pending' %}is-warning
+                                        {% elif ca_registration.status == 'rejected' %}is-danger
+                                        {% else %}is-info
+                                        {% endif %}">
+                                        {% if ca_registration.status == 'pending' %}
+                                            অনুমোদনের অপেক্ষায়
+                                        {% elif ca_registration.status == 'rejected' %}
+                                            আবেদন বাতিল হয়েছে
+                                        {% else %}
+                                            {{ ca_registration.status }}
+                                        {% endif %}
+                                    </span>
                                 </div>
                             </div>
                             {% endif %}
                         </div>
 
-                        <hr>
-
-                        <!-- Application Details -->
-                        <h3 class="title is-5">📄 Application Details</h3>
-
-                        <div class="columns is-multiline">
-                            <div class="column is-6"><strong>Email:</strong> {{ ca_registration.email }}</div>
-                            <div class="column is-6"><strong>Phone:</strong> {{ ca_registration.phone }}</div>
-                            <div class="column is-6"><strong>Institution:</strong> {{ ca_registration.institution }}
-                            </div>
-                            <div class="column is-6"><strong>Class/Year:</strong> {{ ca_registration.class }}</div>
-                        </div>
-
-                        <hr>
-
-                        <!-- Next Steps -->
-                        <h3 class="title is-5">🚀 What’s Next?</h3>
-                        <div class="content">
-                            <ol>
-                                <li>Your application is <strong>{{ ca_registration.status }}</strong></li>
-                                <li>You will receive an email confirmation shortly</li>
-                                <li>Review time: 3–5 business days</li>
-                                <li>If approved, you’ll receive:
-                                    <ul>
-                                        <li>CA Welcome Kit</li>
-                                        <li>Detailed guidelines</li>
-                                        <li>Access to CA portal</li>
-                                    </ul>
-                                </li>
-                            </ol>
-                        </div>
-
-                        <!-- Actions -->
-                        <div class="buttons is-centered mt-4">
-                            <a href="{{ url_for('index') }}" class="button is-link is-light">🏠 Back to Home</a>
-                            <a href="{{ url_for('ca_register') }}" class="button is-info is-light">➕ Apply for a
-                                Friend</a>
-                        </div>
-
                     </div>
+
                 </div>
-
-                <!-- Instructions -->
-                <div class="box mt-5">
-                    <h3 class="title is-5 has-text-centered">📌 How to Use Your CA Code</h3>
-
-                    <div class="columns has-text-centered mt-4">
-                        <div class="column">
-                            <p class="title is-4">1️⃣</p>
-                            <p class="has-text-weight-semibold">Share Your Code</p>
-                            <p class="is-size-7">Give your CA code to participants</p>
-                        </div>
-                        <div class="column">
-                            <p class="title is-4">2️⃣</p>
-                            <p class="has-text-weight-semibold">Track Registrations</p>
-                            <p class="is-size-7">Each signup is linked to you</p>
-                        </div>
-                        <div class="column">
-                            <p class="title is-4">3️⃣</p>
-                            <p class="has-text-weight-semibold">Earn Rewards</p>
-                            <p class="is-size-7">Top CAs get special prizes</p>
-                        </div>
-                        <div class="column">
-                            <p class="title is-4">4️⃣</p>
-                            <p class="has-text-weight-semibold">Get Certificate</p>
-                            <p class="is-size-7">Official recognition of your work</p>
-                        </div>
-                    </div>
-                </div>
-
             </div>
         </div>
+
+        <!-- What's Next Section -->
+        <div class="columns is-centered">
+            <div class="column is-10">
+                <div class="box animate-on-scroll" style="background-color: rgba(252, 251, 229, 0.5);">
+
+                    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem;">
+                        <i class="fas fa-rocket" style="font-size: 2rem; color: var(--secondary-accent);"></i>
+                        <h3 class="title is-4" style="margin: 0;">এরপর কী?</h3>
+                    </div>
+
+                    <ul class="timeline-list">
+                        <li class="timeline-item">
+                            <i class="timeline-icon fas fa-check-circle"></i>
+                            <div class="timeline-content">
+                                <h4>আবেদনের অবস্থা: 
+                                    {% if ca_registration.status == 'approved' %}
+                                        অনুমোদিত
+                                    {% elif ca_registration.status == 'pending' %}
+                                        বিচারাধীন
+                                    {% elif ca_registration.status == 'rejected' %}
+                                        বাতিল
+                                    {% else %}
+                                        {{ ca_registration.status }}
+                                    {% endif %}
+                                </h4>
+                                <p>
+                                    {% if ca_registration.status == 'approved' %}
+                                        আপনার আবেদন পর্যালোচনা করা হয়েছে এবং অনুমোদিত হয়েছে। দলে স্বাগতম!
+                                    {% elif ca_registration.status == 'pending' %}
+                                        আপনার আবেদন পর্যালোচনাধীন রয়েছে। আমরা শীঘ্রই আপনাকে জানাব।
+                                    {% elif ca_registration.status == 'rejected' %}
+                                        দুঃখিত, আপনার আবেদনটি এই মুহূর্তে অনুমোদিত হয়নি।
+                                    {% else %}
+                                        আপনার আবেদনের অবস্থা: {{ ca_registration.status }}
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </li>
+                        <li class="timeline-item">
+                            <i class="timeline-icon fas fa-envelope"></i>
+                            <div class="timeline-content">
+                                <h4>ইমেইল নিশ্চিতকরণ</h4>
+                                <p>অনুমোদনের পর নির্দেশিকা সহ একটি বিস্তারিত ইমেইল পাবেন।</p>
+                            </div>
+                        </li>
+                        <li class="timeline-item">
+                            <i class="timeline-icon fas fa-clock"></i>
+                            <div class="timeline-content">
+                                <h4>পর্যালোচনার সময়</h4>
+                                <p>আবেদনগুলি সাধারণত ১-২ সপ্তাহের মধ্যে পর্যালোচনা করা হয়।</p>
+                            </div>
+                        </li>
+                    </ul>
+
+                    <!-- Action Buttons -->
+                    <div style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                        <a href="{{ url_for('index') }}" class="button is-primary">
+                            <i class="fas fa-home"></i>&nbsp; হোম পেজে ফিরে যান
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- How to Use Your CA Code 
+        <div class="columns is-centered">
+            <div class="column is-10">
+                <div class="box animate-on-scroll">
+
+                    <div style="text-align: center; margin-bottom: 2rem;">
+                        <i class="fas fa-map-pin"
+                            style="font-size: 2.5rem; color: var(--secondary-accent); margin-bottom: 0.5rem;"></i>
+                        <h3 class="title is-4">আপনার সিএ কোড কীভাবে ব্যবহার করবেন</h3>
+                        <p class="subtitle is-6" style="margin-top: 0.5rem;">আপনার কোড শেয়ার করুন এবং পুরস্কার অর্জন করুন!</p>
+                    </div>
+
+                    <div class="steps-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem;">
+
+                        <div class="step-card has-text-centered">
+                            <i class="step-icon fas fa-share-alt" style="font-size: 2rem; color: var(--primary-accent);"></i>
+                            <div class="step-title has-text-weight-semibold mt-2">আপনার কোড শেয়ার করুন</div>
+                            <p class="step-description is-size-7">অন্যান্য প্রতিষ্ঠানের শিক্ষার্থীদের সাথে আপনার সিএ কোড শেয়ার করুন।</p>
+                        </div>
+
+                        <div class="step-card has-text-centered">
+                            <i class="step-icon fas fa-chart-line" style="font-size: 2rem; color: var(--primary-accent);"></i>
+                            <div class="step-title has-text-weight-semibold mt-2">রেজিস্ট্রেশন ট্র্যাক করুন</div>
+                            <p class="step-description is-size-7">সিএ পোর্টালে আপনার কোড ব্যবহার করে কতজন রেজিস্ট্রেশন করেছে তা মনিটর করুন।</p>
+                        </div>
+
+                        <div class="step-card has-text-centered">
+                            <i class="step-icon fas fa-gift" style="font-size: 2rem; color: var(--primary-accent);"></i>
+                            <div class="step-title has-text-weight-semibold mt-2">পুরস্কার অর্জন করুন</div>
+                            <p class="step-description is-size-7">প্রতিটি সফল রেজিস্ট্রেশনের জন্য পয়েন্ট এবং এক্সক্লুসিভ সুবিধা পান।</p>
+                        </div>
+
+                        <div class="step-card has-text-centered">
+                            <i class="step-icon fas fa-award" style="font-size: 2rem; color: var(--primary-accent);"></i>
+                            <div class="step-title has-text-weight-semibold mt-2">সার্টিফিকেট পান</div>
+                            <p class="step-description is-size-7">ইভেন্টের শেষে অফিসিয়াল সিএ সার্টিফিকেট গ্রহণ করুন।</p>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+            -->
     </div>
 </section>
 
 {% endblock %}
 
-
 {% block scripts %}
 <script>
     function copyCACode() {
+        {% if ca_registration.status == 'approved' and ca_registration.ca_code %}
         const caCode = "{{ ca_registration.ca_code }}";
         navigator.clipboard.writeText(caCode).then(() => {
-            alert("CA Code copied: " + caCode);
+            alert("সিএ কোড কপি করা হয়েছে: " + caCode);
+        }).catch(err => {
+            console.error('কপি করতে ব্যর্থ হয়েছে:', err);
+            alert("সিএ কোড কপি করতে ব্যর্থ হয়েছে। অনুগ্রহ করে ম্যানুয়ালি কপি করুন।");
         });
+        {% endif %}
     }
 
+    // Store last CA code in localStorage for reference
+    {% if ca_registration.status == 'approved' and ca_registration.ca_code %}
     localStorage.setItem("last_ca_code", "{{ ca_registration.ca_code }}");
+    {% endif %}
+    
+    // Auto-copy functionality (optional)
+    document.addEventListener('DOMContentLoaded', function() {
+        const copyButton = document.getElementById('copy-ca-code');
+        if (copyButton) {
+            copyButton.addEventListener('click', copyCACode);
+        }
+    });
 </script>
+{% endblock %}
+
+{% block style %}
+<style>
+    .status-pill {
+        display: inline-block;
+        padding: 0.35rem 1rem;
+        border-radius: 50px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .status-pill.approved {
+        background: #00d1b2;
+        color: white;
+    }
+    
+    .status-pill.pending {
+        background: #ffdd57;
+        color: rgba(0,0,0,0.7);
+    }
+    
+    .status-pill.rejected {
+        background: #ff3860;
+        color: white;
+    }
+    
+    .ca-code-hero {
+        background: linear-gradient(135deg, var(--primary-light), var(--primary-dark));
+        border-radius: 16px;
+        padding: 2rem;
+        text-align: center;
+        color: white;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+    
+    .ca-code-label {
+        font-size: 0.9rem;
+        opacity: 0.9;
+        margin-bottom: 0.5rem;
+    }
+    
+    .ca-code-display {
+        font-size: 2.5rem;
+        font-weight: bold;
+        font-family: monospace;
+        letter-spacing: 4px;
+        margin: 1rem 0;
+    }
+    
+    .copy-button {
+        background: white;
+        color: var(--primary-accent);
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 50px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-top: 0.5rem;
+    }
+    
+    .copy-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+    
+    .dashboard-profile {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    
+    .dashboard-avatar {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid var(--primary-accent);
+    }
+    
+    .receipt-row {
+        display: flex;
+        padding: 0.5rem 0;
+        border-bottom: 1px dashed var(--border-color);
+    }
+    
+    .receipt-label {
+        width: 120px;
+        font-weight: 600;
+        color: var(--text-secondary);
+    }
+    
+    .receipt-value {
+        flex: 1;
+        color: var(--text-primary);
+    }
+    
+    .timeline-list {
+        list-style: none;
+        padding: 0;
+    }
+    
+    .timeline-item {
+        display: flex;
+        gap: 1rem;
+        padding: 1rem 0;
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    .timeline-item:last-child {
+        border-bottom: none;
+    }
+    
+    .timeline-icon {
+        font-size: 1.25rem;
+        color: var(--primary-accent);
+        min-width: 2rem;
+    }
+    
+    .steps-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1.5rem;
+    }
+    
+    @media (max-width: 768px) {
+        .steps-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .steps-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
 {% endblock %}

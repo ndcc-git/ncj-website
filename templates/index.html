@@ -13,29 +13,29 @@
         <!-- Hero Artwork - Centered -->
         <div class="hero-artwork parallax-element animate-on-scroll" style="margin-bottom: 3rem;">
           <img
-            src="https://scontent.fdac138-1.fna.fbcdn.net/v/t1.15752-9/625017675_1676003873808809_1228699986677235644_n.jpg?_nc_cat=110&ccb=1-7&_nc_sid=9f807c&_nc_ohc=M6UpzngEzEwQ7kNvwH_BHTI&_nc_oc=AdmsFzRvEv1pTNlWT_ytHHtsaRZrg3Y9HlW7-DiusdumFNs4Ys5gLTpPrYa8QOyNsE4&_nc_zt=23&_nc_ht=scontent.fdac138-1.fna&oh=03_Q7cD4gHBvIBQg6ZgNp5j4n26-5gPHPwGP7D3eYDxyznrPUpejA&oe=69BBBF35"
+            src="{{ url_for('static', filename='assets/logo-bangla.png') }}"
             alt="10th NCJ Festival Artwork" id="hero-image"
-            style="max-width: 800px; width: 100%; border-radius: var(--border-radius-card); box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
+            style="max-width: 800px; width: 100%; border-radius: var(--border-radius-card);">
         </div>
 
         <!-- Event Info - Side by Side Layout -->
         <div class="hero-event-info animate-on-scroll" style="margin-bottom: 2.5rem;">
           <div class="hero-info-item">
-            <span class="hero-info-value">April 23-25, 2026</span>
+            <span class="hero-info-value bangla">এপ্রিল ২৩-২৫, ২০২৬</span>
           </div>
           <div class="hero-info-divider"></div>
           <div class="hero-info-item">
-            <span class="hero-info-value">Notre Dame College, Dhaka</span>
+            <span class="hero-info-value bangla">নটর ডেম কলেজ, ঢাকা</span>
           </div>
         </div>
 
         <!-- Action Buttons - Smaller -->
         <div class="buttons is-centered animate-on-scroll">
           <a href="{{ url_for('register') }}" class="button is-primary is-medium">
-            <i class="fas fa-ticket-alt"></i>&nbsp; Register Now
+            <i class="fas fa-ticket-alt"></i>&nbsp; <span class="bangla">রেজিস্টার</span>
           </a>
           <a href="{{ url_for('events') }}" class="button is-outlined-custom is-medium">
-            <i class="fas fa-calendar-alt"></i>&nbsp; View Events
+            <i class="fas fa-calendar-alt"></i>&nbsp; <span style="color: var(--bg-primary);" class="bangla">ইভেন্টস</span>
           </a>
         </div>
       </div>
@@ -47,23 +47,23 @@
        ======================================== -->
   <section class="countdown-section">
     <div class="container">
-      <h2 class="section-title has-text-white">Event Starts In</h2>
+      <h2 class="section-title has-text-white">ইভেন্ট শুরু হতে যাচ্ছে</h2>
       <div class="countdown-container">
         <div class="countdown-card animate-on-scroll">
           <span id="countdown-days" class="countdown-number">00</span>
-          <span class="countdown-label">Days</span>
+          <span class="countdown-label">দিন</span>
         </div>
         <div class="countdown-card animate-on-scroll">
           <span id="countdown-hours" class="countdown-number">00</span>
-          <span class="countdown-label">Hours</span>
+          <span class="countdown-label">ঘণ্টা</span>
         </div>
         <div class="countdown-card animate-on-scroll">
           <span id="countdown-minutes" class="countdown-number">00</span>
-          <span class="countdown-label">Minutes</span>
+          <span class="countdown-label">মিনিট</span>
         </div>
         <div class="countdown-card animate-on-scroll">
           <span id="countdown-seconds" class="countdown-number">00</span>
-          <span class="countdown-label">Seconds</span>
+          <span class="countdown-label">সেকেন্ড</span>
         </div>
       </div>
     </div>
@@ -75,12 +75,10 @@
        ======================================== -->
   <section class="section" id="about">
     <div class="container">
-      <h2 class="section-title animate-on-scroll">About 10th NCJ</h2>
+      <h2 class="section-title animate-on-scroll">১০ম জাতীয়  কালচারাল জুবিলেশন</h2>
       <div class="content is-medium has-text-centered animate-on-scroll" style="max-width: 800px; margin: 0 auto;">
         <p>
-          The National Cultural Jubilation (NCJ) is a vibrant celebration of art, music, dance, and drama.
-          As we mark our 10th edition, we invite you to be part of this incredible journey. Experience
-          the energy, passion, and creativity that define our cultural festival.
+          নটর ডেম কলেজ গর্বের সঙ্গে প্রতীক্ষা করছে এক মহিমান্বিত সাংস্কৃতিক অভিজ্ঞতা— “১০ম জাতীয় কালচারাল জুবিলেশন” এর জন্য। আমাদের সাংস্কৃতিক ঐতিহ্য শুধু আমাদের শিকড়ের সঙ্গে যুক্ত রাখে না, বরং অনুপ্রেরণা ও আনন্দের আলোও প্রজ্বলিত করে আমাদেরই মাঝে।
         </p>
       </div>
     </div>
@@ -90,7 +88,7 @@
   <!-- ========================================
        TICKET SECTION
        ======================================== -->
-  <div class="is-flex is-justify-content-center is-align-items-center m-5 p-0">
+  <!-- <div class="is-flex is-justify-content-center is-align-items-center m-5 p-0">
 
     <div class="hover-3d m-0 p-0">
       <figure class="image is-256x256 m-0">
@@ -107,14 +105,14 @@
       <div></div>
     </div>
 
-  </div>
+  </div> -->
 
   <!-- ========================================
        SPONSORS MARQUEE
        ======================================== -->
   <section class="marquee-section">
     <div class="container">
-      <h2 class="section-title animate-on-scroll">Our Sponsors</h2>
+      <h2 class="section-title animate-on-scroll">আমাদের স্পনসর</h2>
     </div>
     <div class="marquee-container">
       <div class="marquee-content">
@@ -133,19 +131,19 @@
        ======================================== -->
   <section class="section">
     <div class="container">
-      <h2 class="section-title animate-on-scroll">Signature Events</h2>
+      <h2 class="section-title animate-on-scroll">সিগনেচার ইভেন্টস</h2>
 
       <div class="columns is-multiline is-centered">
 
         <div class="column is-4">
           <div class="event-card animate-on-scroll">
-            <img src="{{ url_for('static', filename='assets/event-dance.jpg') }}" alt="Battle of Bands" class="event-card-image">
+            <img src="https://scontent.fdac138-1.fna.fbcdn.net/v/t39.30808-6/488706976_1081131130714397_5589639071416878270_n.jpg?_nc_cat=110&ccb=1-7&_nc_sid=13d280&_nc_ohc=4QTS-3zzgfsQ7kNvwGrma9s&_nc_oc=Adm0vt9AykWwsGwMszaS2Htq1sQ9o8jSzsYKSR74nLT431GDr5qwcDL5dBpBAOdlJf0&_nc_zt=23&_nc_ht=scontent.fdac138-1.fna&_nc_gid=7fho_uT6iGsGpULykuviGw&oh=00_AfvShNGW0oS9qE0NEfU6spJXPXnHQdhiCJzj4a2Z9FM4yA&oe=699BD73C" alt="ব্যাটল অব দ্য ব্যান্ডস" class="event-card-image">
             <div class="event-card-content">
-              <h3 class="event-card-title">Battle of Bands</h3>
-              <p class="event-card-type">Team Event</p>
+              <h3 class="event-card-title">ব্যাটল অব দ্য ব্যান্ডস</h3>
+              <p class="event-card-type">দলগত ইভেন্ট</p>
               <div class="event-card-actions">
-                <a href="event-details.html" class="button is-secondary">Explore</a>
-                <a href="register.html" class="button is-primary">Register</a>
+                <a href="event-details.html" class="button is-secondary">এক্সপ্লোর</a>
+                <a href="register.html" class="button is-primary">রেজিস্টার</a>
               </div>
             </div>
           </div>
@@ -153,13 +151,13 @@
 
         <div class="column is-4">
           <div class="event-card animate-on-scroll">
-            <img src="{{ url_for('static', filename='assets/event-dance.jpg') }}" alt="Dance Competition" class="event-card-image">
+            <img src="https://scontent.fdac138-2.fna.fbcdn.net/v/t39.30808-6/489054095_1081128510714659_360702231467706330_n.jpg?_nc_cat=102&ccb=1-7&_nc_sid=13d280&_nc_ohc=xuAnbI5jwsAQ7kNvwGchLKc&_nc_oc=Adl4jeBTEDF6mO_lyZ0rbiddAITWDT3vdeG31DjRB0nD8GxRZBqTkYGKH61HRW99VgA&_nc_zt=23&_nc_ht=scontent.fdac138-2.fna&_nc_gid=jULvhIubrLnK_DYGPaks1Q&oh=00_Afve6pWUyF5Das6RUSNBb2qsJdqxKdycg3iLmMnfdVg9oA&oe=699BD8CB" alt="বিটবক্সিং ব্রল" class="event-card-image">
             <div class="event-card-content">
-              <h3 class="event-card-title">Beatbox Brawl</h3>
-              <p class="event-card-type">Solo Event</p>
+              <h3 class="event-card-title">বিটবক্সিং ব্রল</h3>
+              <p class="event-card-type">একক ইভেন্ট</p>
               <div class="event-card-actions">
-                <a href="event-details.html" class="button is-secondary">Explore</a>
-                <a href="{{ url_for('register') }}" class="button is-primary">Register</a>
+                <a href="event-details.html" class="button is-secondary">এক্সপ্লোর</a>
+                <a href="{{ url_for('register') }}" class="button is-primary">রেজিস্টার</a>
               </div>
             </div>
           </div>
@@ -168,7 +166,7 @@
       </div>
 
       <div class="has-text-centered" style="margin-top: 2rem;">
-        <a href="{{ url_for('events') }}" class="button is-primary is-large">View All Events</a>
+        <a href="{{ url_for('events') }}" class="button is-primary is-large">সকল ইভেন্টস</a>
       </div>
     </div>
   </section>
@@ -179,60 +177,58 @@
        ======================================== -->
   <section class="faq-section">
     <div class="container">
-      <h2 class="section-title animate-on-scroll">Frequently Asked Questions</h2>
+      <h2 class="section-title animate-on-scroll">প্রায়শই জিজ্ঞাসিত প্রশ্নাবলী</h2>
       <div class="animate-on-scroll" style="max-width: 800px; margin: 0 auto;">
 
         <div class="faq-item">
           <div class="faq-question">
-            <span>What is NCJ?</span>
+            <span>জাতীয় কালচারাল জুবিলেশন কী?</span>
             <span class="faq-chevron">▼</span>
           </div>
           <div class="faq-answer">
-            <p>National Cultural Jubilation (NCJ) is an annual cultural festival organized by the Notre Dame Cultural
-              Club, celebrating art, music, dance, and drama.</p>
+            <p>জাতীয় কালচারাল জুবিলেশন (NCJ) নটরডেম কালচারাল ক্লাব কর্তৃক আয়োজিত একটি বার্ষিক সাংস্কৃতিক উৎসব, যা শিল্প, সঙ্গীত, নৃত্য এবং নাটক উদযাপন করে।</p>
           </div>
         </div>
 
         <div class="faq-item">
           <div class="faq-question">
-            <span>When and where is the event?</span>
+            <span>কোথায় এবং কখন ১০ম জাতীয় কালচারাল জুবিলেশন অনুষ্ঠিত হবে?</span>
             <span class="faq-chevron">▼</span>
           </div>
           <div class="faq-answer">
-            <p>The 10th NCJ will be held in April 05-07 2026 at Notre Dame College.</p>
+            <p>১০ম এনসিজে ২০২৬ সালের ২৩-২৫ এপ্রিল নটর ডেম কলেজে অনুষ্ঠিত হবে।</p>
           </div>
         </div>
 
         <div class="faq-item">
           <div class="faq-question">
-            <span>How do I register?</span>
+            <span>আমি কিভাবে রেজিস্টার করব?</span>
             <span class="faq-chevron">▼</span>
           </div>
           <div class="faq-answer">
-            <p>You can register online through our website by creating an account then by clicking the "Register"
-              button. Choose your event category
-              and fill in the required details.</p>
+            <p>আপনি আমাদের ওয়েবসাইটের মাধ্যমে একটি অ্যাকাউন্ট তৈরি করে অনলাইনে নিবন্ধন করতে পারেন, তারপর "রেজিস্টার"
+বোতামে ক্লিক করে। আপনার ইভেন্ট নির্বাচন করুন
+এবং প্রয়োজনীয় বিবরণ পূরণ করুন।</p>
           </div>
         </div>
 
         <div class="faq-item">
           <div class="faq-question">
-            <span>What are the participation fees?</span>
+            <span>অংশগ্রহণ ফি কত?</span>
             <span class="faq-chevron">▼</span>
           </div>
           <div class="faq-answer">
-            <p>Participation fees vary by event category. Please check individual event pages for specific fee
-              information.</p>
+            <p>ইভেন্টের ধরণ অনুসারে অংশগ্রহণের ফি ভিন্ন হয়। নির্দিষ্ট ফি-এর তথ্যের জন্য অনুগ্রহ করে প্রতিটি ইভেন্ট পৃষ্ঠা দেখুন।</p>
           </div>
         </div>
 
         <div class="faq-item">
           <div class="faq-question">
-            <span>Can I participate in multiple events?</span>
+            <span>আমি কি একাধিক অনুষ্ঠানে অংশগ্রহণ করতে পারি?</span>
             <span class="faq-chevron">▼</span>
           </div>
           <div class="faq-answer">
-            <p>Yes! Participants are welcome to register for multiple events, subject to scheduling constraints.</p>
+            <p>হ্যাঁ! অংশগ্রহণকারীরা একাধিক ইভেন্টের জন্য নিবন্ধন করতে পারেন, সময়সূচীর সীমাবদ্ধতা সাপেক্ষে।</p>
           </div>
         </div>
 
@@ -245,7 +241,7 @@
        ======================================== -->
   <section class="contact-section" id="contact">
     <div class="container">
-      <h2 class="section-title animate-on-scroll">Get in Touch</h2>
+      <h2 class="section-title animate-on-scroll">যোগাযোগ করুন</h2>
       <div class="columns">
 
         <!-- Contact Form -->
@@ -254,7 +250,7 @@
                 {{ form.hidden_tag() }}
                 
                 <div class="field">
-                    <label class="label">Name *</label>
+                    <label class="label">নাম *</label>
                     <div class="control">
                         {{ form.name(class="input", type="text", id="contact-name", placeholder="Your Name") }}
                     </div>
@@ -268,7 +264,7 @@
                 </div>
 
                 <div class="field">
-                    <label class="label">Institution</label>
+                    <label class="label">প্রতিষ্ঠান *</label>
                     <div class="control">
                         {{ form.institution(class="input", type="text", id="contact-institution", placeholder="Your Institution") }}
                     </div>
@@ -282,7 +278,7 @@
                 </div>
 
                 <div class="field">
-                    <label class="label">Email *</label>
+                    <label class="label">ইমেইল *</label>
                     <div class="control">
                         {{ form.email(class="input", type="email", id="contact-email", placeholder="your@email.com") }}
                     </div>
@@ -296,9 +292,9 @@
                 </div>
 
                 <div class="field">
-                    <label class="label">Message *</label>
+                    <label class="label">বার্তা *</label>
                     <div class="control">
-                        {{ form.message(class="textarea", id="contact-message", placeholder="Your message...", rows="5") }}
+                        {{ form.message(class="textarea", id="contact-message", placeholder="আপনার বার্তা...", rows="5") }}
                     </div>
                     {% if form.message.errors %}
                         <div class="errors">
@@ -310,7 +306,7 @@
                 </div>
 
                 <div class="control">
-                    <button type="submit" class="button is-primary is-fullwidth">Send Message</button>
+                    <button type="submit" class="button is-primary is-fullwidth">বার্তা পাঠান</button>
                 </div>
             </form>
         </div>

@@ -3,135 +3,281 @@
 {% block title %}Become a Campus Ambassador{% endblock %}
 
 {% block content %}
-<div class="ca-registration">
-    <div class="ca-header">
-        <h2>Become a Campus Ambassador</h2>
-        <p class="ca-benefits">
-            <strong>Benefits:</strong> Certificate, Special Recognition, Prizes, Networking Opportunities
-        </p>
+<section class="hero is-medium"
+    style="background: linear-gradient(to bottom, var(--primary-accent) 0%, var(--primary-accent) 40%, var(--secondary-accent) 70%, var(--bg-primary) 100%);">
+    <div class="hero-body">
+        <div class="container has-text-centered">
+            <h1 class="title is-1 animate-on-scroll"
+                style="color: var(--text-primary); font-size: 4rem; font-weight: 900;">
+                ক্যাম্পাস অ্যাম্বাসেডর
+            </h1>
+        </div>
     </div>
-    
-    <form method="POST" action="{{ url_for('ca_register') }}" enctype="multipart/form-data">
-        {{ form.hidden_tag() }}
-        
-        <div class="form-row">
-            <div class="form-group">
-                {{ form.full_name.label }}
-                {{ form.full_name(class="form-control") }}
-                {% if form.full_name.errors %}
-                    <div class="errors">
-                        {% for error in form.full_name.errors %}
-                            <span>{{ error }}</span>
-                        {% endfor %}
-                    </div>
-                {% endif %}
-            </div>
-            
-            <div class="form-group">
-                {{ form.email.label }}
-                {{ form.email(class="form-control", type="email") }}
-                {% if form.email.errors %}
-                    <div class="errors">
-                        {% for error in form.email.errors %}
-                            <span>{{ error }}</span>
-                        {% endfor %}
-                    </div>
-                {% endif %}
-            </div>
-        </div>
-        
-        <div class="form-row">
-            <div class="form-group">
-                {{ form.institution.label }}
-                {{ form.institution(class="form-control") }}
-                {% if form.institution.errors %}
-                    <div class="errors">
-                        {% for error in form.institution.errors %}
-                            <span>{{ error }}</span>
-                        {% endfor %}
-                    </div>
-                {% endif %}
-            </div>
-            
-            <div class="form-group">
-                {{ form.class_info.label }}
-                {{ form.class_info(class="form-control", placeholder="e.g., 3rd Year, 12th Grade") }}
-                {% if form.class_info.errors %}
-                    <div class="errors">
-                        {% for error in form.class_info.errors %}
-                            <span>{{ error }}</span>
-                        {% endfor %}
-                    </div>
-                {% endif %}
-            </div>
-        </div>
-        
-        <div class="form-row">
-            <div class="form-group">
-                {{ form.phone.label }}
-                {{ form.phone(class="form-control") }}
-                {% if form.phone.errors %}
-                    <div class="errors">
-                        {% for error in form.phone.errors %}
-                            <span>{{ error }}</span>
-                        {% endfor %}
-                    </div>
-                {% endif %}
-            </div>
-            
-            <div class="form-group">
-                {{ form.profile_picture.label }}
-                {{ form.profile_picture(class="form-control") }}
-                <small class="form-text">Max 2MB. JPG, JPEG, PNG only.</small>
-                {% if form.profile_picture.errors %}
-                    <div class="errors">
-                        {% for error in form.profile_picture.errors %}
-                            <span>{{ error }}</span>
-                        {% endfor %}
-                    </div>
-                {% endif %}
-            </div>
-        </div>
-        
-        <div class="form-group">
-            {{ form.why_ca.label }}
-            {{ form.why_ca(class="form-control") }}
-            <small class="form-text">Tell us why you want to be a Campus Ambassador (minimum 20 characters)</small>
-            {% if form.why_ca.errors %}
-                <div class="errors">
-                    {% for error in form.why_ca.errors %}
-                        <span>{{ error }}</span>
-                    {% endfor %}
+</section>
+
+<!-- ========================================
+   ক্যাম্পাস অ্যাম্বাসেডর আবেদন ফর্ম
+   ======================================== -->
+<section class="section">
+    <div class="container">
+        <div class="columns is-centered">
+            <div class="column is-half-desktop">
+
+                <div class="box animate-on-scroll"
+                    style="background-color: rgba(252, 251, 229, 0.7); backdrop-filter: blur(10px); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1); border: 2px solid var(--text-primary); border-radius: var(--border-radius);">
+                    <h2 class="title is-3 has-text-centered" style="margin-bottom: 2rem;">ক্যাম্পাস অ্যাম্বাসেডর আবেদন
+                    </h2>
+
+                    <form method="POST" action="{{ url_for('ca_register') }}" enctype="multipart/form-data" id="ca-registration-form">
+                        {{ form.hidden_tag() }}
+
+                        <!-- Profile Picture Upload -->
+                        <div class="field">
+                            <div class="profile-preview-container">
+                                <div class="profile-preview" id="profile-preview">
+                                    <span class="profile-preview-placeholder">👤</span>
+                                </div>
+                                <div class="control">
+                                    <div class="file has-name is-boxed is-centered">
+                                        <label class="file-label">
+                                            {{ form.profile_picture(class="file-input", id="profile-picture", accept="image/*") }}
+                                            <span class="file-cta">
+                                                <span class="file-icon">
+                                                    <i class="fas fa-upload"></i>
+                                                </span>
+                                                <span class="file-label">
+                                                    প্রোফাইল ছবি আপলোড করুন
+                                                </span>
+                                            </span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <small class="help">সর্বোচ্চ ২এমবি। শুধুমাত্র JPG, JPEG, PNG ফরম্যাট অনুমোদিত।</small>
+                            {% if form.profile_picture.errors %}
+                                <div class="errors" style="color: #ff3860; font-size: 0.85rem; margin-top: 0.25rem;">
+                                    {% for error in form.profile_picture.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Full Name -->
+                        <div class="field">
+                            <label class="label">সম্পূর্ণ নাম *</label>
+                            <div class="control">
+                                {{ form.full_name(class="input", type="text", placeholder="আপনার সম্পূর্ণ নাম", id="ca-full-name", required=true) }}
+                            </div>
+                            {% if form.full_name.errors %}
+                                <div class="errors" style="color: #ff3860; font-size: 0.85rem; margin-top: 0.25rem;">
+                                    {% for error in form.full_name.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Institution -->
+                        <div class="field">
+                            <label class="label">প্রতিষ্ঠান *</label>
+                            <div class="control">
+                                {{ form.institution(class="input", type="text", placeholder="প্রতিষ্ঠান", id="ca-institution", required=true) }}
+                            </div>
+                            {% if form.institution.errors %}
+                                <div class="errors" style="color: #ff3860; font-size: 0.85rem; margin-top: 0.25rem;">
+                                    {% for error in form.institution.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Class/Year -->
+                        <div class="field">
+                            <label class="label">শ্রেণী *</label>
+                            <div class="control">
+                                {{ form.class_info(class="input", type="text", placeholder="শ্রেণী", id="ca-class", required=true) }}
+                            </div>
+                            {% if form.class_info.errors %}
+                                <div class="errors" style="color: #ff3860; font-size: 0.85rem; margin-top: 0.25rem;">
+                                    {% for error in form.class_info.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Email Address -->
+                        <div class="field">
+                            <label class="label">ইমেইল *</label>
+                            <div class="control">
+                                {{ form.email(class="input", type="email", placeholder="your@email.com", id="ca-email", required=true) }}
+                            </div>
+                            {% if form.email.errors %}
+                                <div class="errors" style="color: #ff3860; font-size: 0.85rem; margin-top: 0.25rem;">
+                                    {% for error in form.email.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Phone Number -->
+                        <div class="field">
+                            <label class="label">মোবাইল *</label>
+                            <div class="control">
+                                {{ form.phone(class="input", type="tel", placeholder="01XXXXXXXXX", id="ca-phone", required=true) }}
+                            </div>
+                            {% if form.phone.errors %}
+                                <div class="errors" style="color: #ff3860; font-size: 0.85rem; margin-top: 0.25rem;">
+                                    {% for error in form.phone.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Motivation -->
+                        <div class="field">
+                            <label class="label">আপনার উদ্দেশ্য *</label>
+                            <div class="control">
+                                {{ form.why_ca(class="textarea", placeholder="আপনার উদ্দেশ্য, দক্ষতা এবং ১০ম এনসিজে প্রচারে আপনার ভূমিকা সম্পর্কে বলুন...", rows="5", id="ca-motivation", required=true) }}
+                            </div>
+                            <p class="help">সর্বনিম্ন ২০ অক্ষর</p>
+                            {% if form.why_ca.errors %}
+                                <div class="errors" style="color: #ff3860; font-size: 0.85rem; margin-top: 0.25rem;">
+                                    {% for error in form.why_ca.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Terms and Conditions -->
+                        <!-- <div class="field">
+                            <div class="control">
+                                <label class="checkbox">
+                                    <input type="checkbox" id="ca-terms" required>
+                                    আমি <a href="#">সিএ শর্তাবলী</a> মেনে নিচ্ছি *
+                                </label>
+                            </div>
+                        </div> -->
+
+                        <!-- Submit Button -->
+                        <div class="field">
+                            <div class="control">
+                                {{ form.submit(class="button is-primary is-fullwidth is-large", value="আবেদন করুন") }}
+                            </div>
+                        </div>
+
+                    </form>
+
                 </div>
-            {% endif %}
+                
+                <!-- CA Responsibilities from 2nd part -->
+                <div class="notification is-primary is-light animate-on-scroll" style="margin-top: 1rem;">
+                    <h3 class="title is-5">ক্যাম্পাস অ্যাম্বাসেডর দায়িত্বসমূহ:</h3>
+                    <ul>
+                        <li>🎯 আপনার প্রতিষ্ঠানে ফেস্টিভ্যাল প্রচার করা</li>
+                        <li>📝 অংশগ্রহণকারীদের রেজিস্ট্রেশনে সাহায্য করা</li>
+                        <li>🔑 আপনার ইউনিক সিএ কোড ব্যবহার করে রেজিস্ট্রেশন সংগ্রহ করা</li>
+                        <li>🤝 অংশগ্রহণকারীদের জন্য যোগাযোগের পয়েন্ট হিসেবে কাজ করা</li>
+                        <li>📊 আয়োজক কমিটিকে নিয়মিত আপডেট জমা দেওয়া</li>
+                    </ul>
+                </div>
+
+            </div>
         </div>
-        
-        <div class="form-group">
-            {{ form.submit(class="btn btn-primary btn-lg") }}
-        </div>
-    </form>
-    
-    <div class="ca-guidelines">
-        <h3>CA Responsibilities:</h3>
-        <ul>
-            <li>Promote the festival in your institution</li>
-            <li>Help participants with registration</li>
-            <li>Collect registrations using your unique CA code</li>
-            <li>Act as a point of contact for participants</li>
-            <li>Submit regular updates to the organizing committee</li>
-        </ul>
-        
-        <h3>Selection Criteria:</h3>
-        <ul>
-            <li>Good communication skills</li>
-            <li>Active involvement in campus activities</li>
-            <li>Leadership qualities</li>
-            <li>Commitment to the role</li>
-        </ul>
     </div>
-</div>
-{% endblock %}
+</section>
 
-{% block scripts %}
+<!-- JavaScript for Profile Picture Preview -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const profileInput = document.getElementById('profile-picture');
+        const previewContainer = document.getElementById('profile-preview');
+        
+        if (profileInput) {
+            profileInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        previewContainer.innerHTML = `<img src="${e.target.result}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
+                    }
+                    reader.readAsDataURL(file);
+                } else {
+                    previewContainer.innerHTML = '<span class="profile-preview-placeholder">👤</span>';
+                }
+            });
+        }
+    });
+</script>
 
+<!-- Additional CSS for profile preview -->
+<style>
+    .profile-preview-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .profile-preview {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: var(--bg-secondary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        border: 3px solid var(--primary-accent);
+    }
+    
+    .profile-preview-placeholder {
+        font-size: 3rem;
+        opacity: 0.5;
+    }
+    
+    .file.has-name.is-boxed {
+        width: 100%;
+    }
+    
+    .file-label {
+        width: 100%;
+    }
+    
+    .notification ul {
+        margin-top: 0.5rem;
+        margin-left: 1.5rem;
+    }
+    
+    .notification li {
+        margin-bottom: 0.5rem;
+    }
+    
+    .checkbox {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .checkbox input[type="checkbox"] {
+        width: auto;
+        margin-right: 0.25rem;
+    }
+    
+    @media (max-width: 768px) {
+        .hero .title.is-1 {
+            font-size: 2.5rem !important;
+        }
+        
+        .hero .subtitle.is-4 {
+            font-size: 1.2rem !important;
+        }
+    }
+</style>
 {% endblock %}

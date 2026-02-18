@@ -3,118 +3,174 @@
 {% block title %}My Profile - Festival Registration{% endblock %}
 
 {% block content %}
-<div class="user-profile">
-    <div class="profile-header">
-        <h2>My Profile</h2>
-        <div class="profile-actions">
-            <a href="{{ url_for('edit_profile') }}" class="btn btn-primary">Edit Profile</a>
-            <a href="{{ url_for('change_password') }}" class="btn btn-secondary">Change Password</a>
-        </div>
-    </div>
-    
-    <div class="profile-container">
-        <!-- User Info Card -->
-        <div class="profile-card">
+<section class="profile-header">
+    <div class="container">
+        <div class="profile-header-content">
             <div class="profile-info">
+                <h1 id="profile-name">{{ user.full_name }}</h1>
+                <p id="profile-institution">{{ user.institution }}</p>
                 {% if user.profile_picture %}
-                <div class="profile-picture">
+                <div class="profile-picture" style="margin-top: 1rem;">
                     <img src="{{ url_for('static', filename='uploads/user_profiles/' + user.profile_picture) }}" 
-                         alt="{{ user.full_name }}" class="profile-img">
+                         alt="{{ user.full_name }}" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover;">
                 </div>
                 {% endif %}
-                
-                <div class="profile-details">
-                    <h3>{{ user.full_name }}</h3>
-                    <div class="detail-item">
-                        <strong>Email:</strong> {{ user.email }}
-                        {% if not user.email_verified %}
-                        <span class="badge badge-warning">Not Verified</span>
-                        <a href="{{ url_for('verify_email') }}" class="btn btn-sm btn-outline-warning">Verify Email</a>
-                        {% else %}
-                        <span class="badge badge-success">Verified</span>
-                        {% endif %}
-                    </div>
-                    <div class="detail-item">
-                        <strong>Mobile:</strong> {{ user.mobile }}
-                    </div>
-                    <div class="detail-item">
-                        <strong>Institution:</strong> {{ user.institution }}
-                    </div>
-                    <div class="detail-item">
-                        <strong>Class:</strong> {{ user.class_level }}
-                    </div>
-                    <div class="detail-item">
-                        <strong>Address:</strong> {{ user.address }}
-                    </div>
-                    {% if user.facebook_link %}
-                    <div class="detail-item">
-                        <strong>Facebook:</strong> 
-                        <a href="{{ user.facebook_link }}" target="_blank">{{ user.facebook_link }}</a>
-                    </div>
+            </div>
+            <div class="profile-actions">
+                <a href="{{ url_for('edit_profile') }}" class="button is-primary">
+                    <i class="fas fa-edit"></i>&nbsp; প্রোফাইল সম্পাদনা
+                </a>
+                <a href="{{ url_for('change_password') }}" class="button is-outlined-custom" style="margin-left: 0.5rem;">
+                    <i class="fas fa-key"></i>&nbsp; পাসওয়ার্ড পরিবর্তন
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ========================================
+   ব্যক্তিগত তথ্য
+   ======================================== -->
+<section class="section">
+    <div class="container">
+        <div class="profile-section">
+            <h2 class="profile-section-title">ব্যক্তিগত তথ্য</h2>
+            <div class="profile-detail-grid">
+                <div class="profile-detail-item">
+                    <span class="profile-detail-label">সম্পূর্ণ নাম</span>
+                    <span class="profile-detail-value" id="detail-name">{{ user.full_name }}</span>
+                </div>
+                <div class="profile-detail-item">
+                    <span class="profile-detail-label">ইমেইল</span>
+                    <span class="profile-detail-value" id="detail-email">{{ user.email }}</span>
+                    {% if not user.email_verified %}
+                    <span class="badge pending" style="margin-left: 0.5rem;">ভেরিফাই করা হয়নি</span>
+                    <a href="{{ url_for('verify_email') }}" class="button is-small" style="margin-left: 0.5rem;">ভেরিফাই করুন</a>
+                    {% else %}
+                    <span class="badge confirmed" style="margin-left: 0.5rem;">ভেরিফাই করা হয়েছে</span>
                     {% endif %}
                 </div>
+                <div class="profile-detail-item">
+                    <span class="profile-detail-label">মোবাইল</span>
+                    <span class="profile-detail-value" id="detail-mobile">{{ user.mobile }}</span>
+                </div>
+                <div class="profile-detail-item">
+                    <span class="profile-detail-label">প্রতিষ্ঠান</span>
+                    <span class="profile-detail-value" id="detail-institution">{{ user.institution }}</span>
+                </div>
+                <div class="profile-detail-item">
+                    <span class="profile-detail-label">শ্রেণী</span>
+                    <span class="profile-detail-value" id="detail-class">{{ user.class_level }}</span>
+                </div>
+                <div class="profile-detail-item">
+                    <span class="profile-detail-label">ঠিকানা</span>
+                    <span class="profile-detail-value" id="detail-address">{{ user.address }}</span>
+                </div>
+                {% if user.facebook_link %}
+                <div class="profile-detail-item">
+                    <span class="profile-detail-label">ফেসবুক</span>
+                    <span class="profile-detail-value">
+                        <a href="{{ user.facebook_link }}" target="_blank">{{ user.facebook_link }}</a>
+                    </span>
+                </div>
+                {% endif %}
             </div>
         </div>
-        
-        <!-- My Registrations -->
-        <div class="registrations-card">
-            <h3>My Event Registrations</h3>
+    </div>
+</section>
+
+<!-- ========================================
+   আমার ইভেন্ট রেজিস্ট্রেশন
+   ======================================== -->
+<section class="section" style="padding-top: 0;">
+    <div class="container">
+        <div class="profile-section">
+            <h2 class="profile-section-title">আমার ইভেন্ট রেজিস্ট্রেশন</h2>
+            
             {% if registrations %}
-            <div class="registrations-list">
                 {% for reg in registrations %}
-                <div class="registration-item">
-                    <div class="reg-info">
-                        <h4>{{ reg.segment_name }}</h4>
-                        <p>Registered on: {{ reg.registration_date.strftime('%Y-%m-%d') }}</p>
-                        <p>Status: 
-                            {% if reg.verified %}
-                            <span class="status-badge status-approved">Verified</span>
-                            {% else %}
-                            <span class="status-badge status-pending">Pending Verification</span>
-                            {% endif %}
-                        </p>
+                <div class="registration-card">
+                    <div class="registration-card-header">
+                        <h3 class="registration-card-title">{{ reg.segment_name }}</h3>
+                        {% if reg.verified %}
+                        <span class="badge confirmed">ভেরিফাইড</span>
+                        {% else %}
+                        <span class="badge pending">ভেরিফিকেশন অপেক্ষমান</span>
+                        {% endif %}
                     </div>
-                    <div class="reg-actions">
-                        <a href="{{ url_for('registration_success', registration_id=reg._id|string) }}" 
-                           class="btn btn-sm btn-info">View Details</a>
-                    </div>
+                    <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+                        রেজিস্ট্রেশন তারিখ: {{ reg.registration_date.strftime('%Y-%m-%d') }}
+                    </p>
+                    <a href="{{ url_for('registration_success', registration_id=reg._id|string) }}" 
+                       class="button is-primary">
+                        <i class="fas fa-eye"></i>&nbsp; বিস্তারিত দেখুন
+                    </a>
                 </div>
                 {% endfor %}
-            </div>
             {% else %}
-            <p class="text-muted">No registrations yet.</p>
-            <a href="{{ url_for('register') }}" class="btn btn-primary">Register for an Event</a>
-            {% endif %}
-        </div>
-        
-        <!-- My CA Applications -->
-        <div class="ca-applications-card">
-            <h3>My CA Applications</h3>
-            {% if ca_applications %}
-            <div class="ca-applications-list">
-                {% for ca in ca_applications %}
-                <div class="ca-application-item">
-                    <div class="ca-info">
-                        <h4>CA Code: {{ ca.ca_code }}</h4>
-                        <p>Applied on: {{ ca.registration_date.strftime('%Y-%m-%d') }}</p>
-                        <p>Status: 
-                            <span class="status-badge status-{{ ca.status }}">
-                                {{ ca.status|title }}
-                            </span>
-                        </p>
-                    </div>
-                    <div class="ca-actions">
-                        <a href="{{ url_for('ca_registration_success', ca_id=ca._id|string) }}" 
-                           class="btn btn-sm btn-info">View Details</a>
-                    </div>
+                <div style="text-align: center; padding: 2rem; background: var(--bg-secondary); border-radius: 12px;">
+                    <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">এখনও কোনো রেজিস্ট্রেশন নেই।</p>
+                    <a href="{{ url_for('register') }}" class="button is-primary">
+                        <i class="fas fa-plus"></i>&nbsp; ইভেন্টে রেজিস্ট্রেশন করুন
+                    </a>
                 </div>
-                {% endfor %}
-            </div>
-            {% else %}
-            <p class="text-muted">No CA applications yet.</p>
-            <a href="{{ url_for('ca_register') }}" class="btn btn-primary">Apply as Campus Ambassador</a>
             {% endif %}
         </div>
     </div>
-</div>
+</section>
+
+<!-- ========================================
+   ক্যাম্পাস অ্যাম্বাসেডর স্ট্যাটাস
+   ======================================== -->
+<section class="section" style="padding-top: 0;">
+    <div class="container">
+        <div class="profile-section">
+            <h2 class="profile-section-title">ক্যাম্পাস অ্যাম্বাসেডর স্ট্যাটাস</h2>
+            
+            {% if ca_applications %}
+                {% for ca in ca_applications %}
+                <div class="ca-application-banner" id="ca-applied">
+                    <h3>সিএ আবেদনের অবস্থা</h3>
+                    <div style="margin-top: 1.5rem;">
+                        {% if ca.status == 'approved' %}
+                        <span class="badge approved" style="font-size: 1rem;">অনুমোদিত</span>
+                        {% elif ca.status == 'pending' %}
+                        <span class="badge pending" style="font-size: 1rem;">বিচারাধীন</span>
+                        {% elif ca.status == 'rejected' %}
+                        <span class="badge" style="background: #ff3860; font-size: 1rem;">বাতিল</span>
+                        {% endif %}
+                    </div>
+                    
+                    {% if ca.status == 'approved' %}
+                    <div class="ca-code-display">
+                        <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 0.5rem;">আপনার সিএ কোড:</p>
+                        <div class="ca-code">{{ ca.ca_code }}</div>
+                        <p style="margin-top: 1rem; font-size: 1rem">আবেদনের তারিখ: {{ ca.registration_date.strftime('%Y-%m-%d') }}</p>
+                    </div>
+                    {% else %}
+                    <p style="margin-top: 1rem; ">আবেদনের তারিখ: {{ ca.registration_date.strftime('%Y-%m-%d') }}</p>
+                    {% endif %}
+                    
+                    <div style="margin-top: 1.5rem;">
+                        <a href="{{ url_for('ca_registration_success', ca_id=ca._id|string) }}" 
+                           class="button is-primary">
+                            <i class="fas fa-eye"></i>&nbsp; বিস্তারিত দেখুন
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="ca-application-banner" id="ca-not-applied">
+                    <h3>ক্যাম্পাস অ্যাম্বাসেডর হোন!</h3>
+                    <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
+                        আপনার প্রতিষ্ঠানে ১০ম এনসিজে-এর প্রতিনিধিত্ব করুন এবং এক্সক্লুসিভ সুবিধা অর্জন করুন।
+                    </p>
+                    <a href="{{ url_for('ca_register') }}" class="button is-primary is-large">
+                        <strong>সিএ হিসেবে আবেদন করুন</strong>
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
 {% endblock %}

@@ -3,139 +3,205 @@
 {% block title %}Sign Up - Festival Registration{% endblock %}
 
 {% block content %}
-<div class="user-auth-container">
-    <div class="auth-card">
-        <div class="auth-header">
-            <h2>Create Account</h2>
-            <p>Sign up to register for events or become a Campus Ambassador</p>
+<div class="auth-split-container">
+    <!-- Left Panel - Decorative -->
+    <div class="auth-decorative-panel" style="flex: 0 0 40%;">
+        <div style="max-width: 400px;">
+            <img src="C:/Users/Faridin/.gemini/antigravity/brain/5dfe2dd8-9f9b-4ae9-8e01-061f4f665677/cultural_pattern_decorative_1770903173647.png"
+                alt="Cultural Pattern">
         </div>
-        
-        <form method="POST" action="{{ url_for('user_signup') }}">
-            {{ form.hidden_tag() }}
-            
-            <div class="form-row">
-                <div class="form-group">
-                    {{ form.full_name.label }}
-                    {{ form.full_name(class="form-control", placeholder="Your full name") }}
-                    {% if form.full_name.errors %}
-                        <div class="errors">
-                            {% for error in form.full_name.errors %}
-                                <span>{{ error }}</span>
-                            {% endfor %}
-                        </div>
-                    {% endif %}
-                </div>
+    </div>
+
+    <!-- Right Panel - Form -->
+    <div class="auth-form-panel" style="flex: 1;">
+        <div style="max-width: 600px; width: 100%;">
+            <h1 class="auth-card-title">অ্যাকাউন্ট তৈরি করুন</h1>
+            <p class="auth-card-subtitle">১০ম এনসিজে উদযাপনে যোগ দিন</p>
+
+            <form class="auth-form" method="POST" action="{{ url_for('user_signup') }}" id="signup-form">
+                {{ form.hidden_tag() }}
                 
-                <div class="form-group">
-                    {{ form.email.label }}
-                    {{ form.email(class="form-control", type="email", placeholder="Your email address") }}
-                    {% if form.email.errors %}
-                        <div class="errors">
-                            {% for error in form.email.errors %}
-                                <span>{{ error }}</span>
-                            {% endfor %}
+                <div class="columns is-multiline">
+                    <!-- Full Name -->
+                    <div class="column is-6">
+                        <div class="field">
+                            <label class="label"><i class="fas fa-user"></i> সম্পূর্ণ নাম *</label>
+                            <div class="control">
+                                {{ form.full_name(class="input", type="text", placeholder="আপনার সম্পূর্ণ নাম লিখুন", id="fullname", required=true) }}
+                            </div>
+                            {% if form.full_name.errors %}
+                                <div class="errors" style="color: #ff3860; font-size: 0.85rem; margin-top: 0.25rem;">
+                                    {% for error in form.full_name.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
                         </div>
-                    {% endif %}
-                </div>
-            </div>
-            
-            <div class="form-group">
-                {{ form.address.label }}
-                {{ form.address(class="form-control", placeholder="Your complete address") }}
-                {% if form.address.errors %}
-                    <div class="errors">
-                        {% for error in form.address.errors %}
-                            <span>{{ error }}</span>
-                        {% endfor %}
                     </div>
-                {% endif %}
-            </div>
-            
-            <div class="form-row">
-                <div class="form-group">
-                    {{ form.mobile.label }}
-                    {{ form.mobile(class="form-control", placeholder="01XXXXXXXXX") }}
-                    {% if form.mobile.errors %}
-                        <div class="errors">
-                            {% for error in form.mobile.errors %}
-                                <span>{{ error }}</span>
-                            {% endfor %}
+
+                    <!-- Institution -->
+                    <div class="column is-6">
+                        <div class="field">
+                            <label class="label"><i class="fas fa-school"></i> প্রতিষ্ঠান *</label>
+                            <div class="control">
+                                {{ form.institution(class="input", type="text", placeholder="আপনার প্রতিষ্ঠান", list="institutions", id="institution", required=true) }}
+                            </div>
+                            {% if form.institution.errors %}
+                                <div class="errors" style="color: #ff3860; font-size: 0.85rem; margin-top: 0.25rem;">
+                                    {% for error in form.institution.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
                         </div>
-                    {% endif %}
-                </div>
-                
-                <div class="form-group">
-                    {{ form.class_level.label }}
-                    {{ form.class_level(class="form-control") }}
-                    {% if form.class_level.errors %}
-                        <div class="errors">
-                            {% for error in form.class_level.errors %}
-                                <span>{{ error }}</span>
-                            {% endfor %}
-                        </div>
-                    {% endif %}
-                </div>
-            </div>
-            
-            <div class="form-group">
-                {{ form.institution.label }}
-                {{ form.institution(class="form-control", placeholder="Your school, college or university") }}
-                {% if form.institution.errors %}
-                    <div class="errors">
-                        {% for error in form.institution.errors %}
-                            <span>{{ error }}</span>
-                        {% endfor %}
                     </div>
-                {% endif %}
-            </div>
-            
-            <div class="form-group">
-                {{ form.facebook_link.label }}
-                {{ form.facebook_link(class="form-control", placeholder="https://facebook.com/yourprofile") }}
-                <small class="form-text">Optional</small>
-                {% if form.facebook_link.errors %}
-                    <div class="errors">
-                        {% for error in form.facebook_link.errors %}
-                            <span>{{ error }}</span>
-                        {% endfor %}
+
+                    <!-- Class -->
+                    <div class="column is-6">
+                        <div class="field">
+                            <label class="label"><i class="fas fa-graduation-cap"></i> শ্রেণী *</label>
+                            <div class="control">
+                                <div class="select is-fullwidth">
+                                    {{ form.class_level(class="select", id="class", required=true) }}
+                                </div>
+                            </div>
+                            {% if form.class_level.errors %}
+                                <div class="errors" style="color: #ff3860; font-size: 0.85rem; margin-top: 0.25rem;">
+                                    {% for error in form.class_level.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
                     </div>
-                {% endif %}
-            </div>
-            
-            <div class="form-row">
-                <div class="form-group">
-                    {{ form.password.label }}
-                    {{ form.password(class="form-control", placeholder="At least 8 characters") }}
-                    <small class="form-text">Must contain uppercase, lowercase, and numbers</small>
-                    {% if form.password.errors %}
-                        <div class="errors">
-                            {% for error in form.password.errors %}
-                                <span>{{ error }}</span>
-                            {% endfor %}
+
+                    <!-- Mobile -->
+                    <div class="column is-6">
+                        <div class="field">
+                            <label class="label"><i class="fas fa-phone"></i> মোবাইল *</label>
+                            <div class="control">
+                                {{ form.mobile(class="input", type="tel", placeholder="01XXXXXXXXX", id="mobile", required=true) }}
+                            </div>
+                            {% if form.mobile.errors %}
+                                <div class="errors" style="color: #ff3860; font-size: 0.85rem; margin-top: 0.25rem;">
+                                    {% for error in form.mobile.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
                         </div>
-                    {% endif %}
-                </div>
-                
-                <div class="form-group">
-                    {{ form.confirm_password.label }}
-                    {{ form.confirm_password(class="form-control", placeholder="Confirm your password") }}
-                    {% if form.confirm_password.errors %}
-                        <div class="errors">
-                            {% for error in form.confirm_password.errors %}
-                                <span>{{ error }}</span>
-                            {% endfor %}
+                    </div>
+
+                    <!-- Address -->
+                    <div class="column is-12">
+                        <div class="field">
+                            <label class="label"><i class="fas fa-map-marker-alt"></i> ঠিকানা *</label>
+                            <div class="control">
+                                {{ form.address(class="input", type="text", placeholder="আপনার সম্পূর্ণ ঠিকানা", id="address", required=true) }}
+                            </div>
+                            {% if form.address.errors %}
+                                <div class="errors" style="color: #ff3860; font-size: 0.85rem; margin-top: 0.25rem;">
+                                    {% for error in form.address.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
                         </div>
-                    {% endif %}
+                    </div>
+
+                    <!-- Email -->
+                    <div class="column is-6">
+                        <div class="field">
+                            <label class="label"><i class="fas fa-envelope"></i> ইমেইল *</label>
+                            <div class="control">
+                                {{ form.email(class="input", type="email", placeholder="your@email.com", id="email", required=true) }}
+                            </div>
+                            {% if form.email.errors %}
+                                <div class="errors" style="color: #ff3860; font-size: 0.85rem; margin-top: 0.25rem;">
+                                    {% for error in form.email.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Facebook Link -->
+                    <div class="column is-6">
+                        <div class="field">
+                            <label class="label"><i class="fab fa-facebook"></i> ফেসবুক প্রোফাইল *</label>
+                            <div class="control">
+                                {{ form.facebook_link(class="input", type="url", placeholder="https://facebook.com/yourprofile", id="facebook") }}
+                            </div>
+                            <!-- <small style="color: #666; font-size: 0.8rem;">ঐচ্ছিক</small> -->
+                            {% if form.facebook_link.errors %}
+                                <div class="errors" style="color: #ff3860; font-size: 0.85rem; margin-top: 0.25rem;">
+                                    {% for error in form.facebook_link.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Password -->
+                    <div class="column is-6">
+                        <div class="field">
+                            <label class="label"><i class="fas fa-lock"></i> পাসওয়ার্ড *</label>
+                            <div class="control password-toggle">
+                                {{ form.password(class="input", type="password", placeholder="শক্তিশালী পাসওয়ার্ড দিন", id="password", required=true) }}
+                                <span class="toggle-icon" onclick="togglePasswordVisibility('password')">
+                                    <i class="fas fa-eye"></i>
+                                </span>
+                            </div>
+                            <small style="color: #666; font-size: 0.8rem;">বড় হাতের অক্ষর, ছোট হাতের অক্ষর এবং সংখ্যা থাকতে হবে</small>
+                            <!-- <div class="password-strength">
+                                <div class="password-strength-bar" id="password-strength-bar"></div>
+                            </div> -->
+                            {% if form.password.errors %}
+                                <div class="errors" style="color: #ff3860; font-size: 0.85rem; margin-top: 0.25rem;">
+                                    {% for error in form.password.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Confirm Password -->
+                    <div class="column is-6">
+                        <div class="field">
+                            <label class="label"><i class="fas fa-lock"></i> পাসওয়ার্ড নিশ্চিত করুন *</label>
+                            <div class="control password-toggle">
+                                {{ form.confirm_password(class="input", type="password", placeholder="আবার পাসওয়ার্ড দিন", id="confirm-password", required=true) }}
+                                <span class="toggle-icon" onclick="togglePasswordVisibility('confirm-password')">
+                                    <i class="fas fa-eye"></i>
+                                </span>
+                            </div>
+                            <small class="help" id="password-match-msg" style="font-size: 0.8rem;"></small>
+                            {% if form.confirm_password.errors %}
+                                <div class="errors" style="color: #ff3860; font-size: 0.85rem; margin-top: 0.25rem;">
+                                    {% for error in form.confirm_password.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
                 </div>
-            </div>
-            
-            <div class="form-group">
-                {{ form.submit(class="btn btn-primary btn-lg btn-block") }}
-            </div>
-        </form>
-        
-        <div class="auth-footer">
-            <p>Already have an account? <a href="{{ url_for('user_login') }}">Login here</a></p>
+
+                <!-- Submit Button -->
+                <div class="field" style="margin-top: 1.5rem;">
+                    <div class="control">
+                        {{ form.submit(class="button is-primary is-fullwidth is-medium", value="অ্যাকাউন্ট তৈরি করুন") }}
+                    </div>
+                </div>
+
+                <!-- Footer Link -->
+                <div class="auth-footer-link">
+                    ইতিমধ্যে অ্যাকাউন্ট আছে? <a href="{{ url_for('user_login') }}">সাইন ইন করুন</a>
+                </div>
+            </form>
         </div>
     </div>
 </div>

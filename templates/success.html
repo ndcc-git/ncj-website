@@ -2,108 +2,126 @@
 {% block title %}Registration Successful{% endblock %}
 
 {% block content %}
-<section class="section">
+<section class="section" style="padding-top: 3rem;">
     <div class="container">
+
+        <!-- Success Message -->
+        <div class="has-text-centered animate-on-scroll" style="margin-bottom: 2rem;">
+            <h1 class="title is-1" style="color: var(--text-primary);">রেজিস্ট্রেশন সফল হয়েছে!</h1>
+            <p class="subtitle is-4">ধন্যবাদ, <strong>{{ registration.full_name }}</strong></p>
+            <div class="registration-id-badge">আইডি: {{ registration.user_id }}</div>
+        </div>
+
+        <!-- Registration Receipt Card -->
         <div class="columns is-centered">
-            <div class="column is-8">
+            <div class="column is-10">
+                <div class="receipt-card animate-on-scroll" id="receipt">
 
-                <!-- SUCCESS HEADER -->
-                <div class="box has-text-centered mb-5 no-print" style="border-top:4px solid #48c78e;">
-                    <span class="icon is-large has-text-success">
-                        <i class="fas fa-check-circle fa-3x"></i>
-                    </span>
+                    <!-- Header -->
+                    <div class="receipt-header">
+                        <i class="fas fa-receipt" style="font-size: 1.5rem; color: var(--secondary-accent);"></i>
+                        <h3>রেজিস্ট্রেশন রসিদ</h3>
+                    </div>
 
-                    <h1 class="title mt-3">Registration Successful 🎉</h1>
-                    <p class="subtitle">
-                        Thank you, <strong>{{ registration.full_name }}</strong>
-                    </p>
+                    <!-- Content Grid -->
+                    <div class="columns">
 
-                    <span class="tag is-success is-light is-medium">
-                        ID: {{ registration.user_id }}
-                    </span>
-                </div>
-
-                <!-- RECEIPT -->
-                <div class="card" id="receipt">
-                    <header class="card-header">
-                        <p class="card-header-title">📄 Registration Receipt</p>
-                    </header>
-
-                    <div class="card-content">
-                        <div class="columns is-vcentered is-multiline">
-
-                            <!-- DETAILS -->
-                            <div class="column is-7">
-                                <div class="content">
-                                    <p><strong>Email:</strong> {{ registration.email }}</p>
-                                    <p><strong>Segment:</strong> {{ registration.segment_name }}</p>
-                                    <p><strong>Category:</strong> {{ registration.category }}</p>
-                                    <p><strong>Institution:</strong> {{ registration.institution }}</p>
-
-                                    {% if registration.ca_ref %}
-                                    <p><strong>CA Reference:</strong> {{ registration.ca_ref }}</p>
-                                    {% endif %}
-
-                                    <p><strong>Transaction ID:</strong><br>
-                                        <code>{{ registration.transaction_id }}</code>
-                                    </p>
-                                </div>
-                                {% if registration.verified %}
-                                <article class="message is-primary is-light mt-4">
-                                    <div class="message-body">
-                                        ⏳ Status: <strong>Registration verified</strong><br>
-                                        Check your email. Don't forget to check your spam box.
-                                    </div>
-                                </article>
-                                {% else %}
-                                <article class="message is-warning is-light mt-4">
-                                    <div class="message-body">
-                                        ⏳ Status: <strong>Pending verification</strong><br>
-                                        You will receive an email once approved.
-                                    </div>
-                                </article>
-                                {% endif %}
+                        <!-- Left Column: Details -->
+                        <div class="column is-7">
+                            <div class="receipt-row">
+                                <span class="receipt-label">ইমেইল ঠিকানা:</span>
+                                <span class="receipt-value">{{ registration.email }}</span>
                             </div>
-
-                            <!-- QR -->
-                            <div class="column is-5 has-text-centered">
-                                <p class="has-text-weight-semibold mb-2">Scan for Verification</p>
-
-                                <div class="is-flex is-justify-content-center">
-                                    <div id="qrcode" class="mb-3"></div>
-                                </div>
-
-                                <p class="is-size-7 has-text-grey">Contains your registration ID</p>
+                            <div class="receipt-row">
+                                <span class="receipt-label">সেগমেন্ট:</span>
+                                <span class="receipt-value">{{ registration.segment_name }}</span>
                             </div>
+                            <div class="receipt-row">
+                                <span class="receipt-label">ক্যাটাগরি:</span>
+                                <span class="receipt-value">{{ registration.category }}</span>
+                            </div>
+                            <div class="receipt-row">
+                                <span class="receipt-label">প্রতিষ্ঠান:</span>
+                                <span class="receipt-value">{{ registration.institution }}</span>
+                            </div>
+                            
+                            {% if registration.ca_ref %}
+                            <div class="receipt-row">
+                                <span class="receipt-label">সিএ রেফারেন্স:</span>
+                                <span class="receipt-value">{{ registration.ca_ref }}</span>
+                            </div>
+                            {% endif %}
+                            
+                            <div class="receipt-row">
+                                <span class="receipt-label">ট্রানজেকশন আইডি:</span>
+                                <span class="receipt-value"><code>{{ registration.transaction_id }}</code></span>
+                            </div>
+                            
+                            {% if registration.submission_link %}
+                            <div class="receipt-row">
+                                <span class="receipt-label">সাবমিশন লিংক:</span>
+                                <span class="receipt-value"><a href="{{ registration.submission_link }}" style="color: var(--secondary-accent);" target="_blank">সাবমিশন দেখুন</a></span>
+                            </div>
+                            {% endif %}
+                        </div>
 
+                        <!-- Right Column: QR Code -->
+                        <div class="column is-5">
+                            <div class="qr-code-container has-text-centered">
+                                <div id="qrcode" class="mb-3" style="display: inline-block;"></div>
+                                <p class="qr-code-label">ভেরিফিকেশনের জন্য স্ক্যান করুন</p>
+                                <p class="is-size-7 has-text-grey mt-1">আপনার রেজিস্ট্রেশন আইডি সংরক্ষিত আছে</p>
+                            </div>
+                        </div>
 
+                    </div>
+
+                    <!-- Status Box -->
+                    <div class="receipt-status-box">
+                        <div class="receipt-status-text">
+                            {% if registration.verified %}
+                            স্ট্যাটাস: <strong>রেজিস্ট্রেশন ভেরিফাইড</strong>
+                            {% else %}
+                            স্ট্যাটাস: <strong>ভেরিফিকেশন অপেক্ষমান</strong>
+                            {% endif %}
+                        </div>
+                        <div class="receipt-status-helper">
+                            {% if registration.verified %}
+                            আপনার ইমেইল চেক করুন। স্প্যাম বক্স চেক করতে ভুলবেন না।
+                            {% else %}
+                            অনুমোদন পাওয়ার পর আপনি একটি ইমেইল পাবেন।
+                            {% endif %}
                         </div>
                     </div>
 
-                    <!-- ACTIONS -->
-                    <footer class="card-footer no-print">
-                        <a href="{{ url_for('index') }}" class="card-footer-item has-text-success">
-                            🏠 Home
-                        </a>
-                        <a href="{{ url_for('register') }}" class="card-footer-item has-text-link">
-                            ➕ Register Another
-                        </a>
-                        <a onclick="window.print()" class="card-footer-item has-text-primary">
-                            🖨 Download / Print PDF
-                        </a>
-                    </footer>
                 </div>
-
             </div>
         </div>
+
+        <!-- Footer Actions -->
+        <div class="action-footer animate-on-scroll no-print" style="display: flex; gap: 2rem; justify-content: center; flex-wrap: wrap;">
+            <a href="{{ url_for('index') }}" class="action-link has-text-success">
+                <i class="fas fa-home"></i>
+                <span>হোম</span>
+            </a>
+            <a href="{{ url_for('register') }}" class="action-link has-text-link">
+                <i class="fas fa-plus-circle"></i>
+                <span>অন্য ইভেন্টে রেজিস্ট্রেশন</span>
+            </a>
+            <a href="#" class="action-link has-text-primary" onclick="window.print(); return false;">
+                <i class="fas fa-print"></i>
+                <span>ডাউনলোড / পিডিএফ প্রিন্ট</span>
+            </a>
+        </div>
+
     </div>
 </section>
 
-<!-- QR LIB -->
+<!-- QR Code Library -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
 <style>
-    /* PRINT STYLING */
+    /* Print Styling */
     @media print {
         body {
             background: white;
@@ -116,21 +134,176 @@
         #receipt {
             box-shadow: none;
             border: 1px solid #ddd;
+            max-width: 100%;
         }
 
-        .card-header {
+        .receipt-header {
             border-bottom: 2px solid #00d1b2;
+        }
+        
+        .qr-code-container {
+            page-break-inside: avoid;
+        }
+    }
+    
+    /* Additional styling for receipt card */
+    .receipt-card {
+        background: var(--bg-primary);
+        border-radius: 20px;
+        padding: 2rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        border: 1px solid var(--border-color);
+    }
+    
+    .receipt-header {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid var(--secondary-accent);
+    }
+    
+    .receipt-header h3 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin: 0;
+    }
+    
+    .receipt-row {
+        display: flex;
+        padding: 0.75rem 0;
+        border-bottom: 1px dashed var(--border-color);
+    }
+    
+    .receipt-label {
+        width: 160px;
+        font-weight: 600;
+        color: var(--text-secondary);
+    }
+    
+    .receipt-value {
+        flex: 1;
+        color: var(--text-primary);
+    }
+    
+    .receipt-status-box {
+        margin-top: 2rem;
+        padding: 1.5rem;
+        background: var(--bg-secondary);
+        border-radius: 12px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+    
+    .receipt-status-icon {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .receipt-status-text {
+        font-size: 1.1rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .receipt-status-helper {
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+    }
+    
+    .qr-code-container {
+        background: var(--bg-secondary);
+        border-radius: 16px;
+        padding: 2rem 1rem;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .qr-code-label {
+        margin-top: 1rem;
+        font-weight: 500;
+        color: var(--text-primary);
+    }
+    
+    .action-footer {
+        margin-top: 3rem;
+    }
+    
+    .action-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        background: var(--bg-secondary);
+        border-radius: 50px;
+        color: var(--text-primary);
+        font-weight: 500;
+        transition: all 0.3s ease;
+        text-decoration: none;
+    }
+    
+    .action-link:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        background: var(--primary-accent);
+        color: white;
+    }
+    
+    .registration-id-badge {
+        display: inline-block;
+        background: var(--primary-accent);
+        color: white;
+        padding: 0.5rem 1.5rem;
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 1.1rem;
+        margin-top: 1rem;
+    }
+    
+    code {
+        background: var(--bg-secondary);
+        padding: 0.2rem 0.4rem;
+        border-radius: 4px;
+        font-size: 0.9rem;
+    }
+    
+    @media (max-width: 768px) {
+        .receipt-row {
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+        
+        .receipt-label {
+            width: 100%;
+        }
+        
+        .qr-code-container {
+            margin-top: 1rem;
         }
     }
 </style>
 
 <script>
-    const regID = "{{ registration.user_id }}";
-
-    new QRCode(document.getElementById("qrcode"), {
-        text: regID,
-        width: 160,
-        height: 160
+    document.addEventListener('DOMContentLoaded', function() {
+        const regID = "{{ registration.user_id }}";
+        
+        // Generate QR Code
+        if (document.getElementById("qrcode")) {
+            new QRCode(document.getElementById("qrcode"), {
+                text: regID,
+                width: 160,
+                height: 160,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+        }
     });
 </script>
 {% endblock %}

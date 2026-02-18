@@ -1,216 +1,231 @@
 {% extends "base.html" %}
 
-{% block title %}Register for Festival{% endblock %}
+{% block title %}রেজিস্টেশন{% endblock %}
 
 {% block content %}
-<div class="registration-form">
-    <h2>Register for Festival Segment</h2>
 
-    <form method="POST" action="{{ url_for('register') }}">
-        {{ form.hidden_tag() }}
-
-        <!-- Honeypot field for bot prevention -->
-        <div style="display: none;">
-            {{ form.honeypot.label }} {{ form.honeypot }}
+<!-- HERO -->
+<section class="hero is-medium"
+    style="background: linear-gradient(to bottom, var(--primary-accent) 0%, var(--primary-accent) 40%, var(--secondary-accent) 70%, var(--bg-primary) 100%);">
+    <div class="hero-body">
+        <div class="container has-text-centered">
+            <h1 class="title is-1 animate-on-scroll"
+                style="color: var(--text-primary); font-size: 4rem; font-weight: 900;">
+                রেজিস্টেশন
+            </h1>
+            <p class="subtitle is-4 animate-on-scroll" style="color: var(--text-primary);">
+                ১০ম জাতীয় কালচারাল জুবিলেশন
+            </p>
         </div>
+    </div>
+</section>
 
-        <div class="form-group">
-            {{ form.full_name.label }}
-            {{ form.full_name(class="form-control") }}
-            {% if form.full_name.errors %}
-            <div class="errors">
-                {% for error in form.full_name.errors %}
-                <span>{{ error }}</span>
-                {% endfor %}
-            </div>
-            {% endif %}
-        </div>
+<!-- FORM SECTION -->
+<section class="section">
+    <div class="container">
+        <div class="columns is-centered">
+            <div class="column is-8">
 
-        <div class="form-group">
-            {{ form.email.label }}
-            {{ form.email(class="form-control", type="email") }}
-            {% if form.email.errors %}
-            <div class="errors">
-                {% for error in form.email.errors %}
-                <span>{{ error }}</span>
-                {% endfor %}
-            </div>
-            {% endif %}
-        </div>
+                <div class="box animate-on-scroll"
+                    style="background-color: rgba(252, 251, 229, 0.7); backdrop-filter: blur(10px); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1); border: 2px solid var(--text-primary); border-radius: var(--border-radius);">
 
-        <div class="form-group">
-            {{ form.institution.label }}
-            {{ form.institution(class="form-control") }}
-            {% if form.institution.errors %}
-            <div class="errors">
-                {% for error in form.institution.errors %}
-                <span>{{ error }}</span>
-                {% endfor %}
-            </div>
-            {% endif %}
-        </div>
+                    <h2 class="title is-3 has-text-centered mb-5">রেজিস্টেশন ফর্ম</h2>
 
-        <div class="form-group">
-            {{ form.segment.label }}
-            {{ form.segment(class="form-control", id="segment-select") }}
-            {% if form.segment.errors %}
-            <div class="errors">
-                {% for error in form.segment.errors %}
-                <span>{{ error }}</span>
-                {% endfor %}
-            </div>
-            {% endif %}
-        </div>
+                    <form method="POST" action="{{ url_for('register') }}" id="registration-form">
+                        {{ form.hidden_tag() }}
 
-        <div class="form-group" id="category">
-            {{ form.category.label }}
-            <div id="category-options">
-                {% for subfield in form.category %}
-                <div class="radio-option">
-                    {{ subfield }} {{ subfield.label }}
+                        <!-- Honeypot -->
+                        <div style="display:none;">
+                            {{ form.honeypot }}
+                        </div>
+
+                        <!-- Full Name -->
+                        <div class="field">
+                            <label class="label">নাম *</label>
+                            <div class="control">
+                                {{ form.full_name(class="input", id="full_name") }}
+                            </div>
+                            {% for error in form.full_name.errors %}
+                            <p class="help is-danger">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Email -->
+                        <div class="field">
+                            <label class="label">ইমেইল *</label>
+                            <div class="control">
+                                {{ form.email(class="input", type="email", id="email") }}
+                            </div>
+                            {% for error in form.email.errors %}
+                            <p class="help is-danger">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Institution -->
+                        <div class="field">
+                            <label class="label">প্রতিষ্ঠান *</label>
+                            <div class="control">
+                                {{ form.institution(class="input") }}
+                            </div>
+                            {% for error in form.institution.errors %}
+                            <p class="help is-danger">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Segment -->
+                        <div class="field">
+                            <label class="label">সেগমেন্ট নির্বাচন করুন *</label>
+                            <div class="control">
+                                <div class="select is-fullwidth">
+                                    {{ form.segment(id="segment-select") }}
+                                </div>
+                            </div>
+                            {% for error in form.segment.errors %}
+                            <p class="help is-danger">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Category -->
+                        <div class="field" id="category">
+                            <label class="label">বিভাগ</label>
+                            <div id="category-options"></div>
+                            {% for error in form.category.errors %}
+                            <p class="help is-danger">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Submission Link -->
+                        <div class="field" id="submission-link-group" style="display:none;">
+                            <label class="label">সাবমিশন লিংক</label>
+                            <div class="control">
+                                {{ form.submission_link(class="input") }}
+                            </div>
+                            {% for error in form.submission_link.errors %}
+                            <p class="help is-danger">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+
+                        <!-- CA Ref -->
+                        <div class="field">
+                            <label class="label">CA রেফারেন্স</label>
+                            <div class="control">
+                                {{ form.ca_ref(class="input") }}
+                            </div>
+                            {% for error in form.ca_ref.errors %}
+                            <p class="help is-danger">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+
+                        <!-- bKash -->
+                        <div class="field">
+                            <label class="label">বিকাশ নম্বর *</label>
+                            <div class="control">
+                                {{ form.bkash_number(class="input") }}
+                            </div>
+                            {% for error in form.bkash_number.errors %}
+                            <p class="help is-danger">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Transaction ID -->
+                        <div class="field">
+                            <label class="label">ট্রানজেকশন আইডি *</label>
+                            <div class="control">
+                                {{ form.transaction_id(class="input") }}
+                            </div>
+                            {% for error in form.transaction_id.errors %}
+                            <p class="help is-danger">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Submit -->
+                        <div class="field">
+                            <div class="control">
+                                {{ form.submit(class="button is-primary is-fullwidth is-large", value="নিবন্ধন করুন") }}
+                            </div>
+                        </div>
+
+                    </form>
                 </div>
-                {% endfor %}
+
             </div>
-            {% if form.category.errors %}
-            <div class="errors">
-                {% for error in form.category.errors %}
-                <span>{{ error }}</span>
-                {% endfor %}
-            </div>
-            {% endif %}
         </div>
+    </div>
+</section>
 
-        <div class="form-group" id="submission-link-group" style="display:none;">
-            {{ form.submission_link.label }}
-            {{ form.submission_link(class="form-control") }}
-            {% if form.submission_link.errors %}
-                <div class="errors">
-                    {% for error in form.submission_link.errors %}
-                        <span>{{ error }}</span>
-                    {% endfor %}
-                </div>
-            {% endif %}
-        </div>
-
-
-        <div class="form-group">
-            {{ form.ca_ref.label }}
-            {{ form.ca_ref(class="form-control", type="text") }}
-            {% if form.ca_ref.errors %}
-            <div class="errors">
-                {% for error in form.ca_ref.errors %}
-                <span>{{ error }}</span>
-                {% endfor %}
-            </div>
-            {% endif %}
-        </div>
-
-        <div class="form-group">
-            {{ form.bkash_number.label }}
-            {{ form.bkash_number(class="form-control") }}
-            {% if form.bkash_number.errors %}
-            <div class="errors">
-                {% for error in form.bkash_number.errors %}
-                <span>{{ error }}</span>
-                {% endfor %}
-            </div>
-            {% endif %}
-        </div>
-
-        <div class="form-group">
-            {{ form.transaction_id.label }}
-            {{ form.transaction_id(class="form-control") }}
-            {% if form.transaction_id.errors %}
-            <div class="errors">
-                {% for error in form.transaction_id.errors %}
-                <span>{{ error }}</span>
-                {% endfor %}
-            </div>
-            {% endif %}
-        </div>
-
-        <div class="form-group">
-            {{ form.submit(class="btn btn-primary") }}
-        </div>
-    </form>
-</div>
 {% endblock %}
 
 {% block scripts %}
 <script>
     document.getElementById('segment-select').addEventListener('change', function () {
         const segmentId = this.value;
-        if (segmentId) {
-            fetch(`/api/segments/${segmentId}/categories`)
-                .then(response => response.json())
-                .then(data => {
-                    const categoryWrapper = document.getElementById('category');
-                    const categoryDiv = document.getElementById('category-options');
-                    categoryDiv.innerHTML = '';
+        if (!segmentId) return;
 
-                    // hide if empty, show otherwise
-                    if (!data.categories || data.categories.length === 0) {
-                        categoryWrapper.style.display = 'none';
-                        return;
-                    } else {
-                        categoryWrapper.style.display = 'block';
+        fetch(`/api/segments/${segmentId}/categories`)
+            .then(res => res.json())
+            .then(data => {
+                const wrapper = document.getElementById('category');
+                const container = document.getElementById('category-options');
+                container.innerHTML = '';
+
+                if (!data.categories || data.categories.length === 0) {
+                    wrapper.style.display = 'none';
+                    return;
+                }
+
+                wrapper.style.display = 'block';
+
+                data.categories.forEach(cat => {
+                    let label = '';
+                    switch (cat) {
+                        case 'K': label = 'K (0-2)'; break;
+                        case 'P': label = 'P (3-5)'; break;
+                        case 'J': label = 'J (6-8)'; break;
+                        case 'S': label = 'S (9-10)'; break;
+                        case 'HS': label = 'HS (11-12)'; break;
                     }
 
-                    data.categories.forEach(category => {
-                        let label = '';
-                        switch (category) {
-                            case 'P': label = 'Primary'; break;
-                            case 'S': label = 'School'; break;
-                            case 'HS': label = 'High School'; break;
-                            case 'A': label = 'Adult'; break;
-                        }
+                    const div = document.createElement('div');
+                    div.className = 'field';
 
-                        const div = document.createElement('div');
-                        div.className = 'radio-option';
-                        div.innerHTML = `
-            <input type="radio" id="category-${category}" name="category" value="${category}">
-            <label for="category-${category}">${label} (${category})</label>
-        `;
-                        categoryDiv.appendChild(div);
-                    });
+                    div.innerHTML = `
+                    <div class="control">
+                        <label class="radio">
+                            <input type="radio"
+                                name="{{ form.category.name }}"
+                                value="${cat}"
+                                id="category-${cat}">
+                            ${label}
+                        </label>
+                    </div>
+                `;
+                    container.appendChild(div);
                 });
+            });
 
-            fetch(`/api/segments/${segmentId}/type`)
-                .then(response => response.json())
-                .then(data => {
-                    const nameLabel = document.querySelector("body > div > div > form > div:nth-child(4) > label");
+        fetch(`/api/segments/${segmentId}/type`)
+            .then(res => res.json())
+            .then(data => {
+                const nameLabel = document.querySelector("label[for='full_name']");
+                if (data.type === "Team") {
+                    nameLabel.innerText = "দলের নাম";
+                } else {
+                    nameLabel.innerText = "পূর্ণ নাম";
+                }
 
-                    if (data.type == "Team") {
-                        nameLabel.innerHTML = "Team Name"
-                    } else {
-                        nameLabel.innerHTML = "Full Name"
-                    }
-
-                    // submission link logic
-                    const submissionDiv = document.getElementById("submission-link-group");
-
-                    if (data.type === "submission") {
-                        submissionDiv.style.display = "block";
-                    } else {
-                        submissionDiv.style.display = "none";
-                    }
-                });
-        }
+                const submissionDiv = document.getElementById("submission-link-group");
+                submissionDiv.style.display = (data.type === "submission") ? "block" : "none";
+            });
     });
 
-    // Auto-fill from localStorage if available
+    // LocalStorage Autofill
     document.addEventListener('DOMContentLoaded', function () {
         const savedName = localStorage.getItem('festival_registration_name');
         const savedEmail = localStorage.getItem('festival_registration_email');
 
-        if (savedName) {
-            document.getElementById('full_name').value = savedName;
-        }
-        if (savedEmail) {
-            document.getElementById('email').value = savedEmail;
-        }
+        if (savedName) document.getElementById('full_name').value = savedName;
+        if (savedEmail) document.getElementById('email').value = savedEmail;
 
-        // Save to localStorage on blur
         document.getElementById('full_name').addEventListener('blur', function () {
             localStorage.setItem('festival_registration_name', this.value);
         });
@@ -219,5 +234,16 @@
             localStorage.setItem('festival_registration_email', this.value);
         });
     });
+    document.addEventListener('DOMContentLoaded', function () {
+        const segmentSelect = document.getElementById('segment-select');
+
+        if (segmentSelect.value) {
+            segmentSelect.dispatchEvent(new Event('change'));
+        }
+    });
+
 </script>
+{% endblock %}
+
+{% block style %}
 {% endblock %}

@@ -3,137 +3,178 @@
 {% block title %}Edit Profile - Festival Registration{% endblock %}
 
 {% block content %}
-<div class="user-profile-edit">
-    <div class="profile-edit-header">
-        <h2>Edit Your Profile</h2>
-        <a href="{{ url_for('user_profile') }}" class="btn btn-secondary">Back to Profile</a>
-    </div>
-    
-    <div class="profile-edit-container">
-        <!-- Current Profile Info -->
-        <div class="current-profile-card">
-            <h3><i class="profile-icon">👤</i> Current Profile Information</h3>
-            <div class="current-info">
-                
-                <div class="current-details">
-                    <div class="detail-item">
-                        <strong>Email:</strong> {{ user.email }}
+<section class="section" style="padding: 3rem 1.5rem;">
+    <div class="container">
+        <div class="columns is-centered">
+            <div class="column is-10-tablet is-8-desktop">
+                <h1 class="auth-card-title">প্রোফাইল সম্পাদনা করুন</h1>
+                <p class="auth-card-subtitle">আপনার ব্যক্তিগত তথ্য আপডেট করুন</p>
+
+                <!-- Current Profile Info Card -->
+                <div class="auth-card" style="max-width: none; margin-bottom: 2rem; background: var(--bg-secondary);">
+                    <h3 style="margin-bottom: 1rem; color: var(--text-primary);">
+                        <i class="fas fa-info-circle"></i> বর্তমান প্রোফাইল তথ্য
+                    </h3>
+                    <div class="current-info" style="display: flex; gap: 2rem; align-items: center;">
+                        <div class="current-details" style="flex: 1;">
+                            <div class="detail-item" style="margin-bottom: 0.5rem;">
+                                <strong>ইমেইল:</strong> {{ user.email }}
+                            </div>
+                            <div class="detail-item" style="margin-bottom: 0.5rem;">
+                                <strong>অ্যাকাউন্ট তৈরি:</strong> {{ user.created_at.strftime('%B %d, %Y') }}
+                            </div>
+                            <div class="detail-item" style="margin-bottom: 0.5rem;">
+                                <strong>সর্বশেষ আপডেট:</strong> {{ user.updated_at.strftime('%B %d, %Y') if user.updated_at else 'কখনো নয়' }}
+                            </div>
+                        </div>
                     </div>
-                    <div class="detail-item">
-                        <strong>Account Created:</strong> {{ user.created_at.strftime('%B %d, %Y') }}
-                    </div>
-                    <div class="detail-item">
-                        <strong>Last Updated:</strong> {{ user.updated_at.strftime('%B %d, %Y') if user.updated_at else 'Never' }}
-                    </div>
+                </div>
+
+                <!-- Edit Profile Form -->
+                <div class="auth-card" style="max-width: none;">
+                    <form class="auth-form" method="POST" action="{{ url_for('edit_profile') }}" enctype="multipart/form-data" id="edit-profile-form">
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="columns is-multiline">
+                            <!-- Full Name -->
+                            <div class="column is-6">
+                                <div class="field">
+                                    <label class="label"><i class="fas fa-user"></i> সম্পূর্ণ নাম *</label>
+                                    <div class="control">
+                                        {{ form.full_name(class="input", type="text", placeholder="আপনার সম্পূর্ণ নাম লিখুন", id="edit-fullname", value=user.full_name, required=true) }}
+                                    </div>
+                                    {% if form.full_name.errors %}
+                                        <div class="errors" style="color: #ff3860; font-size: 0.85rem; margin-top: 0.25rem;">
+                                            {% for error in form.full_name.errors %}
+                                                <span>{{ error }}</span>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- Institution -->
+                            <div class="column is-6">
+                                <div class="field">
+                                    <label class="label"><i class="fas fa-school"></i> প্রতিষ্ঠান *</label>
+                                    <div class="control">
+                                        {{ form.institution(class="input", type="text", placeholder="আপনার প্রতিষ্ঠান", list="institutions", id="edit-institution", value=user.institution, required=true) }}
+                                        <datalist id="institutions">
+                                            <option value="নটর ডেম কলেজ">
+                                            <option value="ঢাকা কলেজ">
+                                            <option value="আদমজী ক্যান্টনমেন্ট কলেজ">
+                                            <option value="ভিকারুননিসা নূন স্কুল এন্ড কলেজ">
+                                            <option value="অন্যান্য">
+                                        </datalist>
+                                    </div>
+                                    {% if form.institution.errors %}
+                                        <div class="errors" style="color: #ff3860; font-size: 0.85rem; margin-top: 0.25rem;">
+                                            {% for error in form.institution.errors %}
+                                                <span>{{ error }}</span>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- Class -->
+                            <div class="column is-6">
+                                <div class="field">
+                                    <label class="label"><i class="fas fa-graduation-cap"></i> শ্রেণী *</label>
+                                    <div class="control">
+                                        <div class="select is-fullwidth">
+                                            {{ form.class_level(class="select", id="edit-class", required=true) }}
+                                        </div>
+                                    </div>
+                                    {% if form.class_level.errors %}
+                                        <div class="errors" style="color: #ff3860; font-size: 0.85rem; margin-top: 0.25rem;">
+                                            {% for error in form.class_level.errors %}
+                                                <span>{{ error }}</span>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- Mobile -->
+                            <div class="column is-6">
+                                <div class="field">
+                                    <label class="label"><i class="fas fa-phone"></i> মোবাইল *</label>
+                                    <div class="control">
+                                        {{ form.mobile(class="input", type="tel", placeholder="০১XXXXXXXXX", id="edit-mobile", value=user.mobile, required=true) }}
+                                    </div>
+                                    {% if form.mobile.errors %}
+                                        <div class="errors" style="color: #ff3860; font-size: 0.85rem; margin-top: 0.25rem;">
+                                            {% for error in form.mobile.errors %}
+                                                <span>{{ error }}</span>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- Address -->
+                            <div class="column is-12">
+                                <div class="field">
+                                    <label class="label"><i class="fas fa-map-marker-alt"></i> ঠিকানা *</label>
+                                    <div class="control">
+                                        {{ form.address(class="input", type="text", placeholder="আপনার সম্পূর্ণ ঠিকানা", id="edit-address", value=user.address, required=true) }}
+                                    </div>
+                                    {% if form.address.errors %}
+                                        <div class="errors" style="color: #ff3860; font-size: 0.85rem; margin-top: 0.25rem;">
+                                            {% for error in form.address.errors %}
+                                                <span>{{ error }}</span>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- Email (Read-only) -->
+                            <div class="column is-6">
+                                <div class="field">
+                                    <label class="label"><i class="fas fa-envelope"></i> ইমেইল *</label>
+                                    <div class="control">
+                                        <input class="input" type="email" id="edit-email" value="{{ user.email }}" readonly disabled>
+                                    </div>
+                                    <p class="help">নিরাপত্তার কারণে ইমেইল পরিবর্তন করা যাবে না</p>
+                                </div>
+                            </div>
+
+                            <!-- Facebook Link -->
+                            <div class="column is-6">
+                                <div class="field">
+                                    <label class="label"><i class="fab fa-facebook"></i> ফেসবুক প্রোফাইল</label>
+                                    <div class="control">
+                                        {{ form.facebook_link(class="input", type="url", placeholder="https://facebook.com/yourprofile", id="edit-facebook", value=user.facebook_link) }}
+                                    </div>
+                                    <small style="color: #666; font-size: 0.8rem;">ঐচ্ছিক - আপনার ফেসবুক প্রোফাইল URL লিখুন</small>
+                                    {% if form.facebook_link.errors %}
+                                        <div class="errors" style="color: #ff3860; font-size: 0.85rem; margin-top: 0.25rem;">
+                                            {% for error in form.facebook_link.errors %}
+                                                <span>{{ error }}</span>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="field is-grouped is-grouped-centered" style="margin-top: 2rem;">
+                            <div class="control">
+                                {{ form.submit(class="button is-primary is-medium", value="আপডেট") }}
+                            </div>
+                            <div class="control">
+                                <a href="{{ url_for('user_profile') }}" class="button is-outlined-custom is-medium">
+                                    বাতিল করুন
+                                </a>
+                            </div>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
-        
-        <!-- Edit Profile Form -->
-        <div class="edit-form-card">
-            <form method="POST" action="{{ url_for('edit_profile') }}" enctype="multipart/form-data">
-                {{ form.hidden_tag() }}
-                
-                <div class="form-row">
-                    <div class="form-group">
-                        {{ form.full_name.label }}
-                        {{ form.full_name(class="form-control", placeholder="Your full name") }}
-                        {% if form.full_name.errors %}
-                            <div class="errors">
-                                {% for error in form.full_name.errors %}
-                                    <span>{{ error }}</span>
-                                {% endfor %}
-                            </div>
-                        {% endif %}
-                    </div>
-                    
-                    <div class="form-group">
-                        {{ form.mobile.label }}
-                        {{ form.mobile(class="form-control", placeholder="01XXXXXXXXX") }}
-                        {% if form.mobile.errors %}
-                            <div class="errors">
-                                {% for error in form.mobile.errors %}
-                                    <span>{{ error }}</span>
-                                {% endfor %}
-                            </div>
-                        {% endif %}
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    {{ form.address.label }}
-                    {{ form.address(class="form-control", placeholder="Your complete address") }}
-                    {% if form.address.errors %}
-                        <div class="errors">
-                            {% for error in form.address.errors %}
-                                <span>{{ error }}</span>
-                            {% endfor %}
-                        </div>
-                    {% endif %}
-                </div>
-                
-                <div class="form-row">
-                    <div class="form-group">
-                        {{ form.institution.label }}
-                        {{ form.institution(class="form-control", placeholder="Your school, college or university") }}
-                        {% if form.institution.errors %}
-                            <div class="errors">
-                                {% for error in form.institution.errors %}
-                                    <span>{{ error }}</span>
-                                {% endfor %}
-                            </div>
-                        {% endif %}
-                    </div>
-                    
-                    <div class="form-group">
-                        {{ form.class_level.label }}
-                        {{ form.class_level(class="form-control") }}
-                        {% if form.class_level.errors %}
-                            <div class="errors">
-                                {% for error in form.class_level.errors %}
-                                    <span>{{ error }}</span>
-                                {% endfor %}
-                            </div>
-                        {% endif %}
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    {{ form.facebook_link.label }}
-                    {{ form.facebook_link(class="form-control", placeholder="https://facebook.com/yourprofile") }}
-                    <small class="form-text">Optional - Enter your Facebook profile URL</small>
-                    {% if form.facebook_link.errors %}
-                        <div class="errors">
-                            {% for error in form.facebook_link.errors %}
-                                <span>{{ error }}</span>
-                            {% endfor %}
-                        </div>
-                    {% endif %}
-                </div>
-            
-                
-                <div class="form-group">
-                    {{ form.submit(class="btn btn-primary btn-lg") }}
-                    <a href="{{ url_for('user_profile') }}" class="btn btn-secondary">Cancel</a>
-                </div>
-            </form>
-        </div>
-        
-        <!-- Quick Actions -->
-        <div class="quick-actions-card">
-            <h3><i class="action-icon">⚡</i> Quick Actions</h3>
-            <div class="action-buttons">
-                <a href="{{ url_for('change_password') }}" class="btn btn-warning">
-                    <i class="action-icon">🔒</i> Change Password
-                </a>
-                <a href="{{ url_for('verify_email') }}" class="btn btn-info">
-                    <i class="action-icon">📧</i> Verify Email
-                </a>
-                <a href="{{ url_for('user_profile') }}" class="btn btn-secondary">
-                    <i class="action-icon">👁️</i> View Profile
-                </a>
-            </div>
-        </div>
     </div>
-</div>
+</section>
 {% endblock %}

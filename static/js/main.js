@@ -26,9 +26,18 @@ document.addEventListener('DOMContentLoaded', () => {
 // ========================================
 // Countdown Timer
 // ========================================
+function toBanglaNumber(number) {
+  const eng = ['0','1','2','3','4','5','6','7','8','9'];
+  const ban = ['০','১','২','৩','৪','৫','৬','৭','৮','৯'];
+
+  return number.toString().split('').map(d => {
+    return eng.includes(d) ? ban[eng.indexOf(d)] : d;
+  }).join('');
+}
+
+
 function initCountdown() {
-  // Set the target date for the festival (Update this date)
-  const festivalDate = new Date('2026-02-28T00:00:00').getTime();
+  const festivalDate = new Date('2026-04-23T00:00:00').getTime();
 
   const countdownElements = {
     days: document.getElementById('countdown-days'),
@@ -37,33 +46,38 @@ function initCountdown() {
     seconds: document.getElementById('countdown-seconds')
   };
 
-  // Update countdown every second
+  // Convert to Bangla with leading zero
+  function formatBangla(num) {
+    return toBanglaNumber(num)
+      .toString()
+      .padStart(2, '0')
+      .replace(/\d/g, d => d.toLocaleString('bn-BD'));
+  }
+
   const countdownInterval = setInterval(() => {
     const now = new Date().getTime();
     const distance = festivalDate - now;
 
-    // Calculate time units
-    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+    if (distance >= 0) {
+      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-    // Display the countdown
-    if (countdownElements.days) countdownElements.days.textContent = days;
-    if (countdownElements.hours) countdownElements.hours.textContent = hours;
-    if (countdownElements.minutes) countdownElements.minutes.textContent = minutes;
-    if (countdownElements.seconds) countdownElements.seconds.textContent = seconds;
-
-    // If countdown is finished
-    if (distance < 0) {
+      if (countdownElements.days) countdownElements.days.textContent = formatBangla(days);
+      if (countdownElements.hours) countdownElements.hours.textContent = formatBangla(hours);
+      if (countdownElements.minutes) countdownElements.minutes.textContent = formatBangla(minutes);
+      if (countdownElements.seconds) countdownElements.seconds.textContent = formatBangla(seconds);
+    } else {
       clearInterval(countdownInterval);
-      if (countdownElements.days) countdownElements.days.textContent = '0';
-      if (countdownElements.hours) countdownElements.hours.textContent = '0';
-      if (countdownElements.minutes) countdownElements.minutes.textContent = '0';
-      if (countdownElements.seconds) countdownElements.seconds.textContent = '0';
+      if (countdownElements.days) countdownElements.days.textContent = '০০';
+      if (countdownElements.hours) countdownElements.hours.textContent = '০০';
+      if (countdownElements.minutes) countdownElements.minutes.textContent = '০০';
+      if (countdownElements.seconds) countdownElements.seconds.textContent = '০০';
     }
   }, 1000);
 }
+
 
 // Initialize countdown when DOM is loaded
 document.addEventListener('DOMContentLoaded', initCountdown);

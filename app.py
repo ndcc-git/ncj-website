@@ -1072,12 +1072,6 @@ def contact():
     return redirect(url_for('index'))
 
 
-@app.route('/contact-success')
-def contact_success():
-    """Contact form success page"""
-    return render_template('contact_success.html')
-
-
 # ========== API ROUTES ==========
 
 @app.route('/api/segments/<segment_id>/categories')

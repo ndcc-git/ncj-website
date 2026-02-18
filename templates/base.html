@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}10th NCJ{% endblock %}</title>
+    <title>{% block title %}১০ম জাতীয় কালচারাল জুবিলেশন{% endblock %}</title>
     <!-- Bulma CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
     <!-- Font Awesome for Icons -->
@@ -34,11 +34,11 @@
 
       <div id="navbarMenu" class="navbar-menu">
         <div class="navbar-start">
-          <a class="navbar-item" href="{{ url_for('index') }}">Home</a>
-          <a class="navbar-item" href="#about">About</a>
-          <a class="navbar-item" href="{{ url_for('gallery') }}">Gallery</a>
-          <a class="navbar-item" href="{{ url_for('executives') }}">Executives</a>
-          <a class="navbar-item" href="#contact">Contact</a>
+          <a class="navbar-item" href="{{ url_for('index') }}">হোম</a>
+          <a class="navbar-item" href="#about">সম্পর্কে</a>
+          <a class="navbar-item" href="{{ url_for('gallery') }}">গ্যালারি</a>
+          <a class="navbar-item" href="{{ url_for('executives') }}">এক্সিকিউটিভস</a>
+          <a class="navbar-item" href="#contact">যোগাযোগ</a>
         </div>
 
         <div class="navbar-end">
@@ -47,13 +47,18 @@
             <div class="navbar-auth-group auth-guest" id="auth-guest">
                 {% if session.get('user_id') %}
                 <!-- User is logged in -->
-                <a href="{{ url_for('user_profile') }}">My Profile</a>
-                <a href="{{ url_for('user_logout') }}">Logout</a>
+                 <a class="navbar-profile-link" href="{{ url_for('user_profile') }}">
+                      <i class="fas fa-user-circle"></i>
+                      <span>প্রোফাইল</span>
+                  </a>
+                  <a class="button is-outlined-custom" href="{{ url_for('user_logout') }}">
+                      লগআউট
+                  </a>
                 <!-- <span class="user-badge">{{ session.user_name }}</span> -->
                 {% else %}
-                <a class="button is-text-link" href="{{ url_for('user_login') }}">Sign In</a>
+                <a class="button is-text-link" href="{{ url_for('user_login') }}">সাইন ইন</a>
                 <a class="button is-primary" href="{{ url_for('user_signup') }}">
-                    <strong>Sign Up</strong>
+                    <strong>সাইন আপ</strong>
                 </a>
                 {% endif %}
               
@@ -116,26 +121,27 @@
 
         <!-- About Column -->
         <div class="column is-4">
-          <h3 class="footer-title">Organized By</h3>
-          <p>National Cultural Jubilation organized by Notre Dame Cultural Club</p>
+          <h3 class="footer-title">আয়োজনে</h3>
+          <!-- <p>নটর ডেম কালচারাল ক্লাব</p> -->
+          <img style="max-width: 80px;" src="{{ url_for('static', filename='assets/logo-white.png') }}" alt="নটর ডেম কালচারাল ক্লাব">
         </div>
 
         <!-- Quick Links -->
         <div class="column is-4">
-          <h3 class="footer-title">Quick Links</h3>
+          <h3 class="footer-title">লিঙ্কস</h3>
           <ul>
-            <li><a href="{{ url_for('index') }}">Home</a></li>
-            <li><a href="{{ url_for('events') }}">Events</a></li>
-            <li><a href="gallery.html">Gallery</a></li>
-            <li><a href="#contact">Contact</a></li>
-            <li><a href="{{ url_for('executives') }}">Executives</a></li>
-            <li><a href="{{ url_for('developers') }}">Developers</a></li>
+            <li><a href="{{ url_for('index') }}">হোম</a></li>
+            <li><a href="{{ url_for('events') }}">ইভেন্টস</a></li>
+            <li><a href="gallery.html">গ্যালারি</a></li>
+            <li><a href="#contact">যোগাযোগ</a></li>
+            <li><a href="{{ url_for('executives') }}">এক্সিকিউটিভস</a></li>
+            <li><a href="{{ url_for('developers') }}">ডেভেলাপারস</a></li>
           </ul>
         </div>
 
         <!-- Social Media -->
         <div class="column is-4">
-          <h3 class="footer-title">Contact Us</h3>
+          <h3 class="footer-title">যোগাযোগ করুন</h3>
           <div class="social-icons">
             <a target="_blank" href="https://www.facebook.com/NDCCDhaka" aria-label="Facebook"><i
                 class="fab fa-facebook"></i></a>
@@ -151,7 +157,7 @@
       </div>
 
       <div class="copyright">
-        <p>&copy; 2026 Notre Dame Cultural Club. All rights reserved.</p>
+        <p>&copy; 2026 নটর ডেম কালচারাল ক্লাব। সর্বস্বত্ব সংরক্ষিত।</p>
       </div>
     </div>
   </footer>

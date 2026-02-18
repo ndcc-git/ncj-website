@@ -5,15 +5,15 @@
 {% block content %}
 <div class="auth-centered-container">
     <div class="auth-card">
-        <h1 class="auth-card-title">Welcome Back</h1>
-        <p class="auth-card-subtitle">Sign in to your account</p>
+        <h1 class="auth-card-title">স্বাগতম</h1>
+        <p class="auth-card-subtitle">আপনার অ্যাকাউন্টে সাইন ইন করুন</p>
 
         <form class="auth-form" id="signin-form" method="POST" action="{{ url_for('user_login') }}">
             {{ form.hidden_tag() }}
 
             <!-- Email -->
             <div class="field">
-                <label class="label"><i class="fas fa-envelope"></i> Email</label>
+                <label class="label"><i class="fas fa-envelope"></i> ইমেইল</label>
                 <div class="control">
                     {{ form.email(class="input", type="email", id="signin-email", placeholder="your@email.com") }}
                 </div>
@@ -28,7 +28,7 @@
 
             <!-- Password -->
             <div class="field">
-                <label class="label"><i class="fas fa-lock"></i> Password</label>
+                <label class="label"><i class="fas fa-lock"></i> পাসওয়ার্ড</label>
                 <div class="control password-toggle">
                     {{ form.password(class="input", type="password", id="signin-password", placeholder="Enter your password") }}
                     <span class="toggle-icon" onclick="togglePasswordVisibility('signin-password')">
@@ -48,21 +48,21 @@
             <div class="field" style="display: flex; justify-content: space-between; align-items: center;">
                 <label class="checkbox">
                     {{ form.remember(class="checkbox-input", id="remember-me") }}
-                    Remember me
+                    মনে রাখুন
                 </label>
-                <a href="{{ url_for('forgot_password') }}" style="color: var(--primary-accent);">Forgot Password?</a>
+                <a href="{{ url_for('forgot_password') }}" style="color: var(--primary-accent);">পাসওয়ার্ড ভুলে গেছেন?</a>
             </div>
 
             <!-- Submit Button -->
             <div class="field" style="margin-top: 2rem;">
                 <div class="control">
-                    {{ form.submit(class="button is-primary is-fullwidth is-medium") }}
+                    {{ form.submit(class="button is-primary is-fullwidth is-medium", value="সাইন ইন") }}
                 </div>
             </div>
 
             <!-- Footer Link -->
             <div class="auth-footer-link">
-                Don't have an account? <a href="{{ url_for('user_signup') }}">Sign Up</a>
+                একাউন্ট নেই? <a href="{{ url_for('user_signup') }}">সাইন আপ করুন</a>
             </div>
         </form>
     </div>

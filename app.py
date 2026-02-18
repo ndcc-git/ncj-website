@@ -319,7 +319,6 @@ def ca_registration_closed():
 @app.route('/')
 def index():
     """Home page"""
-    segments = list(segments_collection.find({}, {'_id': 1, 'name': 1, 'price': 1, 'type': 1}))
     form = ContactForm()  # Add this line
     
     # Pre-fill form with session data if available
@@ -328,7 +327,7 @@ def index():
         form.email.data = session['last_contact']['email']
         form.institution.data = session['last_contact']['institution']
     
-    return render_template('index.html', segments=segments, form=form)  # Add form to template context
+    return render_template('index.html', form=form)  # Add form to template context
 
 
 # User Authentication Routes
@@ -1027,7 +1026,27 @@ def developers():
 
 @app.route('/events', methods=['GET'])
 def events():
-    return render_template('events.html')
+    events = list(segments_collection.find({}, {'_id': 1, 'name': 1, 'type': 1, 'img': 1}))
+    
+    signature_names = ['Battle of The bands', 'Beatbox Brawl']
+    signature_events = [e for e in events if e['name'] in signature_names]
+    solo_events = [e for e in events if e['type'] == 'Solo']
+    team_events = [e for e in events if e['type'] == 'Team']
+    submission_events = [e for e in events if e['type'] == 'Submission']
+    print(submission_events)
+    return render_template(
+        "events.html",
+        signature_events=signature_events,
+        solo_events=solo_events,
+        team_events=team_events,
+        submission_events=submission_events
+    )
+    
+@app.route('/event/<_id>', methods=['GET'])
+def event(_id):
+    return render_template(
+        "events.html",
+    )
 
 
 

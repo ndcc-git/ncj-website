@@ -4,4 +4,150 @@
 
 {% block content %}
 
+
+{# ================= SIGNATURE EVENTS ================= #}
+{% if signature_events %}
+<section class="section">
+  <div class="container">
+    <h2 class="section-title animate-on-scroll">
+      <i class="fas fa-star"></i> সিগনেচার ইভেন্টস
+    </h2>
+    <div class="columns is-multiline">
+      {% for event in signature_events %}
+      <div class="column is-4">
+        <div class="event-card animate-on-scroll">
+          <img src="{{ event.img }}" alt="{{ event.name }}" class="event-card-image">
+          <div class="event-card-content">
+            <h3 class="event-card-title">{{ event.name }}</h3>
+            {% if event.type == 'Team' %}
+            <p class="event-card-type"><i class="fas fa-users"></i> দলগত ইভেন্ট</p>
+            {% elif event.type == 'Solo' %}
+            <p class="event-card-type"><i class="fas fa-user"></i> একক ইভেন্ট</p>
+            {% elif event.type == 'Submission' %}
+            <p class="event-card-type"><i class="fas fa-upload"></i> সাবমিশন ইভেন্ট</p>
+            {% endif %}
+            <div class="event-card-actions">
+              <a href="{{ url_for('event', _id=event._id) }}" class="button is-secondary">এক্সপ্লোর</a>
+              <a href="register.html" class="button is-primary">রেজিস্টার</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+
+
+{# ================= SOLO EVENTS ================= #}
+{% if solo_events %}
+<section class="section">
+  <div class="container">
+    <h2 class="section-title animate-on-scroll">
+      <i class="fas fa-star"></i> একক ইভেন্ট
+    </h2>
+    <div class="columns is-multiline">
+      {% for event in solo_events %}
+      <div class="column is-4">
+        <div class="event-card animate-on-scroll">
+          <img src="{{ event.img }}" alt="{{ event.name }}" class="event-card-image">
+          <div class="event-card-content">
+            <h3 class="event-card-title">{{ event.name }}</h3>
+            {% if event.type == 'Team' %}
+            <p class="event-card-type"><i class="fas fa-users"></i> দলগত ইভেন্ট</p>
+            {% elif event.type == 'Solo' %}
+            <p class="event-card-type"><i class="fas fa-user"></i> একক ইভেন্ট</p>
+            {% elif event.type == 'Submission' %}
+            <p class="event-card-type"><i class="fas fa-upload"></i> সাবমিশন ইভেন্ট</p>
+            {% endif %}
+            <div class="event-card-actions">
+              <a href="{{ url_for('event', _id=event._id) }}" class="button is-secondary">এক্সপ্লোর</a>
+              <a href="register.html" class="button is-primary">রেজিস্টার</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+
+
+{# ================= TEAM EVENTS ================= #}
+{% if team_events %}
+<section class="section">
+  <div class="container">
+    <h2 class="section-title animate-on-scroll">
+      <i class="fas fa-star"></i> দলগত ইভেন্ট
+    </h2>
+    <div class="columns is-multiline">
+      {% for event in team_events %}
+      <div class="column is-4">
+        <div class="event-card animate-on-scroll">
+          <img src="{{ event.img }}" alt="{{ event.name }}" class="event-card-image">
+          <div class="event-card-content">
+            <h3 class="event-card-title">{{ event.name }}</h3>
+            {% if event.type == 'Team' %}
+            <p class="event-card-type"><i class="fas fa-users"></i> দলগত ইভেন্ট</p>
+            {% elif event.type == 'Solo' %}
+            <p class="event-card-type"><i class="fas fa-user"></i> একক ইভেন্ট</p>
+            {% elif event.type == 'Submission' %}
+            <p class="event-card-type"><i class="fas fa-upload"></i> সাবমিশন ইভেন্ট</p>
+            {% endif %}
+            <div class="event-card-actions">
+              <a href="{{ url_for('event', _id=event._id) }}" class="button is-secondary">এক্সপ্লোর</a>
+              <a href="register.html" class="button is-primary">রেজিস্টার</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+
+
+{# ================= SUBMISSION EVENTS ================= #}
+{% if submission_events %}
+<section class="section">
+  <div class="container">
+    <h2 class="section-title animate-on-scroll">
+      <i class="fas fa-star"></i> সাবমিশন ইভেন্ট
+    </h2>
+    <div class="columns is-multiline">
+      {% for event in submission_events %}
+      <div class="column is-4">
+        <div class="event-card animate-on-scroll">
+          <img src="{{ event.img }}" alt="{{ event.name }}" class="event-card-image">
+          <div class="event-card-content">
+            <h3 class="event-card-title">{{ event.name }}</h3>
+            {% if event.type == 'Team' %}
+            <p class="event-card-type"><i class="fas fa-users"></i> দলগত ইভেন্ট</p>
+            {% elif event.type == 'Solo' %}
+            <p class="event-card-type"><i class="fas fa-user"></i> একক ইভেন্ট</p>
+            {% elif event.type == 'Submission' %}
+            <p class="event-card-type"><i class="fas fa-upload"></i> সাবমিশন ইভেন্ট</p>
+            {% endif %}
+            <div class="event-card-actions">
+              <a href="{{ url_for('event', _id=event._id) }}" class="button is-secondary">এক্সপ্লোর</a>
+              <a href="register.html" class="button is-primary">রেজিস্টার</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+
+
+
 {% endblock %}

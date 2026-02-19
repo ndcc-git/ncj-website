@@ -259,6 +259,7 @@ def admin_analytics():
     ]
     ca_stats = list(db.registrations.aggregate(ca_pipeline))
     
+    
     return render_template('admin/analytics.html',
                          daily_stats=daily_stats,
                          category_stats=category_stats,
@@ -606,10 +607,10 @@ def admin_users():
     
     if current_user_role == 'admin':
         # Admin can see all users
-        admin_users_list = list(db.users.find().sort('created_at', -1))
+        admin_users_list = list(db.users.find({'role': {'$exists': True}}).sort('created_at', -1))
     else:
         # Others can only see non-admin users
-        admin_users_list = list(db.users.find({'role': {'$ne': 'admin'}}).sort('created_at', -1))
+        admin_users_list = list(db.users.find({'role': {'$exists': True, '$ne': 'admin'}}).sort('created_at', -1))
     
     return render_template('admin/users.html', 
                          form=form, 

@@ -399,7 +399,6 @@ def check_and_update_email_verification(id_token):
     """Check if user's email is verified and update MongoDB"""
     try:
         user_info = firebase_get_user_info(id_token)
-        print(user_info)
         if user_info:
             email = user_info.get('email')
             email_verified = user_info.get('emailVerified', False)
@@ -1032,7 +1031,6 @@ def events():
     solo_events = [e for e in events if e['type'] == 'Solo']
     team_events = [e for e in events if e['type'] == 'Team']
     submission_events = [e for e in events if e['type'] == 'Submission']
-    print(submission_events)
     return render_template(
         "events.html",
         signature_events=signature_events,

@@ -11,3 +11,4 @@ venv/
 instance/
 gen.py
 ncjtest.json
+vvenv

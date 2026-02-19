@@ -48,14 +48,14 @@ def send_reg_verification_email(registration):
     qr.save(buffer, format="PNG")
     buffer.seek(0)
     
-    subject = "৯ম ন্যাশনাল কালচারাল জুবিলেশন-এ রেজিস্ট্রেশনের জন্য ধন্যবাদ"
+    subject = "১০ম  ন্যাশনাল কালচারাল জুবিলেশন-এ রেজিস্ট্রেশনের জন্য ধন্যবাদ"
     body = f"""
     <!DOCTYPE html>
     <html lang="bn">
     <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>৯ম ন্যাশনাল কালচারাল জুবিলেশন-এ রেজিস্ট্রেশনের জন্য ধন্যবাদ!</title>
+    <title>১০ম  ন্যাশনাল কালচারাল জুবিলেশন-এ রেজিস্ট্রেশনের জন্য ধন্যবাদ!</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Baloo+Da+2:wght@400..800&display=swap" rel="stylesheet">

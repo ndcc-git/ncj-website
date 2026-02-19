@@ -137,7 +137,6 @@ def login_required(f):
                         session['firebase_token'] = new_tokens.get('id_token')
                         session['refresh_token'] = new_tokens.get('refresh_token')
                         # Also update the user's email_verified status using the new token
-                        from utils.firebase_helpers import firebase_verify_token
                         user_info = firebase_verify_token(new_tokens.get('id_token'))
                         if user_info:
                             session['email_verified'] = user_info.get('emailVerified', False)

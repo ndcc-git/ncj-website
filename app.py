@@ -409,7 +409,9 @@ def check_and_update_email_verification(id_token):
                     {'email': email},
                     {'$set': {'email_verified': True}}
                 )
+                print('1')
                 return True
+        print('2')
         return False
     except Exception as e:
         print(f"Error checking email verification: {str(e)}")
@@ -445,6 +447,7 @@ def user_login():
                     {'_id': user['_id']},
                     {'$set': {'email_verified': True}}
                 )
+                print('3')
                 user['email_verified'] = True
             elif not is_verified:
                 # Update verification status from Firebase
@@ -453,13 +456,13 @@ def user_login():
                     {'$set': {'email_verified': False}}
                 )
                 user['email_verified'] = False
-            
+                print('4')
             # 4. Update last login
             db.users.update_one(
                 {'_id': user['_id']},
                 {'$set': {'last_login': datetime.utcnow()}}
             )
-            
+            print('5')
             # 5. Store user session
             session['user_id'] = str(user['_id'])
             session['firebase_uid'] = user['firebase_uid']

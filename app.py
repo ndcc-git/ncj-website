@@ -131,18 +131,20 @@ def login_required(f):
                     # Token expired, try to refresh it
                     from utils.firebase_helpers import refresh_firebase_token
                     new_tokens = refresh_firebase_token(session['refresh_token'])
+                    print(new_tokens)
                     if new_tokens:
                         session['firebase_token'] = new_tokens.get('id_token')
                         session['refresh_token'] = new_tokens.get('refresh_token')
                     else:
                         # Refresh failed, clear session
                         session.clear()
-                        flash('Session expired. Please login again.', 'error')
+                        flash('1. Session expired. Please login again.', 'error')
                         return redirect(url_for('user_login'))
-            except:
+            except Exception as e:
                 # Token verification failed
                 session.clear()
-                flash('Session expired. Please login again.', 'error')
+                print(e)
+                flash('2. Session expired. Please login again.', 'error')
                 return redirect(url_for('user_login'))
         
         return f(*args, **kwargs)

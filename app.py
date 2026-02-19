@@ -126,6 +126,7 @@ def login_required(f):
         if 'refresh_token' in session:
             try:
                 # Try to verify current token
+                # Instead of using firebase_verify_token, use the REST API directly
                 decoded_token = firebase_verify_token(session['firebase_token'])
                 if not decoded_token:
                     # Token expired, try to refresh it
@@ -135,6 +136,11 @@ def login_required(f):
                     if new_tokens:
                         session['firebase_token'] = new_tokens.get('id_token')
                         session['refresh_token'] = new_tokens.get('refresh_token')
+                        # Also update the user's email_verified status using the new token
+                        from utils.firebase_helpers import firebase_verify_token
+                        user_info = firebase_verify_token(new_tokens.get('id_token'))
+                        if user_info:
+                            session['email_verified'] = user_info.get('emailVerified', False)
                     else:
                         # Refresh failed, clear session
                         session.clear()

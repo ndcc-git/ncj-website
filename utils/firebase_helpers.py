@@ -78,11 +78,33 @@ def firebase_send_password_reset(email):
             raise Exception(f'Error sending reset email: {error_message}')
 
 def firebase_verify_token(id_token):
-    """Verify Firebase ID token"""
+    """Verify Firebase ID token using REST API (no project ID required)"""
+    if not id_token:
+        return None
+    
+    api_key = os.environ.get('FIREBASE_API_KEY')
+    
+    if not api_key:
+        print("FIREBASE_API_KEY not configured")
+        return None
+    
+    url = f"https://identitytoolkit.googleapis.com/v1/accounts:lookup?key={api_key}"
+    
+    payload = {
+        "idToken": id_token
+    }
+    
     try:
-        decoded_token = auth.verify_id_token(id_token)
-        return decoded_token
-    except firebase_exceptions.FirebaseError:
+        response = requests.post(url, json=payload, timeout=5)
+        data = response.json()
+        
+        if response.status_code == 200:
+            users = data.get('users', [])
+            if users:
+                return users[0]  # Return user info
+        return None
+    except Exception as e:
+        print(f"Token verification error: {e}")
         return None
 
 def firebase_update_user(uid, display_name=None, email=None, phone_number=None):

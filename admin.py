@@ -8,7 +8,7 @@ from flask import render_template, request, jsonify, redirect, url_for, flash, s
 import jwt
 from pymongo import MongoClient
 from forms import AdminLoginForm, AdminUserForm
-from utils.email_service import send_bulk_emails, send_ca_approval_email, send_verification_email
+from utils.email_service import send_bulk_emails, send_ca_approval_email, send_reg_verification_email
 from utils.export_service import export_ca_to_csv, export_ca_to_excel, export_to_csv, export_to_excel
 from utils.security import hash_password, verify_password
 from extensions import db
@@ -392,18 +392,20 @@ def admin_registrations():
 def verify_registration(registration_id):
     """Verify a single registration"""
     try:
-        db.registrations.update_one(
-            {'_id': ObjectId(registration_id)},
-            {'$set': {'verified': True, 'verified_at': datetime.utcnow()}}
-        )
         
         # Get registration to send email
         registration = db.registrations.find_one({'_id': ObjectId(registration_id)})
         if registration:
-            send_verification_email(registration)
-        
-        return jsonify({'success': True})
-    except:
+            _reg = send_reg_verification_email(registration)
+            if _reg:
+                db.registrations.update_one(
+                    {'_id': ObjectId(registration_id)},
+                    {'$set': {'verified': True, 'verified_at': datetime.utcnow()}}
+                )
+                flash(f"verified registration {registration['_id']}", 'success')
+                return jsonify({'success': True})
+    except Exception as e:
+        print(e)
         return jsonify({'success': False}), 500
 
 @admin_bp.route('/bulk-verify', methods=['POST'])
@@ -487,19 +489,20 @@ def update_ca_status(ca_id):
         return jsonify({'success': False, 'message': 'Invalid status'}), 400
     
     try:
-        result = db.ca_registrations.update_one(
-            {'_id': ObjectId(ca_id)},
-            {'$set': {'status': status, 'status_updated_at': datetime.utcnow()}}
-        )
-        
         if status == 'approved':
             # Send approval email
             ca = db.ca_registrations.find_one({'_id': ObjectId(ca_id)})
             if ca:
-                send_ca_approval_email(ca)
-        
-        return jsonify({'success': True})
+                _ca = send_ca_approval_email(ca)
+                if _ca:
+                    db.ca_registrations.update_one(
+                        {'_id': ObjectId(ca_id)},
+                        {'$set': {'status': status, 'status_updated_at': datetime.utcnow()}}
+                    )
+                    flash(f'verified reg of {ca['full_name']}', 'success')
+                    return jsonify({'success': True})
     except Exception as e:
+        print(e)
         return jsonify({'success': False, 'message': str(e)}), 500
 
 

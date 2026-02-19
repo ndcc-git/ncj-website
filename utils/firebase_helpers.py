@@ -5,6 +5,7 @@ import requests
 import json
 from flask import current_app
 import os
+from .email_service import send_email
 
 def firebase_create_user(email, password, display_name=None):
     """Create a new user in Firebase Authentication"""
@@ -66,10 +67,23 @@ def firebase_send_password_reset(email):
     """Send password reset email"""
     try:
         link = auth.generate_password_reset_link(email)
-        
-        # You can customize the email template in Firebase Console
-        # For now, we'll return the reset link
+        subject = "Password Reset Link for 10th NCJ"
+        body=f"""
+
+        We received a request to reset your password.
+
+        Use the link below to set a new password: {link}
+
+        If you did not request this, please ignore this email.
+
+        Regards,
+        Notre Dame Cultural Club
+
+        """
+        send_email(email, subject=subject, body=body, is_html=False)
         return link
+    
+    
     except firebase_exceptions.FirebaseError as e:
         error_message = str(e)
         if 'USER_NOT_FOUND' in error_message:

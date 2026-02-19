@@ -512,11 +512,9 @@ def forgot_password():
         try:
             reset_link = firebase_send_password_reset(form.email.data)
             
-            # In production, Firebase sends the email automatically
-            # We can log the reset link for debugging
             app.logger.info(f'Password reset link: {reset_link}')
             
-            flash('Password reset email sent. Check your inbox.', 'success')
+            flash("পাসওয়ার্ড রিসেট ইমেল পাঠানো হয়েছে। আপনার স্প্যাম ফোল্ডারটি পরীক্ষা করতে ভুলবেন না।", 'success')
             return redirect(url_for('user_login'))
             
         except Exception as e:

@@ -1,0 +1,203 @@
+{% extends "base.html" %}
+
+{% block title %}গ্যালারি{% endblock %}
+
+{% block content %}
+<!-- ========================================
+   EVENT HERO SECTION
+   ======================================== -->
+<section class="event-hero">
+    <div class="container">
+        <div class="event-hero-content">
+
+            <!-- Event Image -->
+            <div class="event-hero-image animate-on-scroll">
+                {% if event.img == '' %}
+                <img src="url_for('static', filename='assets/event-dance.jpg')" alt="{{ event.name }}">
+                {% else %}
+                <img src="{{ event.img }}" alt="{{ event.name }}">
+                {% endif %}
+            </div>
+
+            <!-- Event Info -->
+            <div class="event-hero-info animate-on-scroll">
+                <h1 class="event-title">{{ event.name }}</h1>
+
+                {% if event.info %}
+                <p class="event-info">{{ event.info }}</p>
+                {% endif %}
+
+                <div class="event-meta">
+                    {% if event.venue %}
+                    <div class="event-meta-item">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>{{ event.venue }}</span>
+                    </div>
+                    {% endif %}
+                    {% if event.date %}
+                    <div class="event-meta-item">
+                        <i class="fas fa-calendar"></i>
+                        <span>{{ event.date }}</span>
+                    </div>
+                    {% endif %}
+                    {% if event.price and event.price != 0 %}
+                    <div class="event-meta-item">
+                        <i class="fas fa-money-bill-wave"></i>
+                        <span>
+                            {% if event.type == 'Solo' %}
+                            Solo - ৳{{ event.price }}
+                            {% elif event.type == 'Team' or event.eligibility == 'Free For All' %}
+                            Free For All - ৳{{ event.price }}
+                            {% else %}
+                            ৳{{ event.price }}
+                            {% endif %}
+                        </span>
+                    </div>
+                    {% endif %}
+                    {% if event.type == 'Team' and event.team_size %}
+                    <div class="event-meta-item">
+                        <i class="fas fa-users"></i>
+                        <span>Team Size: {{ event.team_size }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="event-actions">
+                    <a href="{{ url_for('register') }}" class="button is-primary is-large">
+                        <i class="fas fa-edit"></i>&nbsp; রেজিস্টার
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- ========================================
+   EVENT ABOUT & RULES SECTION
+   ======================================== -->
+<section class="event-info-section">
+    <div class="container">
+        <div class="columns">
+
+            <!-- About / Extra Info -->
+            <div class="column is-6">
+                <div class="animate-on-scroll">
+                    <h2 class="title is-3">ইভেন্ট সম্পর্কে</h2>
+                    <div class="content is-medium">
+                        <!-- {% if event.about %}
+                        {% for para in event.about %}
+                        <p>{{ para }}</p>
+                        {% endfor %}
+                        {% elif event.info %}
+                        <p>{{ event.info }}</p>
+                        {% else %}
+                        <p>এই ইভেন্ট সম্পর্কে বিস্তারিত তথ্য শীঘ্রই প্রকাশ করা হবে।</p>
+                        {% endif %} -->
+
+                        {% if event.additional_points %}
+                        <div class="event-additional-points">
+                            <h3 class="subtitle is-5">গুরুত্বপূর্ণ তথ্য:</h3>
+                            <div class="box" style="padding:1.5rem 1rem; background-color:#f5f5f5; border-radius:8px;">
+                                <ul
+                                    style="list-style: none; padding-left:0; margin:0; display:flex; flex-direction:column; gap:4px;">
+                                    {% for point in event.additional_points %}
+                                    <li style="display:flex; align-items:flex-start; gap:6px; line-height:1.2;">
+                                        <span style="color:#3273dc; font-weight:bold;">•</span>
+                                        <span style="white-space: pre-line;">{{ point }}</span>
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+
+
+                        {% endif %}
+                    </div>
+                </div>
+
+                {% if event.sub_categories %}
+                <div class="animate-on-scroll">
+                    <h2 class="title is-3 mt-3">বিভাগ</h2>
+                    <div class="sub-category-container" style="display:flex; flex-wrap:wrap; gap:8px;">
+                        {% for sub in event.sub_categories %}
+                        <span class="tag is-info is-light" style="font-size:0.9rem; padding:0.4em 0.8em;">{{ sub
+                            }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if event.category_config %}
+                <div class="animate-on-scroll mt-4">
+                    <h2 class="title is-3">ক্যাটাগরি ভিত্তিক তথ্যঃ</h2>
+
+                    <div class="columns is-multiline is-variable is-1">
+                        {% for cat, config in event.category_config.items() %}
+                        <div class="column is-6" style="display:flex;">
+                            <div class="box"
+                                style="padding:1rem; border-radius:12px; background:#fdfdfd; box-shadow:0 4px 12px rgba(0,0,0,0.05); flex:1; display:flex; flex-direction:column;">
+
+                                <h4 class="subtitle is-5 has-text-weight-bold mb-3">{{ cat }}</h4>
+
+                                {% if config.theme %}
+                                <p style="margin-bottom:8px;"><strong>Theme:</strong> {{ config.theme }}</p>
+                                {% endif %}
+
+                                {% set sections = ['books','movies','series','anime'] %}
+                                {% for section in sections %}
+                                {% if config[section] %}
+                                <p style="margin:5px 0 4px 0; font-weight:600; color:#3273dc;">{{ section|capitalize }}:
+                                </p>
+                                <div style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:8px;">
+                                    {% for item in config[section] %}
+                                    <span class="tag is-light is-info"
+                                        style="font-size:0.85rem; padding:0.35em 0.7em;">{{ item }}</span>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                                {% endfor %}
+
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+            </div>
+
+            <!-- Rules / Regulations -->
+            <div class="column is-6">
+                <div class="animate-on-scroll">
+                    <h2 class="title is-3">নিয়ম ও প্রবিধান</h2>
+                    <div class="content is-medium">
+                        {% if event.rules %}
+                        <ol class="event-rules">
+                            {% for rule in event.rules %}
+                            <li>{{ rule }}</li>
+                            {% endfor %}
+                        </ol>
+                        {% else %}
+                        <p>নিয়মাবলি শীঘ্রই প্রকাশ করা হবে।</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                {% if event.submission_guideline %}
+                <div class="animate-on-scroll mt-4">
+                    <h2 class="title is-3">Submission Guidelines</h2>
+                    <ul>
+                        {% for guide in event.submission_guideline %}
+                        <li>{{ guide }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+            </div>
+
+        </div>
+    </div>
+</section>
+
+{% endblock %}

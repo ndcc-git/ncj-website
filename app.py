@@ -904,7 +904,7 @@ def register():
     
     # Get segments for dropdown
     segments = list(segments_collection.find({}, {'_id': 1, 'name': 1, 'price': 1, 'categories': 1}))
-    form.segment.choices = [(str(seg['_id']), f"{seg['name']} - ${seg['price']}") for seg in segments]
+    form.segment.choices = [(str(seg['_id']), f"{seg['name']} - ৳{seg['price']}") for seg in segments]
     
     # Get segment_id from query parameter
     segment_id = request.args.get('segment_id')
@@ -1030,7 +1030,7 @@ def developers():
 def events():
     events = list(segments_collection.find({}, {'_id': 1, 'name': 1, 'type': 1, 'img': 1}))
     
-    signature_names = ['Battle of The bands', 'Beatbox Brawl']
+    signature_names = ['ব্যাটল অব দ্য ব্যান্ডস', 'বিটবক্স ব্রল']
     signature_events = [e for e in events if e['name'] in signature_names]
     solo_events = [e for e in events if e['type'] == 'Solo']
     team_events = [e for e in events if e['type'] == 'Team']
@@ -1045,8 +1045,10 @@ def events():
     
 @app.route('/event/<_id>', methods=['GET'])
 def event(_id):
+    event = segments_collection.find_one({'_id': ObjectId(_id)})
+    print(event)
     return render_template(
-        "events.html",
+        "event.html", event=event
     )
 
 

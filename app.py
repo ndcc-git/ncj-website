@@ -895,7 +895,7 @@ def register():
     
     settings = db.settings.find_one({'name': 'system_settings'})
     if not settings or not settings.get('registration_enabled', True):
-        flash('❌ Event registration is currently closed.', 'error')
+        flash('Event registration is currently closed.', 'error')
         return redirect(url_for('registration_closed'))
 
     form = RegistrationForm()
@@ -905,13 +905,23 @@ def register():
     form.segment.choices = [(str(seg['_id']), f"{seg['name']} - ৳{seg['price']}") for seg in segments]
     
     # Get segment_id from query parameter
-    segment_id = request.args.get('segment_id')
+    segment_id = request.args.get('id')
     
     # Pre-fill form with user data
     if request.method == 'GET':
         form.full_name.data = user.get('full_name', '')
         form.email.data = user.get('email', '')
         form.institution.data = user.get('institution', '')
+        
+        # Pre-select segment if segment_id is provided and valid
+        if segment_id:
+            try:
+                ObjectId(segment_id)
+                segment_exists = any(str(seg['_id']) == segment_id for seg in segments)
+                if segment_exists:
+                    form.segment.data = segment_id
+            except:
+                pass
     
     if form.validate_on_submit():
         # Generate CSRF token for this submission
@@ -922,10 +932,6 @@ def register():
         if not segment:
             flash('Selected segment not found', 'error')
             return redirect(url_for('register'))
-        
-        # if segment.get('current_participants', 0) >= segment.get('max_participants', float('inf')):
-        #     flash('This segment is full', 'error')
-        #     return redirect(url_for('register'))
         
         # Check for duplicate registration (same user for same segment)
         existing = registrations_collection.find_one({
@@ -940,12 +946,12 @@ def register():
         # Conditional category validation
         if segment.get('categories') and not form.category.data:
             form.category.errors.append("Category is required for this segment.")
-            return render_template('register.html', form=form, segments=segments)
+            return render_template('register.html', form=form, segments=segments, preselected_segment_id=form.segment.data)
         
         # Conditional submission link validation
         if segment.get('type') == "Submission" and not form.submission_link.data:
             form.submission_link.errors.append("Submission link is required for this segment.")
-            return render_template('register.html', form=form, segments=segments)
+            return render_template('register.html', form=form, segments=segments, preselected_segment_id=form.segment.data)
 
         # Create registration
         registration_data = {
@@ -985,21 +991,10 @@ def register():
         
         return redirect(url_for('registration_success', registration_id=str(result.inserted_id)))
     
-    # Pre-select segment if segment_id is provided and valid
-    if segment_id:
-        try:
-            ObjectId(segment_id)
-            segment_exists = any(str(seg['_id']) == segment_id for seg in segments)
-            if segment_exists:
-                form.segment.data = segment_id
-                return render_template('register.html', 
-                                     form=form, 
-                                     segments=segments,
-                                     preselected_segment_id=segment_id)
-        except:
-            pass
-    
-    return render_template('register.html', form=form, segments=segments)
+    return render_template('register.html', 
+                         form=form, 
+                         segments=segments,
+                         preselected_segment_id=form.segment.data if form.segment.data else None)
 
 
 @app.route('/registration-success/<registration_id>')

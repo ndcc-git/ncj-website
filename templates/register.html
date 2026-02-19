@@ -41,7 +41,7 @@
 
                         <!-- Full Name -->
                         <div class="field">
-                            <label class="label">নাম *</label>
+                            <label class="label" for="full_name">নাম *</label>
                             <div class="control">
                                 {{ form.full_name(class="input", id="full_name") }}
                             </div>
@@ -96,7 +96,7 @@
 
                         <!-- Submission Link -->
                         <div class="field" id="submission-link-group" style="display:none;">
-                            <label class="label">সাবমিশন লিংক</label>
+                            <label class="label">সাবমিশন লিংক *</label>
                             <div class="control">
                                 {{ form.submission_link(class="input") }}
                             </div>
@@ -210,12 +210,15 @@
                 if (data.type === "Team") {
                     nameLabel.innerText = "দলের নাম";
                 } else {
-                    nameLabel.innerText = "পূর্ণ নাম";
+                    nameLabel.innerText = "নাম";
                 }
 
                 const submissionDiv = document.getElementById("submission-link-group");
-                submissionDiv.style.display = (data.type === "submission") ? "block" : "none";
+                submissionDiv.style.display = (data.type === "Submission") ? "block" : "none";
             });
+        // if (segmentId == "6996cf26e7eb96d29e2010c6") {
+
+        // }
     });
 
     // LocalStorage Autofill
@@ -236,7 +239,7 @@
     });
     document.addEventListener('DOMContentLoaded', function () {
         const segmentSelect = document.getElementById('segment-select');
-
+        
         if (segmentSelect.value) {
             segmentSelect.dispatchEvent(new Event('change'));
         }

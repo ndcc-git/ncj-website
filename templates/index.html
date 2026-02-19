@@ -142,8 +142,8 @@
               <h3 class="event-card-title">ব্যাটল অব দ্য ব্যান্ডস</h3>
               <p class="event-card-type">দলগত ইভেন্ট</p>
               <div class="event-card-actions">
-                <a href="event-details.html" class="button is-secondary">এক্সপ্লোর</a>
-                <a href="register.html" class="button is-primary">রেজিস্টার</a>
+                <a href="{{ url_for('events') }}" class="button is-secondary">এক্সপ্লোর</a>
+                <a href="{{ url_for('register') }}" class="button is-primary">রেজিস্টার</a>
               </div>
             </div>
           </div>
@@ -156,7 +156,7 @@
               <h3 class="event-card-title">বিটবক্সিং ব্রল</h3>
               <p class="event-card-type">একক ইভেন্ট</p>
               <div class="event-card-actions">
-                <a href="event-details.html" class="button is-secondary">এক্সপ্লোর</a>
+                <a href="{{ url_for('events') }}" class="button is-secondary">এক্সপ্লোর</a>
                 <a href="{{ url_for('register') }}" class="button is-primary">রেজিস্টার</a>
               </div>
             </div>

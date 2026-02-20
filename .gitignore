@@ -9,6 +9,5 @@ venv/
 .DS_Store
 *.db
 instance/
-gen.py
 ncjtest.json
 vvenv

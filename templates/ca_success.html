@@ -30,7 +30,7 @@
                             <!-- Profile Section -->
                             <div class="dashboard-profile" style="margin-bottom: 2rem;">
                                 {% if ca_registration.profile_picture %}
-                                <img src="{{ url_for('static', filename='uploads/ca_profiles/' + ca_registration.profile_picture) }}" 
+                                <img src="{{ca_registration.profile_picture}}"
                                      alt="Profile Picture" class="dashboard-avatar" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover;">
                                 {% else %}
                                 <img src="https://ui-avatars.com/api/?name={{ ca_registration.full_name|urlencode }}&size=100&background=f097c3&color=fff&bold=true"

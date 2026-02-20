@@ -255,6 +255,7 @@
     function showCADetails(ca) {
         const modal = document.getElementById('caDetailsModal');
         const content = document.getElementById('caDetailsContent');
+        
 
         content.innerHTML = `
     <div class="card">
@@ -264,8 +265,8 @@
           ${ca.profile_picture ? `
           <div class="media-left">
             <figure class="image is-128x128">
-              <img class="is-rounded" 
-                   src="/static/uploads/ca_profiles/${ca.profile_picture}">
+                <img class="is-rounded" 
+                    src="${ca.profile_picture && ca.profile_picture.startsWith('https://') ? ca.profile_picture : '/static/uploads/ca_profiles/' + ca.profile_picture}">
             </figure>
           </div>` : ""}
 

@@ -9,8 +9,6 @@ import jwt
 from pymongo import MongoClient
 from datetime import datetime, timedelta
 from bson.objectid import ObjectId
-import requests
-from werkzeug.utils import secure_filename
 from config import Config
 from forms import ChangePasswordForm, ForgotPasswordForm, ProfileUpdateForm, RegistrationForm, CARegistrationForm, ContactForm, UserLoginForm, UserSignupForm
 from utils.security import hash_password, generate_csrf_token
@@ -28,6 +26,19 @@ from utils.firebase_helpers import (
 import uuid
 from flask_cors import CORS
 import re
+import cloudinary
+import cloudinary.uploader
+import uuid
+from datetime import datetime
+import os
+
+
+cloudinary.config(
+    cloud_name=os.environ.get('CLOUDINARY_CLOUD_NAME'),
+    api_key=os.environ.get('CLOUDINARY_API_KEY'),
+    api_secret=os.environ.get('CLOUDINARY_API_SECRET'),
+    secure=True
+)
 
 app = Flask(__name__)
 CORS(app, supports_credentials=True)
@@ -771,77 +782,49 @@ def ca_register():
         # Generate CA code
         ca_code = generate_ca_code(form.full_name.data)
         
-        # Handle profile picture upload from form
-        profile_pic_filename = None
+        # Handle profile picture upload
+        profile_pic_url = None
         
         if form.profile_picture.data:
             file = form.profile_picture.data
             
-            # Check if file has a name
+            # Basic checks
             if file.filename == '':
                 flash('Profile picture is required', 'error')
                 return redirect(url_for('ca_register'))
             
-            # Validate file extension
+            # Check file extension
             if not allowed_file(file.filename):
                 flash('Only JPG, JPEG, and PNG files are allowed', 'error')
                 return redirect(url_for('ca_register'))
             
-            # Validate file size
-            if not validate_file_size(file):
+            # Check file size (assuming MAX_FILE_SIZE is defined elsewhere)
+            file.seek(0, os.SEEK_END)
+            file_length = file.tell()
+            file.seek(0)
+            
+            if file_length > MAX_FILE_SIZE:
                 flash(f'File size exceeds {MAX_FILE_SIZE // (1024*1024)}MB limit', 'error')
                 return redirect(url_for('ca_register'))
             
-            # Secure the filename
-            original_filename = secure_filename(file.filename)
-            
-            # Extract file extension
-            file_ext = original_filename.rsplit('.', 1)[1].lower() if '.' in original_filename else 'jpg'
-            
-            # Generate unique filename with UUID and timestamp
-            unique_id = uuid.uuid4().hex[:8]
-            timestamp = datetime.utcnow().strftime('%Y%m%d_%H%M%S')
-            profile_pic_filename = f"ca_{ca_code}_{timestamp}_{unique_id}.{file_ext}"
-            
-            # Build safe file path
-            safe_filename = secure_filename(profile_pic_filename)
-            file_path = os.path.join(UPLOAD_FOLDER, safe_filename)
-            
-            # Ensure we're not writing outside the upload directory
-            upload_root = os.path.abspath(UPLOAD_FOLDER)
-            file_abs_path = os.path.abspath(file_path)
-            
-            if not file_abs_path.startswith(upload_root):
-                flash('Invalid file path', 'error')
-                return redirect(url_for('ca_register'))
-            
             try:
-                # Save the file
-                file.save(file_path)
+                # Generate a unique ID for the image
+                unique_id = uuid.uuid4().hex[:8]
+                timestamp = datetime.utcnow().strftime('%Y%m%d_%H%M%S')
+                public_id = f"ca_{timestamp}_{unique_id}"
                 
-                # Verify the saved file is an actual image
-                try:
-                    from PIL import Image
-                    with Image.open(file_path) as img:
-                        img.verify()
-                        
-                        # Resize image if too large
-                        max_dimension = 800
-                        with Image.open(file_path) as img_resize:
-                            if img_resize.width > max_dimension or img_resize.height > max_dimension:
-                                img_resize.thumbnail((max_dimension, max_dimension), Image.Resampling.LANCZOS)
-                                img_resize.save(file_path, optimize=True, quality=85)
-                except ImportError:
-                    # PIL not installed, skip verification
-                    pass
-                except Exception as e:
-                    # Invalid image file, delete it
-                    os.remove(file_path)
-                    flash('Invalid image file. Please upload a valid image.', 'error')
-                    return redirect(url_for('ca_register'))
-                    
+                # Upload directly to Cloudinary
+                upload_result = cloudinary.uploader.upload(
+                    file,
+                    public_id=public_id,
+                    folder="profile_pictures"
+                )
+                
+                # Get the secure URL
+                profile_pic_url = upload_result['secure_url']
+                
             except Exception as e:
-                app.logger.error(f'File upload error: {str(e)}')
+                app.logger.error(f'Upload error: {str(e)}')
                 flash('Error uploading file. Please try again.', 'error')
                 return redirect(url_for('ca_register'))
         else:
@@ -858,7 +841,7 @@ def ca_register():
             'phone': form.phone.data,
             'email': form.email.data,
             'why_ca': form.why_ca.data,
-            'profile_picture': profile_pic_filename,
+            'profile_picture': profile_pic_url,
             'ca_code': ca_code,
             'status': 'pending',
             'registration_date': datetime.utcnow(),

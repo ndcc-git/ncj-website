@@ -251,7 +251,7 @@ def init_db():
     
     if segments_collection.count_documents({}) == 0:
         import gen
-        gen.genrerate_segs()
+        gen.genrerate_segs(app.config['MONGO_URI'])
 
     """Initialize database with sample data if empty"""
     # Initialize Firebase

@@ -714,7 +714,6 @@ def verify_email():
 
 @app.route('/ca-register', methods=['GET', 'POST'])
 @login_required
-@email_verified_required
 def ca_register():
     """CA Registration page"""
     user = get_current_user()
@@ -895,7 +894,6 @@ def ca_registration_success(ca_id):
 
 @app.route('/register', methods=['GET', 'POST'])
 @login_required
-@email_verified_required
 def register():
     """Registration form for participants"""
     user = get_current_user()

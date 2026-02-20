@@ -1030,7 +1030,6 @@ def events():
 @app.route('/event/<_id>', methods=['GET'])
 def event(_id):
     event = segments_collection.find_one({'_id': ObjectId(_id)})
-    print(event)
     return render_template(
         "event.html", event=event
     )

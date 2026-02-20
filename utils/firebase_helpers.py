@@ -6,6 +6,7 @@ import json
 from flask import current_app
 import os
 from .email_service import send_email
+from flask import session
 
 def firebase_create_user(email, password, display_name=None):
     """Create a new user in Firebase Authentication using REST API"""
@@ -247,7 +248,6 @@ def firebase_update_user(uid, display_name=None, email=None, phone_number=None):
 
 def firebase_change_password(uid, new_password):
     """Change user password in Firebase using REST API"""
-    from flask import session  # Import here to avoid circular imports
     
     api_key = os.environ.get('FIREBASE_API_KEY')
     id_token = session.get('firebase_token')  # Get token from session
@@ -300,7 +300,7 @@ def firebase_change_password(uid, new_password):
 
 def firebase_delete_user(uid):
     """Delete user from Firebase Authentication using REST API"""
-    from flask import session  # Import here to avoid circular imports
+    # Import here to avoid circular imports
     
     api_key = os.environ.get('FIREBASE_API_KEY')
     id_token = session.get('firebase_token')  # Get token from session

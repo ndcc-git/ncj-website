@@ -389,25 +389,41 @@ def admin_registrations():
 
 
 @admin_bp.route('/verify-registration/<registration_id>', methods=['POST'])
-@role_required('admin', 'executive')  # Only admin/executive can verify
+@role_required('admin', 'executive')
 def verify_registration(registration_id):
     """Verify a single registration"""
     try:
-        
-        # Get registration to send email
+        # Get registration
         registration = db.registrations.find_one({'_id': ObjectId(registration_id)})
-        if registration:
-            _reg = send_reg_verification_email(registration)
-            if _reg:
-                db.registrations.update_one(
-                    {'_id': ObjectId(registration_id)},
-                    {'$set': {'verified': True, 'verified_at': datetime.utcnow()}}
-                )
-                flash(f"verified registration {registration['_id']}", 'success')
-                return jsonify({'success': True})
+        
+        if not registration:
+            return jsonify({'success': False, 'message': 'Registration not found'}), 404
+        
+        # Send verification email
+        email_sent = send_reg_verification_email(registration)
+        
+        # Update registration status
+        result = db.registrations.update_one(
+            {'_id': ObjectId(registration_id)},
+            {'$set': {
+                'verified': True, 
+                'verified_at': datetime.utcnow()
+            }}
+        )
+        
+        if result.modified_count == 0:
+            return jsonify({'success': False, 'message': 'Failed to update registration'}), 500
+        
+        # Return success response
+        response_data = {'success': True}
+        if not email_sent:
+            response_data['warning'] = 'Registration verified but email failed to send'
+        
+        return jsonify(response_data)
+        
     except Exception as e:
-        print(e)
-        return jsonify({'success': False}), 500
+        print(f"Verification error: {str(e)}")
+        return jsonify({'success': False, 'message': str(e)}), 500
 
 @admin_bp.route('/bulk-verify', methods=['POST'])
 @role_required('admin', 'executive')

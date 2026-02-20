@@ -43,7 +43,7 @@ def send_email(to_email, subject, body, is_html, buffer=None):
 
 def send_reg_verification_email(registration):
     """Send verification email to a participant"""
-    qr = qrcode.make(registration['_id'])
+    qr = qrcode.make(registration['user_id'])
     buffer = BytesIO()
     qr.save(buffer, format="PNG")
     buffer.seek(0)
@@ -100,7 +100,7 @@ def send_reg_verification_email(registration):
             <div style="text-align:center; margin:25px 0;">
                 <div style="display:inline-block; background:#D9C24E; padding:15px 30px; border-radius:8px;">
                     <span id="confirmCode" style="font-size:22px; font-weight:bold; color:#402B12;">
-                        {registration['_id']}
+                        {registration['user_id']}
                     </span>
                 </div>
             </div>
@@ -184,6 +184,11 @@ def send_email_async(app, to_email, subject, body):
 
 def send_ca_approval_email(ca_registration):
     """Send approval email to CA"""
+    qr = qrcode.make(ca_registration['user_id'])
+    buffer = BytesIO()
+    qr.save(buffer, format="PNG")
+    buffer.seek(0)
+    
     subject = "১০ম ন্যাশনাল কালচারাল জুবিলেশন-এ সিএ রেজিস্ট্রেশনের জন্য ধন্যবাদ!"
     body = f"""
     <!DOCTYPE html>
@@ -235,6 +240,14 @@ def send_ca_approval_email(ca_registration):
             <p>
                 অনুগ্রহ করে এই কোডটি সংরক্ষণ করুন।  রেজিস্ট্রেশনের সময় কোডটি ব্যবহার করতে উৎসাহিত করুন। আপনার সক্রিয় অংশগ্রহণ আমাদের আয়োজনকে আরও সফল করে তুলবে — এই প্রত্যাশায়।
             </p>
+            
+            <!-- QR Code -->
+            <div style="text-align:center; margin-bottom:25px;">
+                <img src="cid:qr_code" width="150" style="display:block; margin:0 auto;">
+                <p style="font-size:13px; color:#734610; margin-top:10px;">
+                    প্রবেশের সময় এই QR কোড স্ক্যান করা হবে
+                </p>
+            </div>
 
             <p>
                 সময়সূচি জানতে আমাদের 
@@ -266,4 +279,4 @@ def send_ca_approval_email(ca_registration):
 
     """
     
-    return send_email(ca_registration['email'], subject, body, is_html=True, buffer=None)
+    return send_email(ca_registration['email'], subject, body, is_html=True, buffer=buffer)

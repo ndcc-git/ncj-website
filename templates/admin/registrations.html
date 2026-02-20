@@ -19,7 +19,7 @@
 
 <form method="GET" action="{{ url_for('admin.admin_registrations') }}">
     <div class="field is-grouped is-align-items-flex-end is-flex-wrap-wrap">
-        
+
         <!-- Segment -->
         <div class="control mr-4 mb-2">
             <label class="label is-size-7 mb-1">Segment:</label>
@@ -71,11 +71,11 @@
                 </span>
             </span>
         </div>
-        
+
         <div class="control">
             <input class="input" type="text" placeholder="Search" name="search">
         </div>
-        
+
         <div class="control">
             <button type="submit" class="button is-link">Search</button>
         </div>
@@ -201,24 +201,24 @@
     });
 
     document.querySelectorAll('.verify-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
+        btn.addEventListener('click', function () {
             const regId = this.dataset.id;
             verifyRegistration(regId);
         });
     });
 
 
-    document.getElementById('bulk-verify-btn').addEventListener('click', function() {
+    document.getElementById('bulk-verify-btn').addEventListener('click', function () {
         const selectedIds = [];
         document.querySelectorAll('.registration-checkbox:checked').forEach(cb => {
             selectedIds.push(cb.closest('tr').dataset.id);
         });
-        
+
         if (selectedIds.length === 0) {
             alert('Please select at least one registration to verify.');
             return;
         }
-        
+
         if (confirm(`Are you sure you want to verify ${selectedIds.length} registration(s)?`)) {
             bulkVerify(selectedIds);
         }
@@ -227,6 +227,7 @@
     function verifyRegistration(regId) {
         const meta = document.querySelector('meta[name="csrf-token"]');
         const csrfToken = meta.getAttribute("content");
+
         fetch(`/admin/verify-registration/${regId}`, {
             method: 'POST',
             headers: {
@@ -234,14 +235,26 @@
                 'X-CSRFToken': csrfToken
             }
         })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                location.reload();
-            } else {
-                alert('Failed to verify registration');
-            }
-        });
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => { throw new Error(err.message || 'Server error'); });
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    if (data.warning) {
+                        alert(data.warning);
+                    }
+                    location.reload();
+                } else {
+                    alert('Failed to verify registration: ' + (data.message || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Network error: ' + error.message);
+            });
     }
 
     function bulkVerify(registrationIds) {
@@ -255,15 +268,15 @@
             },
             body: JSON.stringify({ registration_ids: registrationIds })
         })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert(`${data.verified_count} registration(s) verified successfully.`);
-                location.reload();
-            } else {
-                alert('Failed to bulk verify: ' + data.message);
-            }
-        });
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(`${data.verified_count} registration(s) verified successfully.`);
+                    location.reload();
+                } else {
+                    alert('Failed to bulk verify: ' + data.message);
+                }
+            });
     }
 
 </script>

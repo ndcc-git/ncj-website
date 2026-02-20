@@ -300,8 +300,8 @@ class ProfileUpdateForm(FlaskForm):
         ('other', 'Other')
     ], validators=[DataRequired()])
     
-    facebook_link = StringField('Facebook Profile Link (Optional)', validators=[
-        Optional(),
+    facebook_link = StringField('Facebook Profile Link', validators=[
+        DataRequired(),
         URL(),
         Length(max=200)
     ])

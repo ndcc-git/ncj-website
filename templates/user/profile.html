@@ -45,7 +45,6 @@
                     <span class="profile-detail-value" id="detail-email">{{ user.email }}</span>
                     {% if not user.email_verified %}
                     <span class="badge pending" style="margin-left: 0.5rem;">ভেরিফাই করা হয়নি</span>
-                    <a href="{{ url_for('verify_email') }}" class="button is-small" style="margin-left: 0.5rem;">ভেরিফাই করুন</a>
                     {% else %}
                     <span class="badge confirmed" style="margin-left: 0.5rem;">ভেরিফাই করা হয়েছে</span>
                     {% endif %}

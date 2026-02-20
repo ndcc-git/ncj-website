@@ -25,10 +25,11 @@ class RegistrationForm(FlaskForm):
     segment = SelectField('Segment', choices=[], validators=[DataRequired()])
     
     category = RadioField('Category', choices=[
+        ('K', 'Kindergarten (K)'),
         ('P', 'Primary (P)'),
-        ('S', 'School (S)'),
-        ('HS', 'High School (HS)'),
-        ('A', 'Adult (A)')
+        ('J', 'Junior (J)'),
+        ('S', 'Secondary (S)'),
+        ('HS', 'Higher Secondary (HS)')
     ], validators=[Optional()])
 
     submission_link = StringField('Submission Link', validators=[
@@ -210,9 +211,6 @@ class UserSignupForm(FlaskForm):
         ('10', 'Class 10'),
         ('11', 'Class 11'),
         ('12', 'Class 12'),
-        ('college', 'College'),
-        ('university', 'University'),
-        ('other', 'Other')
     ], validators=[DataRequired()])
     
     facebook_link = StringField('Facebook Profile Link (Optional)', validators=[
@@ -295,9 +293,6 @@ class ProfileUpdateForm(FlaskForm):
         ('10', 'Class 10'),
         ('11', 'Class 11'),
         ('12', 'Class 12'),
-        ('college', 'College'),
-        ('university', 'University'),
-        ('other', 'Other')
     ], validators=[DataRequired()])
     
     facebook_link = StringField('Facebook Profile Link', validators=[

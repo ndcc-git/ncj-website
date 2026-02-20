@@ -248,6 +248,10 @@ def init_db():
 
     # Create sample users with different roles
     sample_roles = ['executive', 'organizer', 'moderator']
+    
+    if segments_collection.count_documents({}) == 0:
+        import gen
+        gen.genrerate_segs()
 
     """Initialize database with sample data if empty"""
     # Initialize Firebase
@@ -390,7 +394,8 @@ def user_signup():
             # 5. Send email verification
             try:
                 firebase_send_email_verification(login_data.get('idToken'))
-                flash('Verification email sent. Please check your inbox.', 'info')
+                flash("Verification email sent. Please check your inbox. Don't forget to check your spam box.", 'info')
+                return redirect(url_for('user_profile'))
             except:
                 pass  # Verification email sending is optional
             

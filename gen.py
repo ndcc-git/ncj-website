@@ -549,11 +549,12 @@ segments = [
 # with open('segments.json', 'w', encoding='utf-8') as f:
 #     json.dump(data, f, ensure_ascii=False, indent=4)
 
-extensions.client = MongoClient("mongodb+srv://faridin:hng1roFlJGWfyZmy@festival.a1m03iv.mongodb.net/?appName=festival")
-extensions.db = extensions.client.festival_db
+def genrerate_segs(uri):
+    extensions.client = MongoClient(uri)
+    extensions.db = extensions.client.festival_db
 
-db = extensions.client.festival_db
+    db = extensions.client.festival_db
 
 
-segments_collection = db.segments
-segments_collection.insert_many(segments)
+    segments_collection = db.segments
+    segments_collection.insert_many(segments)

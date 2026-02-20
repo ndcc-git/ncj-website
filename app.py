@@ -317,6 +317,9 @@ def init_db():
 ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'png'}
 MAX_FILE_SIZE = 2 * 1024 * 1024
 
+with app.app_context():
+    init_db()
+
 @app.route('/registration-closed')
 def registration_closed():
     """Registration closed page"""

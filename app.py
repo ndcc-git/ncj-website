@@ -26,9 +26,11 @@ from utils.firebase_helpers import (
     firebase_send_email_verification
 )
 import uuid
+from flask_cors import CORS
 import re
 
 app = Flask(__name__)
+CORS(app, supports_credentials=True)
 app.config.from_object(Config)
 
 extensions.client = MongoClient(app.config['MONGO_URI'])

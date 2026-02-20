@@ -397,12 +397,15 @@ def verify_registration(registration_id):
         # Get registration to send email
         registration = db.registrations.find_one({'_id': ObjectId(registration_id)})
         if registration:
+            print('a')
             _reg = send_reg_verification_email(registration)
             if _reg:
+                print('b')
                 db.registrations.update_one(
                     {'_id': ObjectId(registration_id)},
                     {'$set': {'verified': True, 'verified_at': datetime.utcnow()}}
                 )
+                print('c')
                 flash(f"verified registration {registration['_id']}", 'success')
                 return jsonify({'success': True})
     except Exception as e:

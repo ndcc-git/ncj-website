@@ -73,7 +73,7 @@ def send_reg_verification_email(registration):
         <!-- Heading -->
         <div style="background:#D9A23D; padding:30px 20px; text-align:center;">
             <h1 style="margin:0; color:#261515; font-size:24px;">
-                ৯ম ন্যাশনাল কালচারাল জুবিলেশন-এ রেজিস্ট্রেশনের জন্য ধন্যবাদ!
+                ১০ম ন্যাশনাল কালচারাল জুবিলেশন-এ রেজিস্ট্রেশনের জন্য ধন্যবাদ!
             </h1>
         </div>
 

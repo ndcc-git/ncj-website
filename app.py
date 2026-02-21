@@ -3,7 +3,7 @@ import os
 import random
 import string
 import uuid
-from flask import Flask, render_template, request, jsonify, redirect, url_for, flash, session, blueprints
+from flask import Flask, json, render_template, request, jsonify, redirect, url_for, flash, session, blueprints
 from flask_wtf.csrf import CSRFProtect
 import jwt
 from pymongo import MongoClient
@@ -1004,7 +1004,9 @@ def gallery():
 
 @app.route('/executives', methods=['GET'])
 def executives():
-    return render_template('executives.html')
+    with open('executives.json', 'r') as f:
+        data = json.load(f)
+        return render_template('executives.html', departments=data)
 
 @app.route('/developers', methods=['GET'])
 def developers():

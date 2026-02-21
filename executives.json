@@ -1,0 +1,126 @@
+{
+  "Administration": [
+    {
+      "role": "President",
+      "name": "Thondoker Talaal",
+      "img": "https://scontent.fdac138-2.fna.fbcdn.net/v/t39.30808-6/623383915_1324971329663708_6555337992912004166_n.jpg?_nc_cat=102&ccb=1-7&_nc_sid=13d280&_nc_ohc=enlgxw73s-EQ7kNvwFD6zZm&_nc_oc=Adl0PD4tLiAQqVar5GVaOVOwq98f0EiGy_zK6_wbTMYx7HCGwWI-VE2rIvP44e4fJNg&_nc_zt=23&_nc_ht=scontent.fdac138-2.fna&_nc_gid=zFsbruXrDqCde7_otK1AOw&oh=00_AfvF-JW3IeNstxUCNwQZaa4QVqohaZCD_Y1Rsph7OluiNA&oe=699F6E23"
+    },
+    {
+      "role": "Vice President",
+      "name": "Swaraj Saha",
+      "img": "https://scontent.fdac138-1.fna.fbcdn.net/v/t39.30808-6/623413963_1324971349663706_8598895899875344510_n.jpg?_nc_cat=108&ccb=1-7&_nc_sid=13d280&_nc_ohc=4yX0BApiHBMQ7kNvwEhQ0jV&_nc_oc=AdlK18s_PtHY8jga4dSCMbZSvovhBUgkUTQxhflLFSCC6YXWXd-OB2L6T1fAruWOWKE&_nc_zt=23&_nc_ht=scontent.fdac138-1.fna&_nc_gid=SuBPG2qK_QD0dhhaP28tZg&oh=00_AfskzeqfAybvKHE_1pGMd2zFOnvNpTigo3fkJJGlSlkytw&oe=699F82CF"
+    },
+    {
+      "role": "Vice President",
+      "name": "Soumyajit Roy Surjo",
+      "img": "https://scontent.fdac138-1.fna.fbcdn.net/v/t39.30808-6/487127355_1073878411439669_7104755154708453230_n.jpg?_nc_cat=107&ccb=1-7&_nc_sid=13d280&_nc_ohc=wVsdj64bRhMQ7kNvwF9vU5l&_nc_oc=AdmPjFo97usuanUuFeId2ESSfYSDTZyl4pVKdGdt0dJXePnzpd2tm-4DT2OD5tFUi8M&_nc_zt=23&_nc_ht=scontent.fdac138-1.fna&_nc_gid=MIy3p9MZaXQiL8Cu91quhg&oh=00_AfvIlBX8w4Prfp_ug_MtybWB7pA9B0P25oG9Yl5vAp4DwQ&oe=699F6615"
+    }
+  ],
+  "Public Realtions": [
+    {
+      "role": "President",
+      "name": "Aldrin Dip Sarker",
+      "img": "https://scontent.fdac138-2.fna.fbcdn.net/v/t39.30808-6/487315482_1073878668106310_4476072375171670659_n.jpg?_nc_cat=103&ccb=1-7&_nc_sid=13d280&_nc_ohc=c54iJ1snuJUQ7kNvwENZ_7G&_nc_oc=AdkQKCIYhCev5KFMKHadUbH41nFccT-v5DJjFmbRdUM6biy14PYE4Blta8rn6k_p2_g&_nc_zt=23&_nc_ht=scontent.fdac138-2.fna&_nc_gid=19jBed4J2Tf0yIvY4DPnhw&oh=00_AfswpGGt3Z1z1orCAZu5kcx8yHZ3lnNA7mtSMcseIQAnlg&oe=699F591E"
+    },
+    {
+      "role": "Vice President",
+      "name": "Suvroneel Das",
+      "img": "https://scontent.fdac138-1.fna.fbcdn.net/v/t39.30808-6/487434721_1073878658106311_8578439755011717945_n.jpg?_nc_cat=109&ccb=1-7&_nc_sid=13d280&_nc_ohc=_YfGc8heBasQ7kNvwHa_k8K&_nc_oc=AdnyrZjF4PsJ-clJwdxy1xMWZbtwxLIyASh18dacYsrrJuJ395JBEAg_2UxV5kY4sbE&_nc_zt=23&_nc_ht=scontent.fdac138-1.fna&_nc_gid=Hfj0Ii1YE9V4Tgf6CliTmA&oh=00_Afv7BMVVZW77UNk529oTFceH0iLr1oFwB4cqxWW6IfToTg&oe=699F615A"
+    },
+    {
+      "role": "Vice President",
+      "name": "Suprasun Roy Kawshik",
+      "img": "https://scontent.fdac138-1.fna.fbcdn.net/v/t39.30808-6/487454443_1073878654772978_4494520825869610563_n.jpg?_nc_cat=109&ccb=1-7&_nc_sid=13d280&_nc_ohc=kZ0SzduMFxsQ7kNvwFzyg6f&_nc_oc=AdmJcrlH467ERrF8SzjwgH6AiprSCHHEZUmpgIO0cXbafvrTxzCAtiG-pULGT0mtZ2g&_nc_zt=23&_nc_ht=scontent.fdac138-1.fna&_nc_gid=UqZ_upbha8hNBz_hDl6beQ&oh=00_Afu0eOeWzRab9gZanDz_Quyoqb3yKnicbfluNSn6FpsA6w&oe=699F8F67"
+    },
+    {
+        "role":"Secretary",
+        "name": "Sporsha Ghosh",
+        "img": "https://scontent.fdac138-2.fna.fbcdn.net/v/t39.30808-6/487449823_1073878671439643_144267099937709840_n.jpg?_nc_cat=101&ccb=1-7&_nc_sid=13d280&_nc_ohc=vrxrF-cd5dYQ7kNvwGJd3LY&_nc_oc=AdmQ-NxwAVmdH4Yhf87ZtCEcaNoQwbD8duLjVR9t2N5F1J6J183fKciZTaKhNzDPBkw&_nc_zt=23&_nc_ht=scontent.fdac138-2.fna&_nc_gid=FAz-y1C3t-st6-pq99_g4Q&oh=00_AfsEUvxyh7zdo8Da8NxponKGxg-1eiO-NaL0w3PUiqEOvg&oe=699F64F9"
+    }
+  ],
+  "Cultural Activities": [
+    {
+      "role": "President",
+      "name": "Alindo Das",
+      "img": "https://scontent.fdac138-2.fna.fbcdn.net/v/t39.30808-6/486824927_1073878651439645_3341390410756152922_n.jpg?_nc_cat=103&ccb=1-7&_nc_sid=13d280&_nc_ohc=LLrJlXL27LsQ7kNvwEk7Ccw&_nc_oc=AdkZqwBO_wHQ977bKWDImX3Afg3Oihuaho64WOSHMbmtwLzK_TbBGNAqk7ZUUl9ne_s&_nc_zt=23&_nc_ht=scontent.fdac138-2.fna&_nc_gid=mZpebcqMrOLaruQwMwPagA&oh=00_AfumWLSGM-HPrlONPv5Wser3ecjEqh7VlXs-mLzZc2DATw&oe=699F615F"
+    },
+    {
+      "role": "Vice President",
+      "name": "Sudip Dutta Ahon",
+      "img": "https://scontent.fdac138-2.fna.fbcdn.net/v/t39.30808-6/487118589_1073878428106334_8330301522022479391_n.jpg?_nc_cat=104&ccb=1-7&_nc_sid=13d280&_nc_ohc=Xrb-iXDwnwkQ7kNvwEdG9Gy&_nc_oc=AdmL7U-zDWIxcZLg3CbKU7_1KsJ8JKq0BlCZN3yKbPGX6OpaaIeUSnZ2lEcWW0qgh3U&_nc_zt=23&_nc_ht=scontent.fdac138-2.fna&_nc_gid=I14q1fhSYQ8GvuTeRzQyBw&oh=00_AfsU4qqRDB6u1MteuPvlFyxxklUwqc08q8jXJW3m4dhNTw&oe=699F5E47"
+    },
+    {
+      "role": "Secretary",
+      "name": "Steve D Costa",
+      "img": "https://scontent.fdac138-2.fna.fbcdn.net/v/t39.30808-6/487141265_1073878661439644_413685328616501253_n.jpg?_nc_cat=102&ccb=1-7&_nc_sid=13d280&_nc_ohc=JrHcJiT6aQoQ7kNvwEIe-qV&_nc_oc=Adnd5xWilN-e-yAY0V3H5W5sjpC1dYv9IXq3CZHtVu1sboPT6ot7OwdzE8bK5CXZD7U&_nc_zt=23&_nc_ht=scontent.fdac138-2.fna&_nc_gid=q_Qs-28Of54Ba7XTTCb5Sw&oh=00_AfuXZ-sAt4XWHlT5a5XiknS7l_IA_99w7welVfbTvJ1NsQ&oe=699F8F0F"
+    }
+  ],
+  "Logistics": [
+    {
+      "role": "President",
+      "name": "Purnendu Banik",
+      "img": "https://scontent.fdac138-1.fna.fbcdn.net/v/t39.30808-6/487150412_1073878674772976_920292404226459848_n.jpg?_nc_cat=100&ccb=1-7&_nc_sid=13d280&_nc_ohc=vJ3facEo8CUQ7kNvwF4Z3-c&_nc_oc=AdlH-3cni49rKJSfkGUiVhonyp38CE8raFvChcdHRtotXl1IhAJcViejvlZG3atwAzY&_nc_zt=23&_nc_ht=scontent.fdac138-1.fna&_nc_gid=pylK0jT6dE9BD39jvQsGww&oh=00_AfuzykIR6vZWfdT-HMhvy2VBGe1SjqgJ4w_7DpwmyQnTrQ&oe=699F82D9"
+    },
+    {
+      "role": "Vice President",
+      "name": "MD Hasnain Hasib",
+      "img": "https://scontent.fdac138-2.fna.fbcdn.net/v/t39.30808-6/500266042_1119657980195045_601602963802036898_n.jpg?_nc_cat=106&ccb=1-7&_nc_sid=13d280&_nc_ohc=8tbmTR2Xi2wQ7kNvwH3Qq_d&_nc_oc=AdncAKhRPfjJ1aukYlFHTK2vC19KGpzTyTugA7U48ihZcE91iuzN3-7rTv7SpDrGTi4&_nc_zt=23&_nc_ht=scontent.fdac138-2.fna&_nc_gid=rN6cxt0NDJ723pHObZ-2xQ&oh=00_AfsHNcK5r517DY4-7tUfVMGn7sfqox3APm_AKv0uHRGLSQ&oe=699F65C7"
+    },
+    {
+      "role": "Vice President",
+      "name": "Mubtasim Fuad Mahi",
+      "img": "https://scontent.fdac138-1.fna.fbcdn.net/v/t39.30808-6/487213531_1073878648106312_6151285994909215985_n.jpg?_nc_cat=108&ccb=1-7&_nc_sid=13d280&_nc_ohc=DzhkQ-locPEQ7kNvwEwuaaI&_nc_oc=AdlHWflct22v_PRUZbatIIwqxqmocJlHFmWQc9TY9pRX58lQZDSnFtpiM1x8DThzKuk&_nc_zt=23&_nc_ht=scontent.fdac138-1.fna&_nc_gid=wHdBdEqaFs7L_fq8J4NB5Q&oh=00_AfvdDxKkgXeerFoaOOfzy4fFklBQ7G01gfsy_7sqvOT_5w&oe=699F8B8E"
+    },
+    {
+      "role": "Secretary",
+      "name": "S M Mahruf",
+      "img": "https://scontent.fdac138-1.fna.fbcdn.net/v/t39.30808-6/486846753_1073878718106305_1733080266539125472_n.jpg?_nc_cat=100&ccb=1-7&_nc_sid=13d280&_nc_ohc=z7ZTOW1phi4Q7kNvwHTKD1l&_nc_oc=AdnACqFS9TCClxZSuwEm-xUUMgDGDE48JP-h7eH_fH03pVHyvnDQhw_MuJzYGZUePAs&_nc_zt=23&_nc_ht=scontent.fdac138-1.fna&_nc_gid=5GQX6h3rO8kbegUILII6qg&oh=00_AftEVMEKjnv7jf2ZaTjRYRfmDvGxKL5v7M9rc8ZYnl3rVA&oe=699F8BCB"
+    }
+  ],
+  "Creative Affairs": [
+    {
+      "role": "President",
+      "name": "Pratyaya Saha",
+      "img": "https://scontent.fdac138-2.fna.fbcdn.net/v/t39.30808-6/487448683_1073878421439668_989189429589232142_n.jpg?_nc_cat=104&ccb=1-7&_nc_sid=13d280&_nc_ohc=vmkXg9OlUuQQ7kNvwGqzXtU&_nc_oc=AdmTZgnp-QtyHHpl2zZtbTSgNvOzvlUTT-m7QQ-eVBpeJHNuzWAm1tKp8joZsEP0Zfw&_nc_zt=23&_nc_ht=scontent.fdac138-2.fna&_nc_gid=EDI2uTOOdYtUyx71d1bz8A&oh=00_AfsLLRaeAuy_i0wE6nv8x0LQKWcb2bFtb5uY5z-zyWyn6Q&oe=699F880F"
+    },
+    {
+      "role": "Vice President",
+      "name": "Supratik Paul",
+      "img": "https://scontent.fdac138-1.fna.fbcdn.net/v/t39.30808-6/487456540_1073878641439646_4300887042354087880_n.jpg?_nc_cat=109&ccb=1-7&_nc_sid=13d280&_nc_ohc=hmJZU37Z0Q8Q7kNvwF6uTPV&_nc_oc=Adn7rFBDINZ_MxKR3fnmWnlM8rXSuoGRBLfuDYx6P4Q98ExtALTdm2SM9uDLRnrocXs&_nc_zt=23&_nc_ht=scontent.fdac138-1.fna&_nc_gid=7wpKRVCEFJYFJEHumYo2nA&oh=00_Afu3go_ZFV6lDzKvv26kHIqPrfexr5YrkR_ceEjHXVxrbQ&oe=699F816B"
+    },
+    {
+      "role": "Secretary",
+      "name": "Palak Debnath",
+      "img": "https://scontent.fdac138-1.fna.fbcdn.net/v/t39.30808-6/486629101_1073878644772979_6128729701922979011_n.jpg?_nc_cat=111&ccb=1-7&_nc_sid=13d280&_nc_ohc=hrXvM_0UuugQ7kNvwH-ugRA&_nc_oc=AdnNtWAB1kBG2fq2jbGm6fp2vZlksKPE7AtNVo2JGN1uzERIAVuXryAZEsQB5C0hDJk&_nc_zt=23&_nc_ht=scontent.fdac138-1.fna&_nc_gid=FhD_fqXiN5fjVWspLsUI1w&oh=00_Afvt3sZF5j4vGOUl7FfYxQe5CBQVWIvziSCBhmXYquImeA&oe=699F5502"
+    }
+  ],
+  "Web Development": [
+    {
+      "role": "President",
+      "name": "Muksifur Rahman",
+      "img": "https://scontent.fdac138-1.fna.fbcdn.net/v/t39.30808-6/489100777_1082035270623983_4789704454836617045_n.jpg?_nc_cat=107&ccb=1-7&_nc_sid=13d280&_nc_ohc=4pQPkzAkY5kQ7kNvwH20kqJ&_nc_oc=AdnldTZ4d9o7Ty87oaBzi7BuBFiiawI49uuZ6g8H0aUj5U-qdwELTfJj8OCsM4IDo2E&_nc_zt=23&_nc_ht=scontent.fdac138-1.fna&_nc_gid=yrceStfhwtH_LCOwfkxLGA&oh=00_Aft9Kyeu7kGIcQDaPyXJIrMKZQI5rS9YDOwR9ra55DNZ3g&oe=699F8CD5"
+    },
+    {
+      "role": "Vice President",
+      "name": "HRM Rafsan Amin",
+      "img": "https://scontent.fdac138-1.fna.fbcdn.net/v/t39.30808-6/489687387_1082030723957771_801469449495978257_n.jpg?_nc_cat=110&ccb=1-7&_nc_sid=13d280&_nc_ohc=FH4P77Vnn9QQ7kNvwE9PeyM&_nc_oc=Admehj-EKDUAiXCAxdS4cVYdnwbhts1wKk5HpWKgJltVaKERugYSlyAjEMayUrJnPkU&_nc_zt=23&_nc_ht=scontent.fdac138-1.fna&_nc_gid=fnXMOfGXmvIL_-O5INSVXQ&oh=00_Afu9sa1edRUf_NnviyoYcKEogKrHrW6GGx0ZWgppYC1lYA&oe=699F7FAE"
+    }
+  ],
+  "Publication": [
+    {
+      "role": "President",
+      "name": "Ahnaf Mahmud Hasan",
+      "img": "https://scontent.fdac138-2.fna.fbcdn.net/v/t39.30808-6/487213099_1073878408106336_518960756564706199_n.jpg?_nc_cat=106&ccb=1-7&_nc_sid=13d280&_nc_ohc=8g7g1fkOWWQQ7kNvwGNIGzY&_nc_oc=Adnhr5SY1UHsrYxe33528ZelvoyrZTeQUEbAJon0fYcJkw845EmtUFyj--TP25TL4g4&_nc_zt=23&_nc_ht=scontent.fdac138-2.fna&_nc_gid=QBQn81Qb56bhKF-DMvSB6g&oh=00_AfvJkUiozYAOBi2vJh4wYBWgnBzPjDpgUnsv8B1-AdHMZQ&oe=699F7EA5"
+    },
+    {
+      "role": "Vice President",
+      "name": "Sabyasachi Roy",
+      "img": "https://scontent.fdac138-2.fna.fbcdn.net/v/t39.30808-6/486507248_1073878424773001_8160671051235283605_n.jpg?_nc_cat=106&ccb=1-7&_nc_sid=13d280&_nc_ohc=kPFAwh7IyncQ7kNvwFYeew2&_nc_oc=AdmYonuruXuBk7N9vlXS2QWrWNe7yY90kILyrP-lrk3zl749nlyoVsQxNRlhT4aPgkU&_nc_zt=23&_nc_ht=scontent.fdac138-2.fna&_nc_gid=6FEzk4ztsu9RBLYfpqVOJg&oh=00_AfuZ_2vVxxcoNUgIfd4vhSYVGTqcElDykVXLDrAFnI9CEA&oe=699F8648"
+    },
+    {
+      "role": "Secretary",
+      "name": "Prapyojit Das",
+      "img": "https://scontent.fdac138-1.fna.fbcdn.net/v/t39.30808-6/487407494_1073878664772977_2906796128096801789_n.jpg?_nc_cat=110&ccb=1-7&_nc_sid=13d280&_nc_ohc=z6YC4VBj8HAQ7kNvwHXvSt2&_nc_oc=Adm5nI1dsLn1Q3xx9VIaqd9adySWFMaHZvr2v44IpGWXFhkOvFbSuDWAM0oByiAfmQU&_nc_zt=23&_nc_ht=scontent.fdac138-1.fna&_nc_gid=ONgnGxByiEc2VjPb4loxMQ&oh=00_AfvkgXMO09q49lxZHpMQXu0JvUZ-sxzOdL1HcxSJaIgbCw&oe=699F88AC"
+    }
+  ]
+}

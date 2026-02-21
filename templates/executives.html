@@ -18,235 +18,28 @@
     <!-- ========================================
        ADMINISTRATION DEPARTMENT
        ======================================== -->
+    {% for department_name, members in departments.items() %}
     <section class="team-section">
         <div class="container">
-            <h2 class="team-department-title">Administration</h2>
-            <div class="team-grid">
-                <div class="team-card">
-                    <div class="team-card-image-wrapper">
-                        <img src="https://thumbs.dreamstime.com/b/default-profile-picture-avatar-photo-placeholder-vector-illustration-default-profile-picture-avatar-photo-placeholder-vector-189495158.jpg"
-                            alt="Team Member" class="team-card-image">
-                    </div>
-                    <h3 class="team-card-name">Admin Name</h3>
-                    <p class="team-card-role">President</p>
-                </div>
-                <div class="team-card">
-                    <div class="team-card-image-wrapper">
-                        <img src="https://thumbs.dreamstime.com/b/default-profile-picture-avatar-photo-placeholder-vector-illustration-default-profile-picture-avatar-photo-placeholder-vector-189495158.jpg"
-                            alt="Team Member" class="team-card-image">
-                    </div>
-                    <h3 class="team-card-name">Admin Name</h3>
-                    <p class="team-card-role">Vice President</p>
-                </div>
-                <div class="team-card">
-                    <div class="team-card-image-wrapper">
-                        <img src="https://thumbs.dreamstime.com/b/default-profile-picture-avatar-photo-placeholder-vector-illustration-default-profile-picture-avatar-photo-placeholder-vector-189495158.jpg"
-                            alt="Team Member" class="team-card-image">
-                    </div>
-                    <h3 class="team-card-name">Admin Name</h3>
-                    <p class="team-card-role">Vice President</p>
-                </div>
-            </div>
-        </div>
-    </section>
+            <h2 class="team-department-title">{{ department_name }}</h2>
 
-    <!-- ========================================
-       CULTURAL AFFAIRS DEPARTMENT
-       ======================================== -->
-    <section class="team-section">
-        <div class="container">
-            <h2 class="team-department-title">Cultural Affairs</h2>
             <div class="team-grid">
+                {% for member in members %}
                 <div class="team-card">
                     <div class="team-card-image-wrapper">
-                        <img src="https://thumbs.dreamstime.com/b/default-profile-picture-avatar-photo-placeholder-vector-illustration-default-profile-picture-avatar-photo-placeholder-vector-189495158.jpg"
-                            alt="Team Member" class="team-card-image">
+                        <img src="{{ member.img or 'https://thumbs.dreamstime.com/b/default-profile-picture-avatar-photo-placeholder-vector-illustration-default-profile-picture-avatar-photo-placeholder-vector-189495158.jpg' }}"
+                            alt="{{ member.name }}"
+                            class="team-card-image">
                     </div>
-                    <h3 class="team-card-name">Cultural Head</h3>
-                    <p class="team-card-role">President</p>
-                </div>
-                <div class="team-card">
-                    <div class="team-card-image-wrapper">
-                        <img src="https://thumbs.dreamstime.com/b/default-profile-picture-avatar-photo-placeholder-vector-illustration-default-profile-picture-avatar-photo-placeholder-vector-189495158.jpg"
-                            alt="Team Member" class="team-card-image">
-                    </div>
-                    <h3 class="team-card-name">Event Coordinator</h3>
-                    <p class="team-card-role">Vice President</p>
-                </div>
-                <div class="team-card">
-                    <div class="team-card-image-wrapper">
-                        <img src="https://thumbs.dreamstime.com/b/default-profile-picture-avatar-photo-placeholder-vector-illustration-default-profile-picture-avatar-photo-placeholder-vector-189495158.jpg"
-                            alt="Team Member" class="team-card-image">
-                    </div>
-                    <h3 class="team-card-name">Program Director</h3>
-                    <p class="team-card-role">Secretery</p>
-                </div>
-            </div>
-        </div>
-    </section>
 
-    <!-- ========================================
-       IT & TECH DEPARTMENT
-       ======================================== -->
-    <section class="team-section">
-        <div class="container">
-            <h2 class="team-department-title">Public Relations</h2>
-            <div class="team-grid">
-                <div class="team-card">
-                    <div class="team-card-image-wrapper">
-                        <img src="https://thumbs.dreamstime.com/b/default-profile-picture-avatar-photo-placeholder-vector-illustration-default-profile-picture-avatar-photo-placeholder-vector-189495158.jpg"
-                            alt="Team Member" class="team-card-image">
-                    </div>
-                    <h3 class="team-card-name">IT Head</h3>
-                    <p class="team-card-role">President</p>
+                    <h3 class="team-card-name">{{ member.name }}</h3>
+                    <p class="team-card-role">{{ member.role }}</p>
                 </div>
-                <div class="team-card">
-                    <div class="team-card-image-wrapper">
-                        <img src="https://thumbs.dreamstime.com/b/default-profile-picture-avatar-photo-placeholder-vector-illustration-default-profile-picture-avatar-photo-placeholder-vector-189495158.jpg"
-                            alt="Team Member" class="team-card-image">
-                    </div>
-                    <h3 class="team-card-name">Web Manager</h3>
-                    <p class="team-card-role">Vice President</p>
-                </div>
-                <div class="team-card">
-                    <div class="team-card-image-wrapper">
-                        <img src="https://thumbs.dreamstime.com/b/default-profile-picture-avatar-photo-placeholder-vector-illustration-default-profile-picture-avatar-photo-placeholder-vector-189495158.jpg"
-                            alt="Team Member" class="team-card-image">
-                    </div>
-                    <h3 class="team-card-name">Program Director</h3>
-                    <p class="team-card-role">Secretery</p>
-                </div>
+                {% endfor %}
             </div>
         </div>
     </section>
+    {% endfor %}
 
-    <!-- ========================================
-       LOGISTICS DEPARTMENT
-       ======================================== -->
-    <section class="team-section">
-        <div class="container">
-            <h2 class="team-department-title">Logistics</h2>
-            <div class="team-grid">
-                <div class="team-card">
-                    <div class="team-card-image-wrapper">
-                        <img src="https://thumbs.dreamstime.com/b/default-profile-picture-avatar-photo-placeholder-vector-illustration-default-profile-picture-avatar-photo-placeholder-vector-189495158.jpg"
-                            alt="Team Member" class="team-card-image">
-                    </div>
-                    <h3 class="team-card-name">Logistics Head</h3>
-                    <p class="team-card-role">President</p>
-                </div>
-                <div class="team-card">
-                    <div class="team-card-image-wrapper">
-                        <img src="https://thumbs.dreamstime.com/b/default-profile-picture-avatar-photo-placeholder-vector-illustration-default-profile-picture-avatar-photo-placeholder-vector-189495158.jpg"
-                            alt="Team Member" class="team-card-image">
-                    </div>
-                    <h3 class="team-card-name">Venue Coordinator</h3>
-                    <p class="team-card-role">Vice President</p>
-                </div>
-                <div class="team-card">
-                    <div class="team-card-image-wrapper">
-                        <img src="https://thumbs.dreamstime.com/b/default-profile-picture-avatar-photo-placeholder-vector-illustration-default-profile-picture-avatar-photo-placeholder-vector-189495158.jpg"
-                            alt="Team Member" class="team-card-image">
-                    </div>
-                    <h3 class="team-card-name">Program Director</h3>
-                    <p class="team-card-role">Secretery</p>
-                </div>
-            </div>
-        </div>
-    </section>
 
-    <!-- ========================================
-       CREATIVE AFFAIRS DEPARTMENT
-       ======================================== -->
-    <section class="team-section">
-        <div class="container">
-            <h2 class="team-department-title">Creative Affairs</h2>
-            <div class="team-grid">
-                <div class="team-card">
-                    <div class="team-card-image-wrapper">
-                        <img src="https://thumbs.dreamstime.com/b/default-profile-picture-avatar-photo-placeholder-vector-illustration-default-profile-picture-avatar-photo-placeholder-vector-189495158.jpg"
-                            alt="Team Member" class="team-card-image">
-                    </div>
-                    <h3 class="team-card-name">Marketing Head</h3>
-                    <p class="team-card-role">President</p>
-                </div>
-                <div class="team-card">
-                    <div class="team-card-image-wrapper">
-                        <img src="https://thumbs.dreamstime.com/b/default-profile-picture-avatar-photo-placeholder-vector-illustration-default-profile-picture-avatar-photo-placeholder-vector-189495158.jpg"
-                            alt="Team Member" class="team-card-image">
-                    </div>
-                    <h3 class="team-card-name">Social Media Lead</h3>
-                    <p class="team-card-role">Vice President</p>
-                </div>
-                <div class="team-card">
-                    <div class="team-card-image-wrapper">
-                        <img src="https://thumbs.dreamstime.com/b/default-profile-picture-avatar-photo-placeholder-vector-illustration-default-profile-picture-avatar-photo-placeholder-vector-189495158.jpg"
-                            alt="Team Member" class="team-card-image">
-                    </div>
-                    <h3 class="team-card-name">Program Director</h3>
-                    <p class="team-card-role">Secretery</p>
-                </div>
-            </div>
-        </div>
-    </section>
-    <!-- ========================================
-       PUBLICATION DEPARTMENT
-       ======================================== -->
-    <section class="team-section">
-        <div class="container">
-            <h2 class="team-department-title">Publication</h2>
-            <div class="team-grid">
-                <div class="team-card">
-                    <div class="team-card-image-wrapper">
-                        <img src="https://thumbs.dreamstime.com/b/default-profile-picture-avatar-photo-placeholder-vector-illustration-default-profile-picture-avatar-photo-placeholder-vector-189495158.jpg"
-                            alt="Team Member" class="team-card-image">
-                    </div>
-                    <h3 class="team-card-name">Marketing Head</h3>
-                    <p class="team-card-role">President</p>
-                </div>
-                <div class="team-card">
-                    <div class="team-card-image-wrapper">
-                        <img src="https://thumbs.dreamstime.com/b/default-profile-picture-avatar-photo-placeholder-vector-illustration-default-profile-picture-avatar-photo-placeholder-vector-189495158.jpg"
-                            alt="Team Member" class="team-card-image">
-                    </div>
-                    <h3 class="team-card-name">Social Media Lead</h3>
-                    <p class="team-card-role">Vice President</p>
-                </div>
-                <div class="team-card">
-                    <div class="team-card-image-wrapper">
-                        <img src="https://thumbs.dreamstime.com/b/default-profile-picture-avatar-photo-placeholder-vector-illustration-default-profile-picture-avatar-photo-placeholder-vector-189495158.jpg"
-                            alt="Team Member" class="team-card-image">
-                    </div>
-                    <h3 class="team-card-name">Program Director</h3>
-                    <p class="team-card-role">Secretery</p>
-                </div>
-            </div>
-        </div>
-    </section>
-    <!-- ========================================
-       MARKETING DEPARTMENT
-       ======================================== -->
-    <section class="team-section">
-        <div class="container">
-            <h2 class="team-department-title">IT</h2>
-            <div class="team-grid">
-                <div class="team-card">
-                    <div class="team-card-image-wrapper">
-                        <img src="https://thumbs.dreamstime.com/b/default-profile-picture-avatar-photo-placeholder-vector-illustration-default-profile-picture-avatar-photo-placeholder-vector-189495158.jpg"
-                            alt="Team Member" class="team-card-image">
-                    </div>
-                    <h3 class="team-card-name">Marketing Head</h3>
-                    <p class="team-card-role">President</p>
-                </div>
-                <div class="team-card">
-                    <div class="team-card-image-wrapper">
-                        <img src="https://thumbs.dreamstime.com/b/default-profile-picture-avatar-photo-placeholder-vector-illustration-default-profile-picture-avatar-photo-placeholder-vector-189495158.jpg"
-                            alt="Team Member" class="team-card-image">
-                    </div>
-                    <h3 class="team-card-name">Social Media Lead</h3>
-                    <p class="team-card-role">Vice President</p>
-                </div>
-            </div>
-        </div>
-    </section>
 {% endblock %}

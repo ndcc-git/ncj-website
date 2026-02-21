@@ -554,7 +554,18 @@ def admin_ca_export():
         query['status'] = status
     
     ca_data = list(db.ca_registrations.find(query))
-
+    for ca_item in ca_data:
+        user_id = ca_item.get('user_id')
+        if user_id:
+            user_data = db.users.find_one({'_id': user_id})
+            if user_data and 'facebook_link' in user_data:
+                ca_item['facebook_link'] = user_data['facebook_link']
+            else:
+                ca_item['facebook_link'] = None  # or handle missing case as needed
+        else:
+            ca_item['facebook_link'] = None  # handle case where user_id is missing
+    
+    
     if format_type == 'csv':
         csv_data = export_ca_to_csv(ca_data)
         return csv_data

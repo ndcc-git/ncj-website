@@ -50,6 +50,10 @@
 
 }
 
+.eve:hover {
+  color: var(--text-primary);
+}
+
 body {
   font-family: var(--font-body);
   background-color: var(--bg-primary);

@@ -1036,7 +1036,9 @@ def event(_id):
         "event.html", event=event
     )
 
-
+@app.route('/contacts')
+def contacts():
+    return render_template('contacts.html')
 
 @app.route('/contact', methods=['GET', 'POST'])
 def contact():

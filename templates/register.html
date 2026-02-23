@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}রেজিস্টেশন{% endblock %}
+{% block title %}রেজিস্ট্রেশন{% endblock %}
 
 {% block content %}
 
@@ -11,7 +11,7 @@
         <div class="container has-text-centered">
             <h1 class="title is-1 animate-on-scroll"
                 style="color: var(--text-primary); font-size: 4rem; font-weight: 900;">
-                রেজিস্টেশন
+                রেজিস্ট্রেশন
             </h1>
             <p class="subtitle is-4 animate-on-scroll" style="color: var(--text-primary);">
                 ১০ম জাতীয় কালচারাল জুবিলেশন
@@ -29,7 +29,7 @@
                 <div class="box animate-on-scroll"
                     style="background-color: rgba(252, 251, 229, 0.7); backdrop-filter: blur(10px); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1); border: 2px solid var(--text-primary); border-radius: var(--border-radius);">
 
-                    <h2 class="title is-3 has-text-centered mb-5">রেজিস্টেশন ফর্ম</h2>
+                    <h2 class="title is-3 has-text-centered mb-5">রেজিস্ট্রেশন ফর্ম</h2>
 
                     <form method="POST" action="{{ url_for('register') }}" id="registration-form">
                         {{ form.hidden_tag() }}

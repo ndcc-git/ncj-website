@@ -44,12 +44,12 @@ class RegistrationForm(FlaskForm):
     ])
     
     bkash_number = StringField('Bkash Number', validators=[
-        DataRequired(),
+        Optional(),
         Regexp(r'^01[3-9]\d{8}$', message='Enter a valid Bangladesh mobile number')
     ])
     
     transaction_id = StringField('Transaction ID', validators=[
-        DataRequired(),
+        Optional(),
         Length(min=5, max=50)
     ])
     submit = SubmitField('Register')

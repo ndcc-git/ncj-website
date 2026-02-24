@@ -934,6 +934,19 @@ def register():
             flash('You have already registered for this segment', 'error')
             return redirect(url_for('register'))
         
+        if (segment.get('_id') != "6996cf26e7eb96d29e2010c5" and not form.bkash_number.data):
+            form.bkash_number.errors.append("Bkash Number is required for this segment.")
+            return render_template('register.html', form=form, segments=segments, preselected_segment_id=form.segment.data)
+        
+        elif (segment.get('_id') != "6996cf26e7eb96d29e2010c5" and not form.transaction_id.data):
+            form.transaction_id.errors.append("Transaction ID is required for this segment.")
+            return render_template('register.html', form=form, segments=segments, preselected_segment_id=form.segment.data)
+        
+        elif (segment.get('_id') == "6996cf26e7eb96d29e2010c5" and not form.submission_link.data):
+            form.submission_link.errors.append("Submission link is required for this segment.")
+            return render_template('register.html', form=form, segments=segments, preselected_segment_id=form.segment.data)
+        
+        
         # Conditional category validation
         if segment.get('categories') and not form.category.data:
             form.category.errors.append("Category is required for this segment.")

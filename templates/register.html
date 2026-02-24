@@ -73,7 +73,7 @@
                         </div>
 
                         <!-- Segment -->
-                        <div class="field">
+                        <div class="field mb-5">
                             <label class="label">সেগমেন্ট নির্বাচন করুন *</label>
                             <div class="control">
                                 <div class="select is-fullwidth">
@@ -117,7 +117,7 @@
                         </div>
 
                         <!-- bKash -->
-                        <div class="field">
+                        <div class="field" id="bksh">
                             <label class="label">বিকাশ নম্বর *</label>
                             <div class="control">
                                 {{ form.bkash_number(class="input") }}
@@ -128,7 +128,7 @@
                         </div>
 
                         <!-- Transaction ID -->
-                        <div class="field">
+                        <div class="field" id="trx">
                             <label class="label">ট্রানজেকশন আইডি *</label>
                             <div class="control">
                                 {{ form.transaction_id(class="input") }}
@@ -160,6 +160,12 @@
     document.getElementById('segment-select').addEventListener('change', function () {
         const segmentId = this.value;
         if (!segmentId) return;
+
+        const bkshDiv = document.getElementById("bksh");
+        const trxDiv = document.getElementById("trx");
+
+        bkshDiv.style.display = "block"
+        trxDiv.style.display = "block"
 
         fetch(`/api/segments/${segmentId}/categories`)
             .then(res => res.json())
@@ -216,9 +222,24 @@
                 const submissionDiv = document.getElementById("submission-link-group");
                 submissionDiv.style.display = (data.type === "Submission") ? "block" : "none";
             });
-        // if (segmentId == "6996cf26e7eb96d29e2010c6") {
 
-        // }
+        if (segmentId == "6996cf26e7eb96d29e2010c6") {
+            fetch(`/api/segments/${segmentId}/type`)
+            .then(res => res.json())
+            .then(data => {
+                const nameLabel = document.querySelector("label[for='full_name']");
+                nameLabel.innerText = "ব্যান্ডের নাম";
+
+                const submissionDiv = document.getElementById("submission-link-group");
+                submissionDiv.style.display = (data.type === "Team") ? "block" : "none";
+
+                const bkshDiv = document.getElementById("bksh");
+                const trxDiv = document.getElementById("trx");
+
+                bkshDiv.style.display = "none"
+                trxDiv.style.display = "none"
+            });
+        }
     });
 
     // LocalStorage Autofill

@@ -432,9 +432,14 @@ def bulk_verify():
         
         # Send emails to verified registrations
         verified_registrations = list(db.registrations.find({'_id': {'$in': object_ids}}))
-        send_bulk_emails(verified_registrations)
+        succ = send_bulk_emails(verified_registrations)
+        if succ:
+            result = db.registrations.update_many(
+            {'_id': {'$in': object_ids}},
+            {'$set': {'verified': True, 'verified_at': datetime.utcnow()}})
+            return jsonify({'success': True, 'verified_count': result.modified_count})
         
-        return jsonify({'success': True, 'verified_count': result.modified_count})
+        
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)}), 500
 

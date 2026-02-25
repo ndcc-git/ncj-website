@@ -1,5 +1,15 @@
 {% extends "base.html" %}
 
+
+{% set category_map = {
+    "K": "শিশু [K]",
+    "P": "প্রাথমিক [P]",
+    "J": "নিম্ন মাধ্যমিক [J]",
+    "S": "মাধ্যমিক [S]",
+    "HS": "উচ্চ মাধ্যমিক [HS]"
+} %}
+
+
 {% block title %}গ্যালারি{% endblock %}
 
 {% block content %}
@@ -54,12 +64,14 @@
                         </span>
                     </div>
                     {% endif %}
-                    {% if event.type == 'Team' and event.team_size %}
                     <div class="event-meta-item">
-                        <i class="fas fa-users"></i>
-                        <span>Team Size: {{ event.team_size }}</span>
+                        <span>
+                        ক্যাটাগরি: <br>
+                        {% for c in event.categories %}
+                            {{ loop.index }}. {{ category_map.get(c, c) }}{% if not loop.last %} {% endif %} <br>
+                        {% endfor %}
+                        </span>
                     </div>
-                    {% endif %}
                 </div>
 
                 <div class="event-actions">
@@ -138,10 +150,22 @@
                             <div class="box"
                                 style="padding:1rem; border-radius:12px; background:#fdfdfd; box-shadow:0 4px 12px rgba(0,0,0,0.05); flex:1; display:flex; flex-direction:column;">
 
-                                <h4 class="subtitle is-5 has-text-weight-bold mb-3">{{ cat }}</h4>
+                                <h4 class="subtitle is-5 has-text-weight-bold mb-3">
+                                {% if cat == "K" %}
+                                    শিশু [K]: প্রাক-প্রাথমিক - দ্বিতীয় শ্রেণি 
+                                {% elif cat == "P" %}
+                                    প্রাথমিক [P]: তৃতীয় শ্রেণি - পঞ্চম শ্রেণি
+                                {% elif cat == "J" %}
+                                    নিম্ন মাধ্যমিক [J]: ষষ্ঠ শ্রেণি - অষ্টম শ্রেণি
+                                {% elif cat == "S" %}
+                                    মাধ্যমিক [S]: নবম শ্রেণি - দশম শ্রেণি
+                                {% elif cat == "HS" %}
+                                    উচ্চ মাধ্যমিক [HS]: একাদশ শ্রেণি - দ্বাদশ শ্রেণি ও এইচ
+                                {% endif %}
+                                </h4>
 
                                 {% if config.theme %}
-                                <p style="margin-bottom:8px;"><strong>Theme:</strong> {{ config.theme }}</p>
+                                <p style="margin-bottom:8px;"><strong>বিষয়:</strong> {{ config.theme }}</p>
                                 {% endif %}
 
                                 {% set sections = ['books','movies','series','anime'] %}

@@ -224,24 +224,6 @@
                 const submissionDiv = document.getElementById("submission-link-group");
                 submissionDiv.style.display = (data.type === "Submission") ? "block" : "none";
             });
-
-        if (segmentId == "6996cf26e7eb96d29e2010c6") {
-            fetch(`/api/segments/${segmentId}/type`)
-            .then(res => res.json())
-            .then(data => {
-                const nameLabel = document.querySelector("label[for='full_name']");
-                nameLabel.innerText = "ব্যান্ডের নাম";
-
-                const submissionDiv = document.getElementById("submission-link-group");
-                submissionDiv.style.display = (data.type === "Team") ? "block" : "none";
-
-                const bkshDiv = document.getElementById("bksh");
-                const trxDiv = document.getElementById("trx");
-
-                bkshDiv.style.display = "none"
-                trxDiv.style.display = "none"
-            });
-        }
     });
 
     // LocalStorage Autofill

@@ -537,7 +537,10 @@ h6 {
    ======================================== */
 #registration-form .input,
 #registration-form .textarea,
-#registration-form .select select {
+#registration-form .select select,
+#bob-registration-form .input,
+#bob-registration-form .textarea,
+#bob-registration-form .select select {
   background-color: transparent;
   border: 2px solid var(--tertiary-accent);
   border-radius: var(--border-radius);
@@ -572,23 +575,29 @@ h6 {
 
 #registration-form .input:focus,
 #registration-form .textarea:focus,
-#registration-form .select select:focus {
+#registration-form .select select:focus,
+#bob-registration-form .input:focus,
+#bob-registration-form .textarea:focus,
+#bob-registration-form .select select:focus {
   border-color: var(--primary-accent);
   box-shadow: 0 0 0 0.125em rgba(217, 162, 61, 0.25);
   outline: none;
 }
 
-#registration-form .select {
+#registration-form .select,
+#bob-registration-form .select {
   width: 100%;
 }
 
-#registration-form .select select {
+#registration-form .select select,
+#bob-registration-form .select select {
   width: 100%;
   padding-top: 0.75rem;
   padding-bottom: 0.75rem;
 }
 
-#registration-form .select:not(.is-multiple):not(.is-loading)::after {
+#registration-form .select:not(.is-multiple):not(.is-loading)::after,
+#bob-registration-form .select:not(.is-multiple):not(.is-loading)::after {
   border-color: var(--text-primary);
 }
 
@@ -2423,3 +2432,104 @@ h6 {
   }
 }
 
+/* BOB REGISTER PAGE */
+/* Elegant Table Styles */
+.elegant-table-container {
+    margin-top: 1rem;
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+}
+
+.elegant-table {
+    border-collapse: separate;
+    border-spacing: 0 0.75rem;
+    width: 100%;
+    min-width: 600px;
+}
+
+.elegant-table th {
+    background-color: var(--primary-accent);
+    color: var(--text-primary);
+    padding: 1rem 1.25rem;
+    text-align: left;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 0.85rem;
+}
+
+.elegant-table th:first-child {
+    border-top-left-radius: var(--border-radius);
+    border-bottom-left-radius: var(--border-radius);
+    width: 70px;
+    text-align: center;
+}
+
+.elegant-table th:last-child {
+    border-top-right-radius: var(--border-radius);
+    border-bottom-right-radius: var(--border-radius);
+}
+
+.elegant-table td {
+    background-color: rgba(255, 255, 255, 0.7);
+    padding: 0.85rem 1.25rem;
+    vertical-align: middle;
+    transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02);
+}
+
+.elegant-table tr:hover td {
+    background-color: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+.elegant-table td:first-child {
+    border-top-left-radius: var(--border-radius);
+    border-bottom-left-radius: var(--border-radius);
+    font-weight: 800;
+    color: var(--tertiary-accent);
+    text-align: center;
+    font-size: 1.1rem;
+}
+
+.elegant-table td:last-child {
+    border-top-right-radius: var(--border-radius);
+    border-bottom-right-radius: var(--border-radius);
+}
+
+.elegant-table .table-input {
+    width: 100%;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid rgba(115, 70, 16, 0.2);
+    border-radius: 0;
+    color: var(--text-primary);
+    padding: 0.5rem 0.25rem;
+    font-family: var(--font-body);
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+}
+
+.elegant-table .table-input:focus {
+    outline: none;
+    border-bottom-color: var(--primary-accent);
+}
+
+.elegant-table .table-input::placeholder {
+    color: rgba(64, 43, 18, 0.4);
+}
+
+/* Member details container animation */
+#member-details-container {
+    transition: all 0.4s ease-in-out;
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+}
+
+#member-details-container.is-active {
+    opacity: 1;
+    max-height: 1200px;
+    margin-top: 1.5rem;
+    overflow: visible;
+}

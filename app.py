@@ -323,6 +323,12 @@ def init_db():
     db.contact_messages.create_index([('submitted_at', -1)])
     db.contact_messages.create_index([('status', 1)])
     db.contact_messages.create_index([('archived', 1)])
+    
+    db.bob_registrations.create_index([('user_id', 1)])
+    db.bob_registrations.create_index([('email', 1)])
+    db.bob_registrations.create_index([('band_name', 1)])
+    db.bob_registrations.create_index([('registration_date', -1)])
+    db.bob_registrations.create_index([('status', 1)])
 
 
 ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'png'}
@@ -565,6 +571,10 @@ def user_profile():
         {'user_id': user['_id']}
     ).sort('registration_date', -1))
     
+    bob_registrations = list(db.bob_registrations.find(
+        {'user_id': user['_id']}
+    ))
+    
     # Get user's CA applications
     ca_applications = list(db.ca_registrations.find(
         {'user_id': user['_id']}
@@ -573,6 +583,7 @@ def user_profile():
     return render_template('user/profile.html', 
                          user=user,
                          registrations=user_registrations,
+                         bob_registrations=bob_registrations,
                          ca_applications=ca_applications)
 
 @app.route('/profile/edit', methods=['GET', 'POST'])
@@ -892,7 +903,13 @@ def register():
     form = RegistrationForm()
     
     # Get segments for dropdown
-    segments = list(segments_collection.find({}, {'_id': 1, 'name': 1, 'price': 1, 'categories': 1}))
+    segments = list(
+        segments_collection.find(
+            {'_id': {'$nin': [
+                ObjectId('6996cf26e7eb96d29e2010c6')
+            ]}},
+            {'_id': 1, 'name': 1, 'price': 1, 'categories': 1}
+        ))
     form.segment.choices = [(str(seg['_id']), f"{seg['name']} - ৳{seg['price']}") for seg in segments]
     
     # Get segment_id from query parameter
@@ -933,18 +950,6 @@ def register():
         if existing:
             flash('You have already registered for this segment', 'error')
             return redirect(url_for('register'))
-        
-        if (segment.get('_id') != "6996cf26e7eb96d29e2010c5" and not form.bkash_number.data):
-            form.bkash_number.errors.append("Bkash Number is required for this segment.")
-            return render_template('register.html', form=form, segments=segments, preselected_segment_id=form.segment.data)
-        
-        elif (segment.get('_id') != "6996cf26e7eb96d29e2010c5" and not form.transaction_id.data):
-            form.transaction_id.errors.append("Transaction ID is required for this segment.")
-            return render_template('register.html', form=form, segments=segments, preselected_segment_id=form.segment.data)
-        
-        elif (segment.get('_id') == "6996cf26e7eb96d29e2010c5" and not form.submission_link.data):
-            form.submission_link.errors.append("Submission link is required for this segment.")
-            return render_template('register.html', form=form, segments=segments, preselected_segment_id=form.segment.data)
         
         
         # Conditional category validation
@@ -1010,6 +1015,175 @@ def registration_success(registration_id):
         return redirect(url_for('index'))
     
     return render_template('success.html', registration=registration)
+
+@app.route('/battle-of-the-bands')
+@login_required
+def bob_register_page():
+    """Display Battle of the Bands registration form"""
+    user = get_current_user()
+    
+    if not user:
+        return redirect(url_for('user_login'))
+    
+    settings = db.settings.find_one({'name': 'system_settings'})
+    if not settings or not settings.get('registration_enabled', True):
+        flash('Event registration is currently closed.', 'error')
+        return redirect(url_for('registration_closed'))
+    
+    # Pre-fill user data for the template
+    user_data = {
+        'email': user.get('email', ''),
+        'institution': user.get('institution', '')
+    }
+    
+    return render_template('bob_register.html', user=user_data)
+
+@app.route('/bob-register', methods=['POST'])
+@login_required
+def bob_register():
+    
+    """Handle Battle of the Bands registration"""
+    try:
+        # Get current user
+        user = get_current_user()
+        if not user:
+            flash('Please login first', 'error')
+            return redirect(url_for('user_login'))
+        
+        # Get form data from request
+        band_name = request.form.get('bandName', '').strip()
+        email = request.form.get('email', '').strip()
+        institution = request.form.get('institution', '').strip()
+        band_genre = request.form.get('bandGenre', '').strip()
+        member_count = request.form.get('memberCount', '')
+        jamming_clip = request.form.get('jammingClip', '').strip()
+        ca_reference = request.form.get('caReference', '').strip()
+        
+        # Get members data
+        members = []
+        member_names = request.form.getlist('member_name[]')
+        member_roles = request.form.getlist('member_role[]')
+        
+        for i in range(len(member_names)):
+            if member_names[i] and member_roles[i]:
+                members.append({
+                    'name': member_names[i].strip(),
+                    'role': member_roles[i].strip(),
+                    'position': i+1
+                })
+        
+        # Validate required fields
+        if not all([band_name, email, institution, band_genre, member_count, jamming_clip]):
+            flash('All fields are required', 'error')
+            return redirect(url_for('bob_register_page'))
+        
+        # Validate email format
+        email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+        if not re.match(email_pattern, email):
+            flash('Invalid email format', 'error')
+            return redirect(url_for('bob_register_page'))
+        
+        # Validate member count
+        try:
+            member_count = int(member_count)
+            if member_count < 3 or member_count > 6:
+                flash('Member count must be between 3 and 6', 'error')
+                return redirect(url_for('bob_register_page'))
+        except ValueError:
+            flash('Invalid member count', 'error')
+            return redirect(url_for('bob_register_page'))
+        
+        # Validate members array
+        if len(members) != member_count:
+            flash('Member count mismatch', 'error')
+            return redirect(url_for('bob_register_page'))
+        
+        # Validate each member has name and role
+        for i, member in enumerate(members):
+            if not member.get('name'):
+                flash(f'Member {i+1} name is required', 'error')
+                return redirect(url_for('bob_register_page'))
+            if not member.get('role'):
+                flash(f'Member {i+1} role is required', 'error')
+                return redirect(url_for('bob_register_page'))
+        
+        # Validate jamming clip URL
+        if not jamming_clip.startswith('https://'):
+            flash('Invalid jamming clip URL (must start with http:// or https://)', 'error')
+            return redirect(url_for('bob_register_page'))
+        
+        # Check for duplicate registration
+        existing = db.bob_registrations.find_one({
+            'user_id': user['_id'],
+            'band_name': band_name
+        })
+        
+        if existing:
+            flash('You have already registered a band with this name', 'error')
+            return redirect(url_for('bob_register_page'))
+        
+        # Create registration document
+        registration = {
+            'user_id': user['_id'],
+            'firebase_uid': user.get('firebase_uid'),
+            'band_name': band_name,
+            'email': email,
+            'institution': institution,
+            'band_genre': band_genre,
+            'member_count': member_count,
+            'members': members,
+            'jamming_clip': jamming_clip,
+            'ca_reference': ca_reference if ca_reference else None,
+            'status': 'pending',
+            'verified': False,
+            'registration_date': datetime.utcnow(),
+            'ip_address': request.remote_addr,
+            'user_agent': request.user_agent.string
+        }
+        
+        # Insert into database
+        result = db.bob_registrations.insert_one(registration)
+        registration_id = str(result.inserted_id)
+        
+        
+        flash('Band registration submitted successfully! Check your email for confirmation.', 'success')
+        return redirect(url_for('bob_success', registration_id=registration_id))
+        
+    except ValueError as e:
+        flash(f'Invalid data: {str(e)}', 'error')
+        return redirect(url_for('bob_register_page'))
+    
+    except Exception as e:
+        print(f"BoB registration error: {str(e)}")
+        flash('Server error occurred. Please try again later.', 'error')
+        return redirect(url_for('bob_register_page'))
+
+
+@app.route('/bob-success/<registration_id>')
+def bob_success(registration_id):
+    """Battle of the Bands registration success page"""
+    try:
+        user = get_current_user()
+        if not user:
+            flash('Please login first', 'error')
+            return redirect(url_for('user_login'))
+        
+        # Get registration from database
+        registration = db.bob_registrations.find_one({
+            '_id': ObjectId(registration_id)
+        })
+        
+        if not registration:
+            flash('Registration not found', 'error')
+            return redirect(url_for('index'))
+        
+        return render_template('bob_success.html', reg=registration)
+        
+    except Exception as e:
+        print(f"BoB success error: {e}")
+        flash('Invalid registration ID', 'error')
+        return redirect(url_for('index'))
+
 
 @app.route('/gallery', methods=['GET'])
 def gallery():

@@ -1,0 +1,188 @@
+{% extends "base.html" %}
+
+{% block title %}Battle of the Bands Registration Successful{% endblock %}
+
+{% block content %}
+<section class="section" style="padding-top: 3rem;">
+    <div class="container">
+
+        <!-- Success Message -->
+        <div class="has-text-centered animate-on-scroll" style="margin-bottom: 2rem;">
+            <h1 class="title is-1" style="color: var(--text-primary);">Registration Successful!</h1>
+            <p class="subtitle is-4">Thank you, <strong>{{ reg.band_name }}</strong></p>
+            <div class="registration-id-badge">ID: {{ reg._id }}</div>
+        </div>
+
+        <!-- Registration Receipt Card -->
+        <div class="columns is-centered">
+            <div class="column is-10">
+                <div class="receipt-card animate-on-scroll">
+
+                    <!-- Header -->
+                    <div class="receipt-header">
+                        <i class="fas fa-receipt" style="font-size: 1.5rem; color: var(--secondary-accent);"></i>
+                        <h3>Battle of the Bands Registration Receipt</h3>
+                    </div>
+
+                    <!-- Content Grid -->
+                    <div class="columns is-multiline">
+
+                        <!-- Left Column: Details -->
+                        <div class="column is-12">
+                            <h4 class="receipt-section-title">Band Details</h4>
+                            <div class="receipt-row">
+                                <span class="receipt-label">Band Name:</span>
+                                <span class="receipt-value">{{ reg.band_name }}</span>
+                            </div>
+                            <div class="receipt-row">
+                                <span class="receipt-label">Email Address:</span>
+                                <span class="receipt-value">{{ reg.email }}</span>
+                            </div>
+                            <div class="receipt-row">
+                                <span class="receipt-label">Institution:</span>
+                                <span class="receipt-value">{{ reg.institution }}</span>
+                            </div>
+                            <div class="receipt-row">
+                                <span class="receipt-label">Band Genre:</span>
+                                <span class="receipt-value">{{ reg.band_genre }}</span>
+                            </div>
+                            <div class="receipt-row">
+                                <span class="receipt-label">Member Count:</span>
+                                <span class="receipt-value">{{ reg.member_count }} Members</span>
+                            </div>
+                            <div class="receipt-row">
+                                <span class="receipt-label">Jamming Clip:</span>
+                                <span class="receipt-value">
+                                    <a href="{{ reg.jamming_clip }}" target="_blank"
+                                        style="color: var(--secondary-accent);">
+                                        <i class="fas fa-external-link-alt"></i> View Link
+                                    </a>
+                                </span>
+                            </div>
+                            <div class="receipt-row">
+                                <span class="receipt-label">CA Reference:</span>
+                                <span class="receipt-value">
+                                    {% if reg.ca_reference %}
+                                    {{ reg.ca_reference }}
+                                    {% else %}
+                                    Not provided
+                                    {% endif %}
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Full Width Column: Member Details Table -->
+                        <div class="column is-12">
+                            <h4 class="receipt-section-title">Member Details</h4>
+                            <div class="elegant-table-container">
+                                <table class="elegant-table">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 10%">#</th>
+                                            <th style="width: 40%">Name</th>
+                                            <th style="width: 45%">Role</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for member in reg.members %}
+                                        <tr>
+                                            <td>{{ member.position }}</td>
+                                            <td>{{ member.name }}</td>
+                                            <td>{{ member.role }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Status Box -->
+                    <div class="receipt-status-box">
+                        <div class="receipt-status-text">Status: Registration Submitted Successfully</div>
+                        <div class="receipt-status-helper">We will review your jamming clip and contact you soon with
+                            further instructions.</div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<style>
+    /* Elegant Table Styles for Success Page */
+    .elegant-table-container {
+        margin-top: 1rem;
+        margin-bottom: 2rem;
+        overflow-x: auto;
+        padding-bottom: 0.5rem;
+    }
+
+    .elegant-table {
+        border-collapse: separate;
+        border-spacing: 0 0.5rem;
+        width: 100%;
+        min-width: 400px;
+    }
+
+    .elegant-table th {
+        background-color: var(--primary-accent);
+        color: var(--text-primary);
+        padding: 0.75rem 1rem;
+        text-align: left;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-size: 0.8rem;
+    }
+
+    .elegant-table th:first-child {
+        border-top-left-radius: var(--border-radius);
+        border-bottom-left-radius: var(--border-radius);
+        width: 50px;
+        text-align: center;
+    }
+
+    .elegant-table th:last-child {
+        border-top-right-radius: var(--border-radius);
+        border-bottom-right-radius: var(--border-radius);
+    }
+
+    .elegant-table td {
+        background-color: rgba(255, 255, 255, 0.7);
+        padding: 0.75rem 1rem;
+        vertical-align: middle;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02);
+        font-size: 0.95rem;
+        color: var(--text-primary);
+    }
+
+    .elegant-table td:first-child {
+        border-top-left-radius: var(--border-radius);
+        border-bottom-left-radius: var(--border-radius);
+        font-weight: 700;
+        color: var(--tertiary-accent);
+        text-align: center;
+    }
+
+    .elegant-table td:last-child {
+        border-top-right-radius: var(--border-radius);
+        border-bottom-right-radius: var(--border-radius);
+    }
+
+    .receipt-section-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-top: 1.5rem;
+        margin-bottom: 0.5rem;
+        border-bottom: 2px solid var(--primary-accent);
+        padding-bottom: 0.5rem;
+        display: inline-block;
+    }
+</style>
+
+{% endblock %}

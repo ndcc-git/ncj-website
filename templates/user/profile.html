@@ -83,6 +83,7 @@
    ======================================== -->
 <section class="section" style="padding-top: 0;">
     <div class="container">
+        <!-- Regular Event Registrations -->
         <div class="profile-section">
             <h2 class="profile-section-title">আমার ইভেন্ট রেজিস্ট্রেশন</h2>
             
@@ -115,6 +116,41 @@
                 </div>
             {% endif %}
         </div>
+
+        <!-- Battle of the Bands Registrations -->
+        {% if bob_registrations %}
+        <div class="profile-section" style="margin-top: 2rem;">
+            <h2 class="profile-section-title">ব্যাটল অফ দ্য ব্যান্ডস রেজিস্ট্রেশন</h2>
+            
+            {% for bob in bob_registrations %}
+            <div class="registration-card">
+                <div class="registration-card-header">
+                    <h3 class="registration-card-title">{{ bob.band_name }}</h3>
+                    {% if bob.verified %}
+                    <span class="badge confirmed">ভেরিফাইড</span>
+                    {% else %}
+                    <span class="badge pending">ভেরিফিকেশন অপেক্ষমান</span>
+                    {% endif %}
+                </div>
+                <div style="margin-bottom: 1rem;">
+                    <p style="color: var(--text-secondary); margin-bottom: 0.25rem;">
+                        <i class="fas fa-music"></i> জনরা: {{ bob.band_genre }}
+                    </p>
+                    <p style="color: var(--text-secondary); margin-bottom: 0.25rem;">
+                        <i class="fas fa-users"></i> সদস্য সংখ্যা: {{ bob.member_count }}
+                    </p>
+                    <p style="color: var(--text-secondary);">
+                        রেজিস্ট্রেশন তারিখ: {{ bob.registration_date.strftime('%Y-%m-%d') }}
+                    </p>
+                </div>
+                <a href="{{ url_for('bob_success', registration_id=bob._id|string) }}" 
+                   class="button is-primary">
+                    <i class="fas fa-eye"></i>&nbsp; বিস্তারিত দেখুন
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
     </div>
 </section>
 

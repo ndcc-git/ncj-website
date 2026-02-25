@@ -87,7 +87,7 @@
 
                         <!-- Category -->
                         <div class="field" id="category">
-                            <label class="label">বিভাগ</label>
+                            <label class="label">বিভাগ *</label>
                             <div id="category-options"></div>
                             {% for error in form.category.errors %}
                             <p class="help is-danger">{{ error }}</p>
@@ -118,7 +118,9 @@
 
                         <!-- bKash -->
                         <div class="field" id="bksh">
-                            <label class="label">বিকাশ নম্বর *</label>
+                            <label class="label">বিকাশ নম্বর * 
+                                <span class="has-text-danger">(Send Money to +8801711111111)</span>
+                            </label>
                             <div class="control">
                                 {{ form.bkash_number(class="input") }}
                             </div>
@@ -184,11 +186,11 @@
                 data.categories.forEach(cat => {
                     let label = '';
                     switch (cat) {
-                        case 'K': label = 'K (0-2)'; break;
-                        case 'P': label = 'P (3-5)'; break;
-                        case 'J': label = 'J (6-8)'; break;
-                        case 'S': label = 'S (9-10)'; break;
-                        case 'HS': label = 'HS (11-12)'; break;
+                        case 'K': label = 'শিশু: প্রাক-প্রাথমিক - দ্বিতীয় শ্রেণি'; break;
+                        case 'P': label = 'প্রাথমিক: তৃতীয় শ্রেণি - পঞ্চম শ্রেণি'; break;
+                        case 'J': label = 'নিম্ন মাধ্যমিক: ষষ্ঠ শ্রেণি - অষ্টম শ্রেণি'; break;
+                        case 'S': label = 'মাধ্যমিক: নবম শ্রেণি - দশম শ্রেণি'; break;
+                        case 'HS': label = 'উচ্চ মাধ্যমিক: একাদশ শ্রেণি - দ্বাদশ শ্রেণি ও এইচ এস সি ২০২৫'; break;
                     }
 
                     const div = document.createElement('div');

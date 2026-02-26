@@ -279,3 +279,87 @@ def export_ca_to_excel(ca_data):
         mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         headers={'Content-Disposition': 'attachment;filename=caregistrations.xlsx'}
     )
+
+
+def export_bob_to_excel(bob_data):
+    """Export BoB registrations to Excel format matching CA export style"""
+    # Convert to DataFrame
+    data = []
+    for bob in bob_data:
+        # Format members as a readable string
+        members_str = ""
+        for member in bob.get('members', []):
+            members_str += f"{member.get('position', '')}. {member.get('name', '')} - {member.get('role', '')}\n"
+        members_str = members_str.strip()
+        
+        data.append({
+            "ID": str(bob.get("_id", "")),
+            "Band Name": bob.get("band_name", ""),
+            "Email": bob.get("email", ""),
+            "Institution": bob.get("institution", ""),
+            "Genre": bob.get("band_genre", ""),
+            "Member Count": bob.get("member_count", 0),
+            "Members": members_str,
+            "Jamming Clip": bob.get("jamming_clip", ""),
+            "CA Reference": bob.get("ca_reference", "") if bob.get("ca_reference") else "",
+            "Verified": "Yes" if bob.get("verified") else "No",
+            "Status": bob.get("status", "pending"),
+            "Registration Date": bob.get("registration_date", ""),
+            "Firebase uid": bob.get("firebase_uid", ""),
+            "User ID": str(bob.get("user_id", "")),
+            "IP Address": bob.get("ip_address", ""),
+        })
+
+    df = pd.DataFrame(data)
+    
+    # Create Excel file in memory
+    output = io.BytesIO()
+    
+    # Create workbook directly with openpyxl
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "BoBRegistrations"
+    
+    # Write headers
+    for col_num, column_title in enumerate(df.columns, 1):
+        ws.cell(row=1, column=col_num, value=column_title)
+    
+    # Write data
+    for row_num, row_data in enumerate(df.values, 2):
+        for col_num, cell_value in enumerate(row_data, 1):
+            ws.cell(row=row_num, column=col_num, value=cell_value)
+    
+    # Auto-adjust column widths
+    for column in ws.columns:
+        max_length = 0
+        column_letter = column[0].column_letter
+        for cell in column:
+            try:
+                if cell.value and len(str(cell.value)) > max_length:
+                    max_length = len(str(cell.value))
+            except:
+                pass
+        # Cap width at 50 and add padding
+        adjusted_width = min(max_length + 2, 50)
+        ws.column_dimensions[column_letter].width = adjusted_width
+    
+    # Enable text wrapping for Members column (column G)
+    if 'G' in ws.column_dimensions:
+        ws.column_dimensions['G'].width = 50  # Make Members column wider
+    
+    wb.save(output)
+    output.seek(0)
+    
+    # Create filename with timestamp
+    from datetime import datetime
+    timestamp = datetime.utcnow().strftime('%Y%m%d_%H%M%S')
+    filename = f"bob_registrations_{timestamp}.xlsx"
+    
+    return Response(
+        output.getvalue(),
+        mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        headers={
+            'Content-Disposition': f'attachment; filename={filename}',
+            'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet; charset=utf-8'
+        }
+    )

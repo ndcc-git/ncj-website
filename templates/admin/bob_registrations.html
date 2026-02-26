@@ -1,0 +1,127 @@
+{% extends "adm_base.html" %}
+
+{% block title %}Admin BOB Registrations{% endblock %}
+
+{% block content %}
+
+<section class="section is-title-bar">
+    <div class="level">
+        <div class="level-left">
+            <div class="level-item">
+                <ul>
+                    <li>Admin</li>
+                    <li>BOB</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="card has-table">
+    <header class="card-header">
+        <p class="card-header-title">
+            <span class="icon"><i class="mdi mdi-account-multiple"></i></span>
+            BOB Registrations
+        </p>
+        <a href="{{ request.url }}" class="card-header-icon">
+            <span class="icon"><i class="mdi mdi-reload"></i></span>
+        </a>
+    </header>
+    <div class="card-content">
+        <div class="b-table has-pagination">
+            <div class="table-wrapper has-mobile-cards">
+                <table class="table is-fullwidth is-striped is-hoverable is-fullwidth">
+                    <thead>
+                        <tr>
+                            <th>Band Name</th>
+                            <th>Email</th>
+                            <th>Institution</th>
+                            <th>CA Ref</th>
+                            <th>Date</th>
+                            <th>Clip</th>
+                            <th>Verified</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for reg in registrations %}
+                        <tr data-id="{{ reg._id }}">
+                            <td data-label="Name">{{ reg.band_name }}</td>
+                            <td data-label="Email">{{ reg.email }}</td>
+                            <td data-label="Institution">{{ reg.institution }}</td>
+                            <td data-label="CA Ref">{{ reg.ca_ref }}</td>
+                            <td data-label="Date">
+                                <small class="has-text-grey is-abbr-like" title="Oct 25, 2020">
+                                    {{ reg.registration_date.strftime('%#d %b %Y') }}
+                                </small>
+                            </td>
+
+                            <td data-label="Clip">
+                                <a href="{{ reg.jamming_clip }}" target="_blank">
+                                    <span class="icon has-text-success "><i class="mdi mdi-link"></i></span> Clip
+                                </a>
+                            </td>
+
+                            <td data-label="Verified">
+                                {% if reg.verified %}
+                                <span class="tag is-primary">Yes</span>
+                                {% else %}
+                                <span class="tag is-danger">No</span>
+                                {% endif %}
+                            </td>
+
+                            <td class="is-actions-cell">
+                                {% if not reg.verified %}
+                                <div class="buttons is-right verify-btn" data-id="{{ reg._id }}">
+                                    <button class="button is-small is-primary" type="button">
+                                        Verify
+                                    </button>
+                                </div>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+
+<script>
+
+    document.querySelectorAll('.verify-btn').forEach(btn => {
+        btn.addEventListener('click', function () {
+            const regId = this.dataset.id;
+            verifyRegistration(regId);
+        });
+    });
+
+    function verifyRegistration(regId) {
+        const meta = document.querySelector('meta[name="csrf-token"]');
+        const csrfToken = meta.getAttribute("content");
+        fetch(`/admin/verify-bob/${regId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Failed to verify registration');
+                }
+            });
+    }
+
+</script>
+
+
+{% endblock %}

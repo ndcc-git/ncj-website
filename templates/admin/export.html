@@ -153,7 +153,61 @@
     </div>
 </form>
 
+<h4 class="title is-4 ml-3">BOB Registrations</h4>
 
+<form method="GET" action="{{ url_for('admin.admin_bob_export') }}" class="my-3 ml-3">
+    <div class="field is-grouped is-align-items-center">
+
+        <!-- Status -->
+        <div class="field is-horizontal mr-3 mb-0">
+            <div class="field-label is-normal">
+                <label class="label">Status</label>
+            </div>
+            <div class="field-body">
+                <div class="field mb-0">
+                    <div class="control">
+                        <div class="select">
+                            <select name="status">
+                                <option value="">All</option>
+                                <option value="approved" {% if verified_filter=='true' %}selected{% endif %}>Approved</option>
+                                <option value="rejected" {% if verified_filter=='false' %}selected{% endif %}>Rejected</option>
+                                <option value="pending" {% if verified_filter=='false' %}selected{% endif %}>Pending</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Format -->
+        <div class="field is-horizontal mr-3 mb-0">
+            <div class="field-label is-normal">
+                <label class="label">Format</label>
+            </div>
+            <div class="field-body">
+                <div class="field mb-0">
+                    <div class="control">
+                        <div class="select">
+                            <select name="format">
+                                <option value="xlsx">XLSX</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Export Button -->
+        <div class="field mb-0">
+            <div class="control">
+                <button type="submit" class="button is-link">
+                    Export
+                </button>
+            </div>
+        </div>
+
+    </div>
+</form>
 
 
 

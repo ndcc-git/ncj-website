@@ -9,7 +9,7 @@ import jwt
 from pymongo import MongoClient
 from forms import AdminLoginForm, AdminUserForm
 from utils.email_service import send_bulk_emails, send_ca_approval_email, send_reg_verification_email
-from utils.export_service import export_ca_to_csv, export_ca_to_excel, export_to_csv, export_to_excel
+from utils.export_service import export_bob_to_excel, export_ca_to_csv, export_ca_to_excel, export_to_csv, export_to_excel
 from utils.security import hash_password, verify_password
 from extensions import db
 
@@ -198,8 +198,9 @@ def admin_dashboard():
     """Admin dashboard overview"""
     # Get statistics
     total_registrations = db.registrations.count_documents({})
+    total_bob_registrations = db.bob_registrations.count_documents({})
     verified_registrations = db.registrations.count_documents({'verified': True})
-    total_segments = db.segments.count_documents({})
+    ca_registrations = db.ca_registrations.count_documents({})
     
     # Get contact message statistics
     contact_messages_count = db.contact_messages.count_documents({})
@@ -220,7 +221,9 @@ def admin_dashboard():
                          contact_messages_count=contact_messages_count,
                          unread_contact_messages=unread_contact_messages,
                          recent_registrations=recent_registrations,
-                         segments=segments)
+                         segments=segments,
+                         ca_registrations=ca_registrations,
+                         total_bob_registrations=total_bob_registrations)
 
 
 @admin_bp.route('/analytics')
@@ -443,6 +446,34 @@ def bulk_verify():
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)}), 500
 
+@admin_bp.route('/bob-registrations')
+@role_required('admin', 'executive', 'organizer', 'moderator')
+def admin_bob_registrations():
+    """View Battle of the Bands registrations"""
+    registrations = list(db.bob_registrations.find().sort('registration_date', -1))
+    
+    return render_template('admin/bob_registrations.html', registrations=registrations)
+
+
+@admin_bp.route('/verify-bob/<registration_id>', methods=['POST'])
+@role_required('admin', 'executive')  # Only admin/executive can verify
+def verify_bob(registration_id):
+    """Verify a single registration"""
+    try:
+        
+        # Get registration to send email
+        bob_registration = db.bob_registrations.find_one({'_id': ObjectId(registration_id)})
+        if bob_registration:
+            db.bob_registrations.update_one(
+                {'_id': ObjectId(registration_id)},
+                {'$set': {'verified': True, 'verified_at': datetime.utcnow(), 'status': 'approved'}}
+            )
+            flash(f"verified registration {bob_registration['_id']}", 'success')
+            return jsonify({'success': True})
+    except Exception as e:
+        print(e)
+        return jsonify({'success': False}), 500
+
 
 ### CA Registration Routes
 @admin_bp.route('/ca-registrations')
@@ -577,6 +608,19 @@ def admin_ca_export():
     else:
         excel_data = export_ca_to_excel(ca_data)
         return excel_data
+
+@admin_bp.route('/bob-export')
+@role_required('admin', 'executive', 'organizer', 'moderator')
+def admin_bob_export():
+    status = request.args.get('status')
+    
+    query = {}
+    if status:
+        query['status'] = status
+    
+    bob_data = list(db.bob_registrations.find(query))
+    excel_data = export_bob_to_excel(bob_data)
+    return excel_data
 
 # Replace both admin_users and add_admin_user routes with this combined route:
 @admin_bp.route('/users', methods=['GET', 'POST'])

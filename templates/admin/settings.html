@@ -63,7 +63,7 @@
         <hr>
 
         <!-- Setting 2 -->
-        <div class="level">
+        <div class="level mb-5">
           <div class="level-left">
             <div>
               <p class="has-text-weight-semibold">👥 CA Registration</p>
@@ -88,6 +88,34 @@
           </div>
         </div>
 
+        <hr>
+
+        <!-- Setting 3: BoB Registration -->
+        <div class="level">
+          <div class="level-left">
+            <div>
+              <p class="has-text-weight-semibold">🎸 Battle of the Bands Registration</p>
+              <p class="is-size-7 has-text-grey">
+                Allow bands to register for Battle of the Bands competition
+              </p>
+            </div>
+          </div>
+
+          <div class="level-right is-flex is-align-items-center">
+
+            <label class="switch is-rounded mr-3">
+              <input type="checkbox" id="bob-registration-toggle"
+                {% if settings.bob_registration_enabled %}checked{% endif %}>
+              <span class="check"></span>
+            </label>
+
+            <span id="bob-status"
+              class="tag {% if settings.bob_registration_enabled %}is-success{% else %}is-danger{% endif %} is-light">
+              {{ 'Enabled' if settings.bob_registration_enabled else 'Disabled' }}
+            </span>
+          </div>
+        </div>
+
       </div>
 
       <!-- Footer buttons -->
@@ -107,7 +135,6 @@
   </div>
 </section>
 
-
 {% endblock %}
 
 {% block scripts %}
@@ -115,14 +142,17 @@
 <script>
 let currentSettings = {
   registration_enabled: {{ 'true' if settings.registration_enabled else 'false' }},
-  ca_registration_enabled: {{ 'true' if settings.ca_registration_enabled else 'false' }}
+  ca_registration_enabled: {{ 'true' if settings.ca_registration_enabled else 'false' }},
+  bob_registration_enabled: {{ 'true' if settings.bob_registration_enabled else 'false' }}
 };
 
 const regToggle = document.getElementById('registration-toggle');
 const caToggle = document.getElementById('ca-registration-toggle');
+const bobToggle = document.getElementById('bob-registration-toggle');
 
 const regStatus = document.getElementById('registration-status');
 const caStatus = document.getElementById('ca-status');
+const bobStatus = document.getElementById('bob-status');
 
 function updateTag(tag, enabled){
   tag.className = `tag ${enabled ? 'is-success' : 'is-danger'} is-light`;
@@ -137,6 +167,11 @@ regToggle.addEventListener('change', () => {
 caToggle.addEventListener('change', () => {
   currentSettings.ca_registration_enabled = caToggle.checked;
   updateTag(caStatus, caToggle.checked);
+});
+
+bobToggle.addEventListener('change', () => {
+  currentSettings.bob_registration_enabled = bobToggle.checked;
+  updateTag(bobStatus, bobToggle.checked);
 });
 
 document.getElementById('refresh-page').onclick = () => location.reload();
@@ -158,6 +193,11 @@ document.getElementById('save-settings').onclick = async function () {
         method: 'POST',
         headers: {'Content-Type':'application/json','X-CSRFToken':csrfToken},
         body: JSON.stringify({setting_name:'ca_registration_enabled', value:currentSettings.ca_registration_enabled})
+      }),
+      fetch('/api/toggle-setting', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json','X-CSRFToken':csrfToken},
+        body: JSON.stringify({setting_name:'bob_registration_enabled', value:currentSettings.bob_registration_enabled})
       })
     ]);
 
@@ -183,6 +223,5 @@ function showMessage(text, color){
   setTimeout(()=>box.classList.add('is-hidden'), 3000);
 }
 </script>
-
 
 {% endblock %}

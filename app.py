@@ -245,7 +245,7 @@ def init_db():
     # Create admin user if not exists
     if users_collection.count_documents({'role': 'admin'}) == 0:
         admin_user = {
-            'email': 'admin@festival.com',
+            'email': 'admin@gmail.com',
             'password': hash_password('admin123'),
             'name': 'System Administrator',
             'role': 'admin',
@@ -1026,8 +1026,8 @@ def bob_register_page():
         return redirect(url_for('user_login'))
     
     settings = db.settings.find_one({'name': 'system_settings'})
-    if not settings or not settings.get('registration_enabled', True):
-        flash('Event registration is currently closed.', 'error')
+    if not settings or not settings.get('bob_registration_enabled', True):
+        flash('Battle of the Bands registration is currently closed.', 'error')
         return redirect(url_for('registration_closed'))
     
     # Pre-fill user data for the template
@@ -1041,7 +1041,10 @@ def bob_register_page():
 @app.route('/bob-register', methods=['POST'])
 @login_required
 def bob_register():
-    
+    settings = db.settings.find_one({'name': 'system_settings'})
+    if not settings or not settings.get('bob_registration_enabled', True):
+        flash('Event registration is currently closed.', 'error')
+        return redirect(url_for('registration_closed'))
     """Handle Battle of the Bands registration"""
     try:
         # Get current user
@@ -1334,7 +1337,7 @@ def toggle_setting():
     setting_name = data.get('setting_name')
     new_value = data.get('value')
     
-    if setting_name not in ['registration_enabled', 'ca_registration_enabled']:
+    if setting_name not in ['registration_enabled', 'ca_registration_enabled', 'bob_registration_enabled']:
         return jsonify({'success': False, 'message': 'Invalid setting'}), 400
     
     update_data = {

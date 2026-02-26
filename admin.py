@@ -760,7 +760,8 @@ def admin_settings():
     if not settings:
         settings = {
             'registration_enabled': True,
-            'ca_registration_enabled': True
+            'ca_registration_enabled': True,
+            'registration_enabled': True
         }
     
     return render_template('admin/settings.html', settings=settings)

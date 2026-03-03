@@ -6,13 +6,14 @@ from threading import Thread
 import qrcode
 from io import BytesIO
 from email.mime.image import MIMEImage
+from email.utils import formataddr
 
 def send_email(to_email, subject, body, is_html, buffer=None):
     """Send an email using SMTP"""
     try:
         msg = MIMEMultipart("alternative")
         msg["Subject"] = subject
-        msg['From'] = current_app.config['MAIL_DEFAULT_SENDER']
+        msg['From'] = formataddr(("10thNCJ", current_app.config['MAIL_DEFAULT_SENDER']))
         msg['To'] = to_email
         
         with open("logo-bangla.png", "rb") as f:
@@ -269,7 +270,7 @@ def send_ca_approval_email(ca_registration):
     qr.save(buffer, format="PNG")
     buffer.seek(0)
     
-    subject = "১০ম ন্যাশনাল কালচারাল জুবিলেশন-এ সিএ রেজিস্ট্রেশনের জন্য ধন্যবাদ!"
+    subject = "১০ম ন্যাশনাল কালচারাল জুবিলেশন - সিএ রেজিস্ট্রেশন"
     body = f"""
     <!DOCTYPE html>
     <html lang="bn">
@@ -304,8 +305,8 @@ def send_ca_approval_email(ca_registration):
             <p>প্রিয় <strong>{ca_registration['full_name']}</strong>,</p>
 
             <p>
-                ১০ম ন্যাশনাল কালচারাল জুবিলেশন-এ ক্যামপাস অ্যাম্বাসেডর হিসেবে নিবন্ধনের জন্য আপনাকে আন্তরিক অভিনন্দন ও ধন্যবাদ।
-                আপনার নিবন্ধন সফলভাবে সম্পন্ন হয়েছে। আপনার নির্ধারিত সিএ কোড নিচে প্রদান করা হলো:
+                ১০ম ন্যাশনাল কালচারাল জুবিলেশন-এ ক্যামপাস অ্যাম্বাসেডর হিসেবে রেজিস্ট্রেশনের জন্য আপনাকে আন্তরিক অভিনন্দন ও ধন্যবাদ।
+                আপনার রেজিস্ট্রেশন সফলভাবে সম্পন্ন হয়েছে। আপনার নির্ধারিত সিএ কোড নিচে প্রদান করা হলো:
             </p>
 
             <!-- Code Box -->

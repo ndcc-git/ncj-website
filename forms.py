@@ -50,8 +50,14 @@ class RegistrationForm(FlaskForm):
     
     transaction_id = StringField('Transaction ID', validators=[
         DataRequired(),
-        Length(min=5, max=50)
+        Length(min=5, max=15)
     ])
+    
+    receipt = FileField('Bkash Receipt Screenshot', validators=[
+        FileAllowed(['jpg', 'jpeg', 'png'], 'Images only! (jpg, jpeg, png)'),
+        DataRequired()
+    ])
+    
     submit = SubmitField('Register')
     # Hidden fields for bot prevention
     honeypot = StringField('Honeypot', validators=[Optional()])

@@ -62,6 +62,9 @@ ca_collection = db.ca_registrations
 
 initialize_firebase()
 
+def allowed_file(filename):
+        return '.' in filename and \
+               filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 def generate_ca_code(full_name):
     """Generate unique 4-letter CA code from name"""
@@ -763,23 +766,9 @@ def ca_register():
         return redirect(url_for('ca_registration_success', ca_id=str(existing_ca_email['_id'])))
     
     form = CARegistrationForm()
-    
-    # File upload configurations
-    UPLOAD_FOLDER = os.path.join(app.root_path, 'static', 'uploads', 'ca_profiles')
-    
-    # Ensure upload directory exists
-    os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
     
     # Helper function to validate file
-    def allowed_file(filename):
-        return '.' in filename and \
-               filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-    
-    def validate_file_size(file):
-        file.seek(0, 2)  # Seek to end
-        file_size = file.tell()
-        file.seek(0)  # Reset to beginning
-        return file_size <= MAX_FILE_SIZE
     
     # Pre-fill form with user data
     if request.method == 'GET':
@@ -937,9 +926,57 @@ def register():
         
         # Check if segment exists and has capacity
         segment = segments_collection.find_one({'_id': ObjectId(form.segment.data)})
-        if not segment:
+        if not segment or form.segment.data == "6996cf26e7eb96d29e2010c5":
             flash('Selected segment not found', 'error')
             return redirect(url_for('register'))
+        
+        receipt_url = None
+        
+        if form.receipt.data:
+            file = form.receipt.data
+            
+            # Basic checks
+            if file.filename == '':
+                flash('receipt screenshot is required', 'error')
+                return render_template('register.html', form=form, segments=segments, preselected_segment_id=form.segment.data)
+            
+            # Check file extension
+            if not allowed_file(file.filename):
+                flash('Only JPG, JPEG, and PNG files are allowed', 'error')
+                return render_template('register.html', form=form, segments=segments, preselected_segment_id=form.segment.data)
+            
+            # Check file size (assuming MAX_FILE_SIZE is defined elsewhere)
+            file.seek(0, os.SEEK_END)
+            file_length = file.tell()
+            file.seek(0)
+            
+            if file_length > MAX_FILE_SIZE:
+                flash(f'File size exceeds {MAX_FILE_SIZE // (1024*1024)}MB limit', 'error')
+                return render_template('register.html', form=form, segments=segments, preselected_segment_id=form.segment.data)
+            
+            try:
+                # Generate a unique ID for the image
+                unique_id = uuid.uuid4().hex[:8]
+                timestamp = datetime.utcnow().strftime('%Y%m%d_%H%M%S')
+                public_id = f"{timestamp}_{unique_id}"
+                
+                # Upload directly to Cloudinary
+                upload_result = cloudinary.uploader.upload(
+                    file,
+                    public_id=public_id,
+                    folder="receipt_pictures"
+                )
+                
+                # Get the secure URL
+                receipt_url = upload_result['secure_url']
+                
+            except Exception as e:
+                app.logger.error(f'Upload error: {str(e)}')
+                flash('Error uploading file. Please try again.', 'error')
+                return render_template('register.html', form=form, segments=segments, preselected_segment_id=form.segment.data)
+        else:
+            flash('receipt screenshot is required', 'error')
+            return render_template('register.html', form=form, segments=segments, preselected_segment_id=form.segment.data)
         
         # Check for duplicate registration (same user for same segment)
         existing = registrations_collection.find_one({
@@ -949,7 +986,7 @@ def register():
         
         if existing:
             flash('You have already registered for this segment', 'error')
-            return redirect(url_for('register'))
+            return render_template('register.html', form=form, segments=segments, preselected_segment_id=form.segment.data)
         
         
         # Conditional category validation
@@ -976,6 +1013,7 @@ def register():
             'ca_ref': form.ca_ref.data,
             'bkash_number': form.bkash_number.data,
             'transaction_id': form.transaction_id.data,
+            'receipt': receipt_url,
             'verified': False,
             'registration_date': datetime.utcnow(),
             'csrf_token': csrf_token,

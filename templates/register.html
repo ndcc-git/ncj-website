@@ -31,7 +31,8 @@
 
                     <h2 class="title is-3 has-text-centered mb-5">রেজিস্ট্রেশন ফর্ম</h2>
 
-                    <form method="POST" action="{{ url_for('register') }}" id="registration-form">
+                    <form method="POST" action="{{ url_for('register') }}" enctype="multipart/form-data"
+                        id="registration-form">
                         {{ form.hidden_tag() }}
 
                         <!-- Honeypot -->
@@ -96,7 +97,7 @@
 
                         <!-- Submission Link -->
                         <div class="field" id="submission-link-group" style="display:none;">
-                            <label class="label">সাবমিশন লিংক *</label>
+                            <label class="label">সাবমিশন লিংক * (গুগল ড্রাইভ/Canva)</label>
                             <div class="control">
                                 {{ form.submission_link(class="input") }}
                             </div>
@@ -107,7 +108,7 @@
 
                         <!-- CA Ref -->
                         <div class="field">
-                            <label class="label">CA রেফারেন্স</label>
+                            <label class="label">সিএ রেফারেন্স কোড</label>
                             <div class="control">
                                 {{ form.ca_ref(class="input") }}
                             </div>
@@ -118,8 +119,8 @@
 
                         <!-- bKash -->
                         <div class="field" id="bksh">
-                            <label class="label">বিকাশ নম্বর * 
-                                <span class="has-text-danger">(Send Money to +8801711111111)</span>
+                            <label class="label">বিকাশ নম্বর *
+                                <span id="bkash_label" class="has-text-danger">(Send Money to +8801735643997)</span>
                             </label>
                             <div class="control">
                                 {{ form.bkash_number(class="input") }}
@@ -140,10 +141,29 @@
                             {% endfor %}
                         </div>
 
+                        <div class="field" id="receipt-field">
+                            <label class="label">
+                                বিকাশ রিসিট স্ক্রিনশট *
+                                <span class="has-text-danger">(jpg, jpeg, png only)</span>
+                            </label>
+
+                            <div class="custom-file-wrapper">
+                                {{ form.receipt(class="custom-file-input", id="receipt-input") }}
+                                <div class="custom-file-display" id="receipt-display">
+                                    <span id="receipt-text">Click to upload receipt</span>
+                                </div>
+                            </div>
+
+                            {% for error in form.receipt.errors %}
+                            <p class="help is-danger">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+
                         <!-- Submit -->
                         <div class="field">
                             <div class="control">
-                                {{ form.submit(class="button is-primary is-fullwidth is-large", value="নিবন্ধন করুন") }}
+                                {{ form.submit(class="button is-primary is-fullwidth is-large", value="রেজিস্ট্রেশন
+                                করুন") }}
                             </div>
                         </div>
 
@@ -155,12 +175,73 @@
     </div>
 </section>
 
+<style>
+    .custom-file-wrapper {
+        position: relative;
+        width: 100%;
+    }
+
+    .custom-file-input {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        cursor: pointer;
+        z-index: 2;
+    }
+
+    .custom-file-display {
+        border: 2px solid var(--tertiary-accent);
+        background-color: transparent;
+        border-radius: var(--border-radius);
+        color: var(--text-primary);
+        padding: 0.75rem;
+        transition: border-color var(--transition-speed),
+            box-shadow var(--transition-speed);
+        height: auto;
+        line-height: 1.5;
+        display: flex;
+        align-items: center;
+    }
+
+    .custom-file-wrapper:hover .custom-file-display {
+        border-color: #734610;
+    }
+
+    .custom-file-input:focus+.custom-file-display {
+        box-shadow: 0 0 0 3px rgba(115, 70, 16, 0.2);
+    }
+
+    #receipt-text {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+</style>
 {% endblock %}
 
 {% block scripts %}
 <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const input = document.getElementById("receipt-input");
+        const text = document.getElementById("receipt-text");
+
+        input.addEventListener("change", function () {
+            if (this.files && this.files.length > 0) {
+                text.textContent = this.files[0].name;
+            } else {
+                text.textContent = "Click to upload receipt";
+            }
+        });
+    });
     document.getElementById('segment-select').addEventListener('change', function () {
         const segmentId = this.value;
+        const segmentText = this.options[this.selectedIndex].text;
+
+        const segmentPrice = segmentText.split(" - ")[1];
+        const bkashLabel = document.getElementById("bkash_label");
+        bkashLabel.innerHTML = `(Send Money ${segmentPrice} to +8801735643997)`
+
+
         if (!segmentId) return;
 
         const bkshDiv = document.getElementById("bksh");
@@ -244,7 +325,7 @@
     });
     document.addEventListener('DOMContentLoaded', function () {
         const segmentSelect = document.getElementById('segment-select');
-        
+
         if (segmentSelect.value) {
             segmentSelect.dispatchEvent(new Event('change'));
         }

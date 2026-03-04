@@ -127,7 +127,12 @@
             {% endif %}
             <div class="event-card-actions">
               <a href="{{ url_for('event', _id=event._id) }}" class="button is-secondary">এক্সপ্লোর</a>
+
+              {% if event._id|string == '6996cf26e7eb96d29e2010c6' %}
+              <a href="{{ url_for('bob_register_page') }}" class="button is-primary">রেজিস্টার</a>
+              {% else %}
               <a href="{{url_for('register', id=event._id)}}" class="button is-primary">রেজিস্টার</a>
+              {% endif %}
             </div>
           </div>
         </div>

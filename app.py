@@ -923,12 +923,7 @@ def register():
     if form.validate_on_submit():
         # Generate CSRF token for this submission
         csrf_token = generate_csrf_token()
-        
-        # Check if segment exists and has capacity
-        segment = segments_collection.find_one({'_id': ObjectId(form.segment.data)})
-        if not segment or form.segment.data == "6996cf26e7eb96d29e2010c5":
-            flash('Selected segment not found', 'error')
-            return redirect(url_for('register'))
+
 
         
         receipt_url = None

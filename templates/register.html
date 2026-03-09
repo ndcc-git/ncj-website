@@ -297,9 +297,9 @@
             .then(data => {
                 const nameLabel = document.querySelector("label[for='full_name']");
                 if (data.type === "Team") {
-                    nameLabel.innerText = "দলের নাম";
+                    nameLabel.innerText = "দলের নাম *";
                 } else {
-                    nameLabel.innerText = "নাম";
+                    nameLabel.innerText = "নাম *";
                 }
 
                 const submissionDiv = document.getElementById("submission-link-group");

@@ -929,6 +929,7 @@ def register():
         if not segment or form.segment.data == "6996cf26e7eb96d29e2010c5":
             flash('Selected segment not found', 'error')
             return redirect(url_for('register'))
+
         
         receipt_url = None
         
@@ -977,17 +978,7 @@ def register():
         else:
             flash('receipt screenshot is required', 'error')
             return render_template('register.html', form=form, segments=segments, preselected_segment_id=form.segment.data)
-        
-        # Check for duplicate registration (same user for same segment)
-        existing = registrations_collection.find_one({
-            'user_id': user['_id'],
-            'segment_id': ObjectId(form.segment.data)
-        })
-        
-        if existing:
-            flash('You have already registered for this segment', 'error')
-            return render_template('register.html', form=form, segments=segments, preselected_segment_id=form.segment.data)
-        
+          
         
         # Conditional category validation
         if segment.get('categories') and not form.category.data:

@@ -81,7 +81,7 @@ def send_reg_verification_email(registration):
         <!-- Event Strip -->
         <div style="background:#734610; padding:15px; text-align:center;">
             <span style="color:#ffffff; font-weight:bold; letter-spacing:1px;">
-                {registration['segment_name']} ইভেন্ট
+                {registration['segment_name']}
             </span>
         </div>
 
@@ -155,6 +155,10 @@ def send_bulk_emails(recipients, subject=None):
     success_count = 0
     
     for recipient in recipients:
+        qr = qrcode.make({recipient['user_id']})
+        buffer = BytesIO()
+        qr.save(buffer, format="PNG")
+        buffer.seek(0)
         email_subject = "১০ম  ন্যাশনাল কালচারাল জুবিলেশন-এ রেজিস্ট্রেশনের জন্য ধন্যবাদ"
         email_body = f"""
         <!DOCTYPE html>
@@ -187,7 +191,7 @@ def send_bulk_emails(recipients, subject=None):
             <!-- Event Strip -->
             <div style="background:#734610; padding:15px; text-align:center;">
                 <span style="color:#ffffff; font-weight:bold; letter-spacing:1px;">
-                    {recipient['segment_name']} ইভেন্ট
+                    {recipient['segment_name']}
                 </span>
             </div>
 
@@ -252,7 +256,7 @@ def send_bulk_emails(recipients, subject=None):
         """
         
         
-        if send_email(recipient['email'], email_subject, email_body):
+        if send_email(recipient['email'], email_subject, email_body, True, buffer=buffer):
             success_count += 1
     
     return success_count > 0

@@ -1,6 +1,7 @@
 from datetime import datetime
 from functools import wraps
 import json
+from math import ceil
 from bson import ObjectId, json_util
 from bson.errors import InvalidId
 from flask import Blueprint
@@ -343,14 +344,17 @@ def delete_message(message_id):
 @role_required('admin', 'executive', 'organizer', 'moderator')
 def admin_registrations():
     """View and manage registrations"""
+
     segment_id = request.args.get('segment_id')
     verified_filter = request.args.get('verified')
     search = request.args.get('search')
+    page = int(request.args.get('page', 1))
 
+    per_page = 40
     query = {}
 
-    # Normal filters
-    if segment_id:
+    # Filters
+    if segment_id and segment_id != 'None':
         query['segment_id'] = ObjectId(segment_id)
 
     if verified_filter == 'true':
@@ -358,7 +362,6 @@ def admin_registrations():
     elif verified_filter == 'false':
         query['verified'] = False
 
-    # Search filter (same input for _id or other fields)
     if search:
         search = search.strip()
         or_conditions = [
@@ -368,7 +371,6 @@ def admin_registrations():
             {"transaction_id": {"$regex": search, "$options": "i"}},
         ]
 
-        # Try adding _id search if valid ObjectId
         try:
             or_conditions.append({"_id": ObjectId(search)})
         except InvalidId:
@@ -376,9 +378,17 @@ def admin_registrations():
 
         query["$or"] = or_conditions
 
+    # total count
+    total = db.registrations.count_documents(query)
+    total_pages = ceil(total / per_page)
+
     registrations = list(
-        db.registrations.find(query).sort('registration_date', -1)
+        db.registrations.find(query)
+        .sort('registration_date', -1)
+        .skip((page - 1) * per_page)
+        .limit(per_page)
     )
+
     segments = list(db.segments.find({}))
 
     return render_template(
@@ -387,7 +397,9 @@ def admin_registrations():
         segments=segments,
         segment_id=segment_id,
         verified_filter=verified_filter,
-        search=search
+        search=search,
+        page=page,
+        total_pages=total_pages
     )
 
 

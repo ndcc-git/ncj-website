@@ -19,7 +19,7 @@
 
 <form method="GET" action="{{ url_for('admin.admin_registrations') }}">
     <div class="field is-grouped is-align-items-flex-end is-flex-wrap-wrap">
-        
+
         <!-- Segment -->
         <div class="control mr-4 mb-2">
             <label class="label is-size-7 mb-1">Segment:</label>
@@ -71,11 +71,11 @@
                 </span>
             </span>
         </div>
-        
+
         <div class="control">
             <input class="input" type="text" placeholder="Search" name="search">
         </div>
-        
+
         <div class="control">
             <button type="submit" class="button is-link">Search</button>
         </div>
@@ -171,15 +171,43 @@
                     <div class="level-left">
                         <div class="level-item">
                             <div class="buttons has-addons">
-                                <button type="button" class="button is-active">1</button>
-                                <button type="button" class="button">2</button>
-                                <button type="button" class="button">3</button>
+
+                                {% if page > 1 %}
+                                <a class="button" href="{{ url_for('admin.admin_registrations',
+                                        page=page-1,
+                                        segment_id=segment_id,
+                                        verified=verified_filter,
+                                        search=search) }}">
+                                    Prev
+                                </a>
+                                {% endif %}
+
+                                {% for p in range(1, total_pages + 1) %}
+                                <a class="button {% if p == page %}is-active{% endif %}" href="{{ url_for('admin.admin_registrations',
+                                        page=p,
+                                        segment_id=segment_id,
+                                        verified=verified_filter,
+                                        search=search) }}">
+                                    {{ p }}
+                                </a>
+                                {% endfor %}
+
+                                {% if page < total_pages %} <a class="button" href="{{ url_for('admin.admin_registrations',
+                                        page=page+1,
+                                        segment_id=segment_id,
+                                        verified=verified_filter,
+                                        search=search) }}">
+                                    Next
+                                    </a>
+                                    {% endif %}
+
                             </div>
                         </div>
                     </div>
+
                     <div class="level-right">
                         <div class="level-item">
-                            <small>Page 1 of 3</small>
+                            <small>Page {{ page }} of {{ total_pages }}</small>
                         </div>
                     </div>
                 </div>
@@ -201,24 +229,24 @@
     });
 
     document.querySelectorAll('.verify-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
+        btn.addEventListener('click', function () {
             const regId = this.dataset.id;
             verifyRegistration(regId);
         });
     });
 
 
-    document.getElementById('bulk-verify-btn').addEventListener('click', function() {
+    document.getElementById('bulk-verify-btn').addEventListener('click', function () {
         const selectedIds = [];
         document.querySelectorAll('.registration-checkbox:checked').forEach(cb => {
             selectedIds.push(cb.closest('tr').dataset.id);
         });
-        
+
         if (selectedIds.length === 0) {
             alert('Please select at least one registration to verify.');
             return;
         }
-        
+
         if (confirm(`Are you sure you want to verify ${selectedIds.length} registration(s)?`)) {
             bulkVerify(selectedIds);
         }
@@ -234,14 +262,14 @@
                 'X-CSRFToken': csrfToken
             }
         })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                location.reload();
-            } else {
-                alert('Failed to verify registration');
-            }
-        });
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Failed to verify registration');
+                }
+            });
     }
 
     function bulkVerify(registrationIds) {
@@ -255,15 +283,15 @@
             },
             body: JSON.stringify({ registration_ids: registrationIds })
         })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert(`${data.verified_count} registration(s) verified successfully.`);
-                location.reload();
-            } else {
-                alert('Failed to bulk verify: ' + data.message);
-            }
-        });
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(`${data.verified_count} registration(s) verified successfully.`);
+                    location.reload();
+                } else {
+                    alert('Failed to bulk verify: ' + data.message);
+                }
+            });
     }
 
 </script>

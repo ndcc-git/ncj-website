@@ -924,7 +924,6 @@ def register():
         # Generate CSRF token for this submission
         csrf_token = generate_csrf_token()
         
-        # Check if segment exists and has capacity
         segment = segments_collection.find_one({'_id': ObjectId(form.segment.data)})
 
         

@@ -747,10 +747,10 @@ def ca_register():
         return redirect(url_for('user_login'))
     
     # Check if CA registration is enabled
-    settings = db.settings.find_one({'name': 'system_settings'})
-    if not settings or not settings.get('ca_registration_enabled', True):
-        flash('CA registration is currently closed.', 'error')
-        return redirect(url_for('ca_registration_closed'))
+    # settings = db.settings.find_one({'name': 'system_settings'})
+    # if not settings or not settings.get('ca_registration_enabled', True):
+    #     flash('CA registration is currently closed.', 'error')
+    #     return redirect(url_for('ca_registration_closed'))
     
     # Check if user has already applied for CA
     existing_ca = db.ca_registrations.find_one({'user_id': user['_id']})

@@ -901,7 +901,7 @@ def register():
             {'_id': 1, 'name': 1, 'price': 1, 'categories': 1}
         ))
     form.segment.choices = [(str(seg['_id']), f"{seg['name']} - ৳{seg['price']}") for seg in segments]
-    
+    form.division.validate_choice = False
     # Get segment_id from query parameter
     segment_id = request.args.get('id')
     
@@ -982,10 +982,17 @@ def register():
             form.category.errors.append("Category is required for this segment.")
             return render_template('register.html', form=form, segments=segments, preselected_segment_id=form.segment.data)
         
+        if segment.get('sub_categories') and not form.division.data:
+            form.category.errors.append("Subject is required for this segment.")
+            return render_template('register.html', form=form, segments=segments, preselected_segment_id=form.segment.data)
+        
         # Conditional submission link validation
         if segment.get('type') == "Submission" and not form.submission_link.data:
             form.submission_link.errors.append("Submission link is required for this segment.")
             return render_template('register.html', form=form, segments=segments, preselected_segment_id=form.segment.data)
+
+        if len(segment.get('sub_categories', [])) == 0:
+            form.division.data = ''
 
         # Create registration
         registration_data = {
@@ -996,6 +1003,7 @@ def register():
             'institution': form.institution.data,
             'segment_id': ObjectId(form.segment.data),
             'segment_name': segment['name'],
+            'division_name': form.division.data,
             'category': form.category.data if segment.get('categories') else None,
             'submission_link': form.submission_link.data if segment.get('type') == "Submission" else None,
             'ca_ref': form.ca_ref.data,
@@ -1309,6 +1317,18 @@ def get_segment_categories(segment_id):
         return jsonify({'categories': []})
     except:
         return jsonify({'categories': []})
+
+
+@app.route('/api/segments/<segment_id>/sub_categories')
+def get_segment_sub_categories(segment_id):
+    """API endpoint to get categories for a segment"""
+    try:
+        segment = segments_collection.find_one({'_id': ObjectId(segment_id)})
+        if segment:
+            return jsonify({'sub_categories': segment.get('sub_categories', [])})
+        return jsonify({'sub_categories': []})
+    except:
+        return jsonify({'sub_categories': []})
     
 @app.route('/api/segments/<segment_id>/type')
 def get_segment_type(segment_id):

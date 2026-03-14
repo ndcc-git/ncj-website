@@ -86,6 +86,18 @@
                             {% endfor %}
                         </div>
 
+                        <div class="field mb-5" id="division" style="display:none;">
+                            <label class="label">বিষয় *</label>
+                            <div class="control">
+                                <div class="select is-fullwidth">
+                                    {{ form.division(id="division-select") }}
+                                </div>
+                            </div>
+                            {% for error in form.division.errors %}
+                            <p class="help is-danger">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+
                         <!-- Category -->
                         <div class="field" id="category">
                             <label class="label">বিভাগ *</label>
@@ -291,6 +303,31 @@
                     container.appendChild(div);
                 });
             });
+
+        fetch(`/api/segments/${segmentId}/sub_categories`)
+    .then(res => res.json())
+    .then(data => {
+        const divisionField = document.getElementById("division");
+        const divisionSelect = document.getElementById("division-select");
+
+        const subCategories = data.sub_categories;
+
+        if (subCategories && subCategories.length > 0) {
+            divisionField.style.display = "block";
+
+            divisionSelect.innerHTML = ""; // clear existing options
+
+            subCategories.forEach(cat => {
+                const option = document.createElement("option");
+                option.value = cat;
+                option.textContent = cat;
+                divisionSelect.appendChild(option);
+            });
+
+        } else {
+            divisionField.style.display = "none";
+        }
+    });
 
         fetch(`/api/segments/${segmentId}/type`)
             .then(res => res.json())

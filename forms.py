@@ -23,6 +23,7 @@ class RegistrationForm(FlaskForm):
     ])
     
     segment = SelectField('Segment', choices=[], validators=[DataRequired()])
+    division = SelectField('Division', choices=[], validators=[])
     
     category = RadioField('Category', choices=[
         ('K', 'Kindergarten (K)'),

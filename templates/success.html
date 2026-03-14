@@ -36,6 +36,12 @@
                                 <span class="receipt-label">সেগমেন্ট:</span>
                                 <span class="receipt-value">{{ registration.segment_name }}</span>
                             </div>
+                            {% if registration.division_name %}
+                            <div class="receipt-row">
+                                <span class="receipt-label">বিষয়:</span>
+                                <span class="receipt-value">{{ registration.division_name }}</span>
+                            </div>
+                            {% endif %}
                             <div class="receipt-row">
                                 <span class="receipt-label">ক্যাটাগরি:</span>
                                 <span class="receipt-value">{{ registration.category }}</span>

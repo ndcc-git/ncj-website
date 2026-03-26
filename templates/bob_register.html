@@ -50,15 +50,6 @@
                             </div>
                         </div>
 
-                        <!-- Institution -->
-                        <div class="field">
-                            <label class="label">Institution *</label>
-                            <div class="control">
-                                <input class="input" type="text" id="institution"
-                                    placeholder="School/College/University" required>
-                            </div>
-                        </div>
-
                         <!-- Band Genre -->
                         <div class="field">
                             <label class="label">Band Genre *</label>
@@ -154,7 +145,6 @@
     document.addEventListener('DOMContentLoaded', function () {
         // Get user data from the template
         const userEmail = '{{ user.email|safe }}';
-        const userInstitution = '{{ user.institution|safe }}';
 
         // Auto-fill email field
         const emailField = document.getElementById('email');
@@ -162,15 +152,7 @@
             emailField.value = userEmail;
         }
 
-        // Auto-fill institution field
-        const institutionField = document.getElementById('institution');
-        if (institutionField && userInstitution) {
-            institutionField.value = userInstitution;
-        }
 
-        // Make fields read-only if you want (optional)
-        // if (emailField) emailField.readOnly = true;
-        // if (institutionField) institutionField.readOnly = true;
     });
 
 
@@ -217,7 +199,6 @@
         const formData = new FormData();
         formData.append('bandName', document.getElementById('band-name').value.trim());
         formData.append('email', document.getElementById('email').value.trim());
-        formData.append('institution', document.getElementById('institution').value.trim());
         formData.append('bandGenre', document.getElementById('band-genre').value.trim());
         formData.append('memberCount', memberCount);
         formData.append('jammingClip', document.getElementById('jamming-clip').value.trim());

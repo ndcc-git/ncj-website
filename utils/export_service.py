@@ -300,7 +300,6 @@ def export_bob_to_excel(bob_data):
             "ID": str(bob.get("_id", "")),
             "Band Name": bob.get("band_name", ""),
             "Email": bob.get("email", ""),
-            "Institution": bob.get("institution", ""),
             "Genre": bob.get("band_genre", ""),
             "Member Count": bob.get("member_count", 0),
             "Members": members_str,

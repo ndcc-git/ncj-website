@@ -1067,7 +1067,6 @@ def bob_register_page():
     # Pre-fill user data for the template
     user_data = {
         'email': user.get('email', ''),
-        'institution': user.get('institution', '')
     }
     
     return render_template('bob_register.html', user=user_data)
@@ -1090,7 +1089,6 @@ def bob_register():
         # Get form data from request
         band_name = request.form.get('bandName', '').strip()
         email = request.form.get('email', '').strip()
-        institution = request.form.get('institution', '').strip()
         band_genre = request.form.get('bandGenre', '').strip()
         member_count = request.form.get('memberCount', '')
         jamming_clip = request.form.get('jammingClip', '').strip()
@@ -1110,7 +1108,7 @@ def bob_register():
                 })
         
         # Validate required fields
-        if not all([band_name, email, institution, band_genre, member_count, jamming_clip]):
+        if not all([band_name, email, band_genre, member_count, jamming_clip]):
             flash('All fields are required', 'error')
             return redirect(url_for('bob_register_page'))
         
@@ -1165,7 +1163,6 @@ def bob_register():
             'firebase_uid': user.get('firebase_uid'),
             'band_name': band_name,
             'email': email,
-            'institution': institution,
             'band_genre': band_genre,
             'member_count': member_count,
             'members': members,

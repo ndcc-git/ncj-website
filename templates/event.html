@@ -64,14 +64,16 @@
                         </span>
                     </div>
                     {% endif %}
+                    {% if event.categories %}
                     <div class="event-meta-item">
                         <span>
-                        ক্যাটাগরি: <br>
-                        {% for c in event.categories %}
+                            ক্যাটাগরি: <br>
+                            {% for c in event.categories %}
                             {{ loop.index }}. {{ category_map.get(c, c) }}{% if not loop.last %} {% endif %} <br>
-                        {% endfor %}
+                            {% endfor %}
                         </span>
                     </div>
+                    {% endif %}
                 </div>
 
                 <div class="event-actions">

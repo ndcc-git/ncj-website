@@ -925,7 +925,6 @@ def register():
         # Generate CSRF token for this submission
         csrf_token = generate_csrf_token()
         
-        segment = segments_collection.find_one({'_id': ObjectId(form.segment.data)})
 
         
         receipt_url = None
@@ -975,8 +974,9 @@ def register():
         else:
             flash('receipt screenshot is required', 'error')
             return render_template('register.html', form=form, segments=segments, preselected_segment_id=form.segment.data)
-          
         
+        segment = segments_collection.find_one({'_id': ObjectId(form.segment.data)})
+
         # Conditional category validation
         if segment.get('categories') and not form.category.data:
             form.category.errors.append("Category is required for this segment.")

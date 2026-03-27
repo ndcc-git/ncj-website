@@ -86,6 +86,9 @@
                             {% endfor %}
                         </div>
 
+                        <span class="event-meta-item mb-3" id="pack-segs"></span>
+
+
                         <div class="field mb-5" id="division" style="display:none;">
                             <label class="label">বিষয় *</label>
                             <div class="control">
@@ -258,9 +261,11 @@
 
         const bkshDiv = document.getElementById("bksh");
         const trxDiv = document.getElementById("trx");
+        const packSegs = document.getElementById("pack-segs");
 
         bkshDiv.style.display = "block"
         trxDiv.style.display = "block"
+
 
         fetch(`/api/segments/${segmentId}/categories`)
             .then(res => res.json())
@@ -305,29 +310,29 @@
             });
 
         fetch(`/api/segments/${segmentId}/sub_categories`)
-    .then(res => res.json())
-    .then(data => {
-        const divisionField = document.getElementById("division");
-        const divisionSelect = document.getElementById("division-select");
+            .then(res => res.json())
+            .then(data => {
+                const divisionField = document.getElementById("division");
+                const divisionSelect = document.getElementById("division-select");
 
-        const subCategories = data.sub_categories;
+                const subCategories = data.sub_categories;
 
-        if (subCategories && subCategories.length > 0) {
-            divisionField.style.display = "block";
+                if (subCategories && subCategories.length > 0) {
+                    divisionField.style.display = "block";
 
-            divisionSelect.innerHTML = ""; // clear existing options
+                    divisionSelect.innerHTML = ""; // clear existing options
 
-            subCategories.forEach(cat => {
-                const option = document.createElement("option");
-                option.value = cat;
-                option.textContent = cat;
-                divisionSelect.appendChild(option);
+                    subCategories.forEach(cat => {
+                        const option = document.createElement("option");
+                        option.value = cat;
+                        option.textContent = cat;
+                        divisionSelect.appendChild(option);
+                    });
+
+                } else {
+                    divisionField.style.display = "none";
+                }
             });
-
-        } else {
-            divisionField.style.display = "none";
-        }
-    });
 
         fetch(`/api/segments/${segmentId}/type`)
             .then(res => res.json())
@@ -342,6 +347,27 @@
                 const submissionDiv = document.getElementById("submission-link-group");
                 submissionDiv.style.display = (data.type === "Submission") ? "block" : "none";
             });
+
+        if (segmentId == "69c61a78730d01d61681620d") {
+            packSegs.innerText = `
+            ১. বই ভিত্তিক কুইজ
+            ২. মুভি সিরিজ কুইজ 
+            ৩. পপ কালচার কুইজ
+            ৪. এনিমে কুইজ 
+            `
+        } else if (segmentId == "69c61ac5730d01d61681620e") {
+            packSegs.innerText = `
+                ১. উপস্থিত বক্তৃতা 
+                ২. কবিতা আবৃত্তি 
+                ৩. শুদ্ধ পাঠ 
+                ৪. চিঠি লিখন
+            `
+
+        } else if (segmentId == "69c61b22730d01d61681620f") {
+            packSegs.innerText = 'কন্ঠসংগীত প্রতিযোগিতায় যেকোন তিনটি প্রতিযোগিতা';
+        } else {
+            packSegs.innerText = '';
+        }
     });
 
     // LocalStorage Autofill

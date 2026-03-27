@@ -89,6 +89,7 @@
                         <span class="event-meta-item mb-3" id="pack-segs"></span>
 
 
+                        <!-- Original division select (hide by default) -->
                         <div class="field mb-5" id="division" style="display:none;">
                             <label class="label">বিষয় *</label>
                             <div class="control">
@@ -96,6 +97,17 @@
                                     {{ form.division(id="division-select") }}
                                 </div>
                             </div>
+                            {% for error in form.division.errors %}
+                            <p class="help is-danger">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+
+                        <!-- New checkbox version for multiple selections -->
+                        <div class="field mb-5" id="division-checkbox" style="display:none;">
+                            <label class="label">বিষয় * (যেকোনো তিনটি নির্বাচন করুন)</label>
+                            <div id="division-checkboxes"></div>
+                            <div id="division-checkbox-error" class="help is-danger" style="display:none;"></div>
+                            <input type="hidden" id="division-hidden" name="division" value="">
                             {% for error in form.division.errors %}
                             <p class="help is-danger">{{ error }}</p>
                             {% endfor %}
@@ -312,25 +324,106 @@
         fetch(`/api/segments/${segmentId}/sub_categories`)
             .then(res => res.json())
             .then(data => {
-                const divisionField = document.getElementById("division");
+                const divisionSelectField = document.getElementById("division");
+                const divisionCheckboxField = document.getElementById("division-checkbox");
                 const divisionSelect = document.getElementById("division-select");
-
                 const subCategories = data.sub_categories;
 
                 if (subCategories && subCategories.length > 0) {
-                    divisionField.style.display = "block";
+                    // Check if this is the special segment (Music competition)
+                    if (segmentId == "69c61b22730d01d61681620f") {
+                        // Use checkboxes for multiple selection
+                        divisionSelectField.style.display = "none";
+                        divisionCheckboxField.style.display = "block";
 
-                    divisionSelect.innerHTML = ""; // clear existing options
+                        // Populate checkboxes
+                        const checkboxesContainer = document.getElementById("division-checkboxes");
+                        checkboxesContainer.innerHTML = "";
 
-                    subCategories.forEach(cat => {
-                        const option = document.createElement("option");
-                        option.value = cat;
-                        option.textContent = cat;
-                        divisionSelect.appendChild(option);
-                    });
+                        subCategories.forEach(cat => {
+                            const div = document.createElement("div");
+                            div.className = "control mb-2";
 
+                            const checkbox = document.createElement("input");
+                            checkbox.type = "checkbox";
+                            checkbox.value = cat;
+                            checkbox.id = `division-${cat.replace(/\s/g, '-')}`;
+                            checkbox.className = "division-checkbox";
+
+                            const label = document.createElement("label");
+                            label.htmlFor = checkbox.id;
+                            label.className = "checkbox ml-2";
+                            label.textContent = cat;
+
+                            div.appendChild(checkbox);
+                            div.appendChild(label);
+                            checkboxesContainer.appendChild(div);
+                        });
+
+                        // Add event listeners for checkboxes
+                        const allCheckboxes = document.querySelectorAll('#division-checkboxes .division-checkbox');
+                        const errorDiv = document.getElementById("division-checkbox-error");
+                        const hiddenInput = document.getElementById("division-hidden");
+
+                        function updateHiddenField() {
+                            const checked = document.querySelectorAll('#division-checkboxes .division-checkbox:checked');
+                            const selectedValues = Array.from(checked).map(cb => cb.value);
+                            hiddenInput.value = selectedValues.join(',');
+
+                            // Validate selection
+                            if (checked.length > 3) {
+                                errorDiv.textContent = "আপনি সর্বোচ্চ ৩টি বিষয় নির্বাচন করতে পারেন";
+                                errorDiv.style.display = "block";
+                                return false;
+                            } else if (checked.length === 0) {
+                                errorDiv.textContent = "অনুগ্রহ করে অন্তত একটি বিষয় নির্বাচন করুন";
+                                errorDiv.style.display = "block";
+                                return false;
+                            } else if (checked.length === 3) {
+                                errorDiv.style.display = "none";
+                                // Disable unchecked checkboxes
+                                allCheckboxes.forEach(cb => {
+                                    if (!cb.checked) {
+                                        cb.disabled = true;
+                                    }
+                                });
+                                return true;
+                            } else {
+                                errorDiv.style.display = "none";
+                                // Enable all checkboxes if less than 3 selected
+                                allCheckboxes.forEach(cb => {
+                                    cb.disabled = false;
+                                });
+                                return true;
+                            }
+                        }
+
+                        allCheckboxes.forEach(checkbox => {
+                            checkbox.addEventListener('change', updateHiddenField);
+                        });
+
+                        // Clear the select field
+                        divisionSelect.innerHTML = "";
+
+                    } else {
+                        // Use regular select dropdown
+                        divisionSelectField.style.display = "block";
+                        divisionCheckboxField.style.display = "none";
+
+                        divisionSelect.innerHTML = "";
+                        subCategories.forEach(cat => {
+                            const option = document.createElement("option");
+                            option.value = cat;
+                            option.textContent = cat;
+                            divisionSelect.appendChild(option);
+                        });
+
+                        // Clear hidden field
+                        document.getElementById("division-hidden").value = "";
+                    }
                 } else {
-                    divisionField.style.display = "none";
+                    divisionSelectField.style.display = "none";
+                    divisionCheckboxField.style.display = "none";
                 }
             });
 
@@ -393,6 +486,27 @@
             segmentSelect.dispatchEvent(new Event('change'));
         }
     });
+
+    // Add this to your existing JavaScript, before form submission
+    const form = document.getElementById('registration-form');
+    if (form) {
+        form.addEventListener('submit', function (e) {
+            const segmentId = document.getElementById('segment-select').value;
+            if (segmentId === "69c61b22730d01d61681620f") {
+                const checkedDivisions = document.querySelectorAll('#division-checkboxes .division-checkbox:checked');
+                if (checkedDivisions.length !== 3) {
+                    e.preventDefault();
+                    const errorDiv = document.getElementById("division-checkbox-error");
+                    errorDiv.textContent = "অনুগ্রহ করে ঠিক ৩টি বিষয় নির্বাচন করুন";
+                    errorDiv.style.display = "block";
+
+                    // Scroll to the error
+                    document.getElementById("division-checkbox").scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    return false;
+                }
+            }
+        });
+    }
 
 </script>
 {% endblock %}

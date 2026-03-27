@@ -986,6 +986,17 @@ def register():
             form.category.errors.append("Subject is required for this segment.")
             return render_template('register.html', form=form, segments=segments, preselected_segment_id=form.segment.data)
         
+        if str(segment['_id']) == "69c61b22730d01d61681620f":
+            # For the special segment, division.data will be comma-separated
+            divisions_list = [d.strip() for d in form.division.data.split(',') if d.strip()]
+            if len(divisions_list) != 3:
+                flash('Please select exactly 3 subjects for the music competition', 'error')
+                return render_template('register.html', form=form, segments=segments, preselected_segment_id=form.segment.data)
+            # Store as is (comma-separated string)
+            division_data = form.division.data
+        else:
+            division_data = form.division.data
+        
         # Conditional submission link validation
         if segment.get('type') == "Submission" and not form.submission_link.data:
             form.submission_link.errors.append("Submission link is required for this segment.")
@@ -993,6 +1004,7 @@ def register():
 
         if len(segment.get('sub_categories', [])) == 0:
             form.division.data = ''
+            division_data = ''
 
         # Create registration
         registration_data = {
@@ -1003,7 +1015,7 @@ def register():
             'institution': form.institution.data,
             'segment_id': ObjectId(form.segment.data),
             'segment_name': segment['name'],
-            'division_name': form.division.data,
+            'division_name': division_data,
             'category': form.category.data if segment.get('categories') else None,
             'submission_link': form.submission_link.data if segment.get('type') == "Submission" else None,
             'ca_ref': form.ca_ref.data,

@@ -269,15 +269,25 @@
         bkashLabel.innerHTML = `(Send Money ${segmentPrice} to +8801735643997)`
 
 
+
         if (!segmentId) return;
 
         const bkshDiv = document.getElementById("bksh");
         const trxDiv = document.getElementById("trx");
+        const receipt = document.getElementById("receipt-field");
         const packSegs = document.getElementById("pack-segs");
 
-        bkshDiv.style.display = "block"
-        trxDiv.style.display = "block"
 
+
+        if (segmentPrice == "৳0") {
+            bkshDiv.style.display = "none"
+            trxDiv.style.display = "none"
+            receipt.style.display = "none"
+        } else {
+            bkshDiv.style.display = "block"
+            trxDiv.style.display = "block"
+            receipt.style.display = "block"
+        }
 
         fetch(`/api/segments/${segmentId}/categories`)
             .then(res => res.json())

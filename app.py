@@ -544,7 +544,7 @@ def forgot_password():
             
             app.logger.info(f'Password reset link: {reset_link}')
             
-            flash("পাসওয়ার্ড রিসেট ইমেল পাঠানো হয়েছে। আপনার স্প্যাম ফোল্ডারটি পরীক্ষা করতে ভুলবেন না।", 'success')
+            flash("পাসওয়ার্ড রিসেট ইমেল পাঠানো হয়েছে।", 'success')
             return redirect(url_for('user_login'))
             
         except Exception as e:

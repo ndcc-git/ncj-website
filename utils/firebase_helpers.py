@@ -121,26 +121,6 @@ def firebase_send_password_reset(email):
         if response.status_code == 200:
             # Firebase sends the email automatically
             # The response contains the email that was sent to
-            email_sent_to = data.get('email')
-            
-            subject = "Password Reset Link for 10th NCJ"
-            body = f"""
-
-            We received a request to reset your password.
-
-            A password reset email has been sent to {email_sent_to}. 
-            Please check your inbox (and spam folder) for instructions.
-
-            If you did not request this, please ignore this email.
-
-            Regards,
-            Notre Dame Cultural Club
-
-            """
-            
-            # Send a confirmation email (optional - you can remove this if Firebase already sends one)
-            send_email(email, subject=subject, body=body, is_html=False)
-            
             return data.get('email')
         else:
             error_message = data.get('error', {}).get('message', 'Unknown error')

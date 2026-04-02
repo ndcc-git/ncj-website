@@ -551,7 +551,7 @@ def update_ca_status(ca_id):
                         {'_id': ObjectId(ca_id)},
                         {'$set': {'status': status, 'status_updated_at': datetime.utcnow()}}
                     )
-                    flash(f'verified reg of {ca['full_name']}', 'success')
+                    flash(f"verified reg of {ca['full_name']}", 'success')
                     return jsonify({'success': True})
     except Exception as e:
         print(e)

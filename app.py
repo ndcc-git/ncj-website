@@ -928,58 +928,70 @@ def register():
 
         
         receipt_url = None
+        segment = segments_collection.find_one({'_id': ObjectId(form.segment.data)})
         
-        if form.receipt.data:
-            file = form.receipt.data
-            
-            # Basic checks
-            if file.filename == '':
+        if segment.get('price') == 0:
+            receipt_url = ''
+        else:
+            if form.receipt.data:
+                file = form.receipt.data
+                
+                # Basic checks
+                if file.filename == '':
+                    flash('receipt screenshot is required', 'error')
+                    return render_template('register.html', form=form, segments=segments, preselected_segment_id=form.segment.data)
+                
+                # Check file extension
+                if not allowed_file(file.filename):
+                    flash('Only JPG, JPEG, and PNG files are allowed', 'error')
+                    return render_template('register.html', form=form, segments=segments, preselected_segment_id=form.segment.data)
+                
+                # Check file size (assuming MAX_FILE_SIZE is defined elsewhere)
+                file.seek(0, os.SEEK_END)
+                file_length = file.tell()
+                file.seek(0)
+                
+                if file_length > MAX_FILE_SIZE:
+                    flash(f'File size exceeds {MAX_FILE_SIZE // (1024*1024)}MB limit', 'error')
+                    return render_template('register.html', form=form, segments=segments, preselected_segment_id=form.segment.data)
+                
+                try:
+                    # Generate a unique ID for the image
+                    unique_id = uuid.uuid4().hex[:8]
+                    timestamp = datetime.utcnow().strftime('%Y%m%d_%H%M%S')
+                    public_id = f"{timestamp}_{unique_id}"
+                    
+                    # Upload directly to Cloudinary
+                    upload_result = cloudinary.uploader.upload(
+                        file,
+                        public_id=public_id,
+                        folder="receipt_pictures"
+                    )
+                    
+                    # Get the secure URL
+                    receipt_url = upload_result['secure_url']
+                    
+                except Exception as e:
+                    app.logger.error(f'Upload error: {str(e)}')
+                    flash('Error uploading file. Please try again.', 'error')
+                    return render_template('register.html', form=form, segments=segments, preselected_segment_id=form.segment.data)
+            else:
                 flash('receipt screenshot is required', 'error')
                 return render_template('register.html', form=form, segments=segments, preselected_segment_id=form.segment.data)
-            
-            # Check file extension
-            if not allowed_file(file.filename):
-                flash('Only JPG, JPEG, and PNG files are allowed', 'error')
-                return render_template('register.html', form=form, segments=segments, preselected_segment_id=form.segment.data)
-            
-            # Check file size (assuming MAX_FILE_SIZE is defined elsewhere)
-            file.seek(0, os.SEEK_END)
-            file_length = file.tell()
-            file.seek(0)
-            
-            if file_length > MAX_FILE_SIZE:
-                flash(f'File size exceeds {MAX_FILE_SIZE // (1024*1024)}MB limit', 'error')
-                return render_template('register.html', form=form, segments=segments, preselected_segment_id=form.segment.data)
-            
-            try:
-                # Generate a unique ID for the image
-                unique_id = uuid.uuid4().hex[:8]
-                timestamp = datetime.utcnow().strftime('%Y%m%d_%H%M%S')
-                public_id = f"{timestamp}_{unique_id}"
-                
-                # Upload directly to Cloudinary
-                upload_result = cloudinary.uploader.upload(
-                    file,
-                    public_id=public_id,
-                    folder="receipt_pictures"
-                )
-                
-                # Get the secure URL
-                receipt_url = upload_result['secure_url']
-                
-            except Exception as e:
-                app.logger.error(f'Upload error: {str(e)}')
-                flash('Error uploading file. Please try again.', 'error')
-                return render_template('register.html', form=form, segments=segments, preselected_segment_id=form.segment.data)
-        else:
-            flash('receipt screenshot is required', 'error')
-            return render_template('register.html', form=form, segments=segments, preselected_segment_id=form.segment.data)
         
-        segment = segments_collection.find_one({'_id': ObjectId(form.segment.data)})
+        
 
         # Conditional category validation
         if segment.get('categories') and not form.category.data:
             form.category.errors.append("Category is required for this segment.")
+            return render_template('register.html', form=form, segments=segments, preselected_segment_id=form.segment.data)
+        
+        if segment.get('price') > 0 and not form.bkash_number.data:
+            form.category.errors.append("Bkash Number is required for this segment.")
+            return render_template('register.html', form=form, segments=segments, preselected_segment_id=form.segment.data)
+        
+        if segment.get('price') > 0 and not form.transaction_id.data:
+            form.category.errors.append("Transaction id is required for this segment.")
             return render_template('register.html', form=form, segments=segments, preselected_segment_id=form.segment.data)
         
         if segment.get('sub_categories') and not form.division.data:

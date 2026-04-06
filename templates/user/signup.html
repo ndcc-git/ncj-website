@@ -92,25 +92,8 @@
                         </div>
                     </div>
 
-                    <!-- Address -->
-                    <div class="column is-12">
-                        <div class="field">
-                            <label class="label"><i class="fas fa-map-marker-alt"></i> ঠিকানা *</label>
-                            <div class="control">
-                                {{ form.address(class="input", type="text", placeholder="আপনার সম্পূর্ণ ঠিকানা", id="address", required=true) }}
-                            </div>
-                            {% if form.address.errors %}
-                                <div class="errors" style="color: #ff3860; font-size: 0.85rem; margin-top: 0.25rem;">
-                                    {% for error in form.address.errors %}
-                                        <span>{{ error }}</span>
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
-                        </div>
-                    </div>
-
                     <!-- Email -->
-                    <div class="column is-6">
+                    <div class="column is-12">
                         <div class="field">
                             <label class="label"><i class="fas fa-envelope"></i> ইমেইল *</label>
                             <div class="control">
@@ -119,24 +102,6 @@
                             {% if form.email.errors %}
                                 <div class="errors" style="color: #ff3860; font-size: 0.85rem; margin-top: 0.25rem;">
                                     {% for error in form.email.errors %}
-                                        <span>{{ error }}</span>
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
-                        </div>
-                    </div>
-
-                    <!-- Facebook Link -->
-                    <div class="column is-6">
-                        <div class="field">
-                            <label class="label"><i class="fab fa-facebook"></i> ফেসবুক প্রোফাইল *</label>
-                            <div class="control">
-                                {{ form.facebook_link(class="input", type="url", placeholder="https://facebook.com/yourprofile", id="facebook") }}
-                            </div>
-                            <!-- <small style="color: #666; font-size: 0.8rem;">ঐচ্ছিক</small> -->
-                            {% if form.facebook_link.errors %}
-                                <div class="errors" style="color: #ff3860; font-size: 0.85rem; margin-top: 0.25rem;">
-                                    {% for error in form.facebook_link.errors %}
                                         <span>{{ error }}</span>
                                     {% endfor %}
                                 </div>

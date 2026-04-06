@@ -184,7 +184,7 @@ class UserSignupForm(FlaskForm):
     ])
     
     address = StringField('Address', validators=[
-        DataRequired(),
+        Optional(),
         Length(min=5, max=200)
     ])
     
@@ -221,7 +221,7 @@ class UserSignupForm(FlaskForm):
     ], validators=[DataRequired()])
     
     facebook_link = StringField('Facebook Profile Link (Required)', validators=[
-        DataRequired(),
+        Optional(),
         URL(),
         Length(max=200)
     ])

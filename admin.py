@@ -202,7 +202,7 @@ def admin_dashboard():
     total_bob_registrations = db.bob_registrations.count_documents({})
     verified_registrations = db.registrations.count_documents({'verified': True})
     ca_registrations = db.ca_registrations.count_documents({})
-    bob_tickets = db.bob_tickets.count_documents({})
+    bob_tickets = db.bob_ticket.count_documents({})
     
     # total_money = 0
     # regs = db.registrations.find({})

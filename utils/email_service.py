@@ -49,6 +49,8 @@ def send_reg_verification_email(registration):
     qr.save(buffer, format="PNG")
     buffer.seek(0)
     
+    div_text = f"({registration['division_name']})" if registration.get('division_name') else ""
+    
     subject = "১০ম  ন্যাশনাল কালচারাল জুবিলেশন-এ রেজিস্ট্রেশনের জন্য ধন্যবাদ"
     body = f"""
     <!DOCTYPE html>
@@ -91,7 +93,7 @@ def send_reg_verification_email(registration):
             <p>প্রিয় <strong>{registration['full_name']}</strong>,</p>
 
             <p>
-                <strong>{registration['segment_name']}</strong> ইভেন্টে আপনার রেজিস্ট্রেশন সফল হয়েছে।
+                <strong>{registration['segment_name']} {div_text} </strong> ইভেন্টে আপনার রেজিস্ট্রেশন সফল হয়েছে।
                 অনুষ্ঠান দিনে নটর ডেম কলেজ, ঢাকা ক্যাম্পাসে প্রবেশের সময়
                 এই ইমেইলটি প্রদর্শন করবেন।
                 আপনার কোড নিচে দেওয়া হলো:
@@ -159,6 +161,8 @@ def send_bulk_emails(recipients, subject=None):
         buffer = BytesIO()
         qr.save(buffer, format="PNG")
         buffer.seek(0)
+        
+        div_text = f"({recipient['division_name']})" if recipient.get('division_name') else ""
         email_subject = "১০ম  ন্যাশনাল কালচারাল জুবিলেশন-এ রেজিস্ট্রেশনের জন্য ধন্যবাদ"
         email_body = f"""
         <!DOCTYPE html>
@@ -201,7 +205,7 @@ def send_bulk_emails(recipients, subject=None):
                 <p>প্রিয় <strong>{recipient.get('full_name', 'Participant')}</strong>,</p>
 
                 <p>
-                    <strong>{recipient['segment_name']}</strong> ইভেন্টে আপনার রেজিস্ট্রেশন সফল হয়েছে।
+                    <strong>{recipient['segment_name']} {div_text}</strong> ইভেন্টে আপনার রেজিস্ট্রেশন সফল হয়েছে।
                     অনুষ্ঠান দিনে নটর ডেম কলেজ, ঢাকা ক্যাম্পাসে প্রবেশের সময়
                     এই ইমেইলটি প্রদর্শন করবেন।
                     আপনার কোড নিচে দেওয়া হলো:

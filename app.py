@@ -10,7 +10,7 @@ from pymongo import MongoClient
 from datetime import datetime, timedelta
 from bson.objectid import ObjectId
 from config import Config
-from forms import ChangePasswordForm, ForgotPasswordForm, ProfileUpdateForm, RegistrationForm, CARegistrationForm, ContactForm, UserLoginForm, UserSignupForm
+from forms import BobTicketForm, ChangePasswordForm, ForgotPasswordForm, ProfileUpdateForm, RegistrationForm, CARegistrationForm, ContactForm, UserLoginForm, UserSignupForm
 from utils.security import hash_password, generate_csrf_token
 import extensions
 from firebase_config import initialize_firebase
@@ -235,15 +235,13 @@ def init_db():
     """Initialize database with sample data if empty"""
     
     if db.settings.count_documents({'name': 'system_settings'}) == 0:
-        system_settings = {
+        db.settings.insert_one({
             'name': 'system_settings',
             'registration_enabled': True,
             'ca_registration_enabled': True,
-            'contact_form_enabled': True,
-            'created_at': datetime.utcnow(),
-            'updated_at': datetime.utcnow()
-        }
-        db.settings.insert_one(system_settings)
+            'bob_registration_enabled': True,
+            'created_at': datetime.utcnow()
+        })
 
     # Create admin user if not exists
     if users_collection.count_documents({'role': 'admin'}) == 0:
@@ -314,6 +312,12 @@ def init_db():
                 collection.create_index(index_spec[0], **index_spec[1] if len(index_spec) > 1 else {})
             except:
                 pass
+    # In your init_db function
+    db.bob_ticket.create_index([('user_id', 1)])
+    db.bob_ticket.create_index([('email', 1)])
+    db.bob_ticket.create_index([('transaction_id', 1)], unique=True)
+    db.bob_ticket.create_index([('purchase_date', -1)])
+    db.bob_ticket.create_index([('verified', 1)])
 
     users_collection.create_index([('email', 1)], unique=True)
     users_collection.create_index([('role', 1)])
@@ -874,6 +878,59 @@ def ca_registration_success(ca_id):
         return redirect(url_for('index'))
     
     return render_template('ca_success.html', ca_registration=ca_registration)
+
+@app.route('/bob-ticket', methods=['GET', 'POST'])
+def bob_ticket():
+    
+    # Check if BoB ticket registration is enabled
+    settings = db.settings.find_one({'name': 'system_settings'})
+    if not settings or not settings.get('bob_registration_enabled', True):
+        flash('Ticket purchase is currently closed.', 'error')
+        return redirect(url_for('index'))
+    
+    form = BobTicketForm()
+    
+    if form.validate_on_submit():
+        # Check for duplicate transaction ID
+        existing = db.bob_ticket.find_one({'transaction_id': form.transaction_id.data})
+        if existing:
+            flash('This transaction ID has already been used.', 'error')
+            return redirect(url_for('bob_ticket'))
+        
+        # Create ticket purchase record
+        ticket_data = {
+            'name': form.name.data,
+            'email': form.email.data,
+            'institution': form.institution.data,
+            'class': form.class_level.data,
+            'bkash_number': form.bkash_number.data,
+            'transaction_id': form.transaction_id.data,
+            'purchase_date': datetime.utcnow(),
+            'ip_address': request.remote_addr,
+            'user_agent': request.user_agent.string,
+            'verified': False  # Admin will verify payment
+        }
+        
+        result = db.bob_ticket.insert_one(ticket_data)
+        
+        flash('Ticket purchased successfully! Check your email for confirmation.', 'success')
+        return redirect(url_for('bob_ticket_success', ticket_id=str(result.inserted_id)))
+    
+    return render_template('bob_ticket.html', form=form)
+
+@app.route('/bob-ticket-success/<ticket_id>')
+def bob_ticket_success(ticket_id):
+    
+    ticket = db.bob_ticket.find_one({
+        '_id': ObjectId(ticket_id),
+    })
+    
+    if not ticket:
+        flash('Ticket not found', 'error')
+        return redirect(url_for('index'))
+    
+    return render_template('bob_ticket_success.html', ticket=ticket)
+
 
 @app.route('/register', methods=['GET', 'POST'])
 @login_required

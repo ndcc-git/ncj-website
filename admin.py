@@ -202,6 +202,19 @@ def admin_dashboard():
     total_bob_registrations = db.bob_registrations.count_documents({})
     verified_registrations = db.registrations.count_documents({'verified': True})
     ca_registrations = db.ca_registrations.count_documents({})
+    bob_tickets = db.bob_tickets.count_documents({})
+    
+    # total_money = 0
+    # regs = db.registrations.find({})
+    # ## iterate over regs and sum up the money using object_id of each reg segment_id to get the segment and then get the price of that segment and sum it up
+    # for reg in regs:
+    #     segment_id = reg.get('segment_id')
+    #     if segment_id:
+    #         segment = db.segments.find_one({'_id': segment_id})
+    #         if segment and 'price' in segment:
+    #             total_money += segment['price']
+                
+    # print(total_money)
     
     # Get contact message statistics
     contact_messages_count = db.contact_messages.count_documents({})
@@ -224,7 +237,8 @@ def admin_dashboard():
                          recent_registrations=recent_registrations,
                          segments=segments,
                          ca_registrations=ca_registrations,
-                         total_bob_registrations=total_bob_registrations)
+                         total_bob_registrations=total_bob_registrations,
+                         bob_tickets=bob_tickets)
 
 
 @admin_bp.route('/analytics')

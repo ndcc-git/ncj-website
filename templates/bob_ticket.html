@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block title %}Battle of the Bands Ticket Purchase{% endblock %}
+
+{% block content %}
+<!-- ========================================
+       PAGE HEADER
+       ======================================== -->
+<section class="section" style="padding-top: 4rem;">
+    <div class="container">
+        <h1 class="section-title">ব্যাটল অব দ্য ব্যান্ডস টিকেট</h1>
+    </div>
+</section>
+
+<!-- ========================================
+       TICKET PURCHASE FORM
+       ======================================== -->
+<section class="section">
+    <div class="container">
+        <div class="columns is-centered">
+            <div class="column is-8">
+
+                <div class="box animate-on-scroll"
+                    style="background-color: rgba(252, 251, 229, 0.7); backdrop-filter: blur(10px); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1); border: 2px solid var(--text-primary); border-radius: var(--border-radius); padding: 3rem;">
+                    <h2 class="title is-3 has-text-centered" style="margin-bottom: 2rem;">Ticket Purchase Form
+                    </h2>
+
+                    <form id="bob-ticket-form" method="POST" action="{{ url_for('bob_ticket') }}">
+                        {{ form.hidden_tag() }}
+
+                        <!-- Full Name -->
+                        <div class="field">
+                            <label class="label">Full Name *</label>
+                            <div class="control">
+                                {{ form.name(class="input", id="name", placeholder="Enter your full name", required=True) }}
+                            </div>
+                            {% for error in form.name.errors %}
+                            <p class="help is-danger">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Email -->
+                        <div class="field">
+                            <label class="label">Email *</label>
+                            <div class="control">
+                                {{ form.email(class="input", type="email", id="email", placeholder="your@email.com", required=True) }}
+                            </div>
+                            {% for error in form.email.errors %}
+                            <p class="help is-danger">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Institution -->
+                        <div class="field">
+                            <label class="label">Institution *</label>
+                            <div class="control">
+                                {{ form.institution(class="input", id="institution", placeholder="School/College", required=True) }}
+                            </div>
+                            {% for error in form.institution.errors %}
+                            <p class="help is-danger">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Class -->
+                        <div class="field">
+                            <label class="label">Class *</label>
+                            <div class="control">
+                                {{ form.class_level(class="input", id="class", placeholder="e.g., 12, 11", required=True) }}
+                            </div>
+                            {% for error in form.class_level.errors %}
+                            <p class="help is-danger">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Bkash Number -->
+                        <div class="field">
+                            <label class="label">Bkash Number *
+                                <span id="bkash_label" class="has-text-danger">(Send Money 200৳ to +8801735643997)</span>
+                            </label>
+                            <div class="control">
+                                {{ form.bkash_number(class="input", id="bkash-number", placeholder="01XXXXXXXXX", required=True) }}
+                            </div>
+                            {% for error in form.bkash_number.errors %}
+                            <p class="help is-danger">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Transaction ID -->
+                        <div class="field">
+                            <label class="label">Transaction ID *</label>
+                            <div class="control">
+                                {{ form.transaction_id(class="input", id="transaction-id", placeholder="Enter your Bkash transaction ID", required=True) }}
+                            </div>
+                            {% for error in form.transaction_id.errors %}
+                            <p class="help is-danger">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="field">
+                            <div class="control">
+                                <button type="submit" class="button is-primary is-fullwidth is-large">
+                                    Purchase Ticket
+                                </button>
+                            </div>
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

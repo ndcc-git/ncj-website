@@ -329,3 +329,39 @@ class ChangePasswordForm(FlaskForm):
     ])
     
     submit = SubmitField('Change Password')
+    
+    
+class BobTicketForm(FlaskForm):
+    """Ticket purchase form for Battle of the Bands"""
+    name = StringField('Full Name', validators=[
+        DataRequired(),
+        Length(min=2, max=100)
+    ])
+    
+    email = StringField('Email', validators=[
+        DataRequired(),
+        Email(),
+        Length(max=100)
+    ])
+    
+    institution = StringField('Institution', validators=[
+        DataRequired(),
+        Length(min=2, max=200)
+    ])
+    
+    class_level = StringField('Class', validators=[
+        DataRequired(),
+        Length(min=1, max=50)
+    ])
+    
+    bkash_number = StringField('Bkash Number', validators=[
+        DataRequired(),
+        Regexp(r'^01[3-9]\d{8}$', message='Enter a valid Bangladesh mobile number')
+    ])
+    
+    transaction_id = StringField('Transaction ID', validators=[
+        DataRequired(),
+        Length(min=5, max=50)
+    ])
+    
+    submit = SubmitField('Purchase Ticket')

@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block title %}Ticket Purchase Successful{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        <div class="has-text-centered" style="margin-bottom: 2rem;">
+            <h1 class="title is-1">Ticket Purchase Successful!</h1>
+            <p class="subtitle is-4">Thank you, <strong>{{ ticket.name }}</strong></p>
+            <div class="registration-id-badge">Ticket ID: {{ ticket._id }}</div>
+        </div>
+
+        <div class="columns is-centered">
+            <div class="column is-8">
+                <div class="receipt-card">
+                    <div class="receipt-header">
+                        <i class="fas fa-ticket-alt" style="font-size: 1.5rem; color: var(--secondary-accent);"></i>
+                        <h3>BoB Ticket Receipt</h3>
+                    </div>
+
+                    <div class="receipt-row">
+                        <span class="receipt-label">Name:</span>
+                        <span class="receipt-value">{{ ticket.name }}</span>
+                    </div>
+                    <div class="receipt-row">
+                        <span class="receipt-label">Email:</span>
+                        <span class="receipt-value">{{ ticket.email }}</span>
+                    </div>
+                    <div class="receipt-row">
+                        <span class="receipt-label">Institution:</span>
+                        <span class="receipt-value">{{ ticket.institution }}</span>
+                    </div>
+                    <div class="receipt-row">
+                        <span class="receipt-label">Class:</span>
+                        <span class="receipt-value">{{ ticket.class }}</span>
+                    </div>
+                    <div class="receipt-row">
+                        <span class="receipt-label">Bkash Number:</span>
+                        <span class="receipt-value">{{ ticket.bkash_number }}</span>
+                    </div>
+                    <div class="receipt-row">
+                        <span class="receipt-label">Transaction ID:</span>
+                        <span class="receipt-value">{{ ticket.transaction_id }}</span>
+                    </div>
+                    <div class="receipt-row">
+                        <span class="receipt-label">Purchase Date:</span>
+                        <span class="receipt-value">{{ ticket.purchase_date.strftime('%Y-%m-%d %H:%M:%S') }}</span>
+                    </div>
+
+                    <div class="receipt-status-box">
+                        <div class="receipt-status-icon">⏳</div>
+                        <div class="receipt-status-text">Status: Pending Verification</div>
+                        <div class="receipt-status-helper">
+                            Your ticket is pending verification. You will receive an email once verified.
+                            Please keep this receipt for entry.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
+
+{% block styles %}
+
+{% endblock %}

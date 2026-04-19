@@ -882,12 +882,6 @@ def ca_registration_success(ca_id):
 @app.route('/bob-ticket', methods=['GET', 'POST'])
 def bob_ticket():
     
-    # Check if BoB ticket registration is enabled
-    settings = db.settings.find_one({'name': 'system_settings'})
-    if not settings or not settings.get('bob_registration_enabled', True):
-        flash('Ticket purchase is currently closed.', 'error')
-        return redirect(url_for('index'))
-    
     form = BobTicketForm()
     
     if form.validate_on_submit():

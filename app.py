@@ -946,7 +946,9 @@ def register():
     segments = list(
         segments_collection.find(
             {'_id': {'$nin': [
-                ObjectId('6996cf26e7eb96d29e2010c6')
+                ObjectId('6996cf26e7eb96d29e2010c6'),
+                ObjectId('6996cf26e7eb96d29e2010c8'),
+                ObjectId('6996cf26e7eb96d29e2010cc')
             ]}},
             {'_id': 1, 'name': 1, 'price': 1, 'categories': 1}
         ))
